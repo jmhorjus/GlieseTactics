@@ -1,0 +1,24 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GlieseTactics", "GlieseTactics\GlieseTacticsCode\GlieseTactics.csproj", "{CF28EBAB-DB4E-447A-8092-7AC095407270}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GlieseTacticsContent", "GlieseTactics\GlieseTacticsContent\GlieseTacticsContent.contentproj", "{303F3890-5E58-4A63-9E13-7B7BE7698261}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x86 = Debug|x86
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{CF28EBAB-DB4E-447A-8092-7AC095407270}.Debug|x86.ActiveCfg = Debug|x86
+		{CF28EBAB-DB4E-447A-8092-7AC095407270}.Debug|x86.Build.0 = Debug|x86
+		{CF28EBAB-DB4E-447A-8092-7AC095407270}.Release|x86.ActiveCfg = Release|x86
+		{CF28EBAB-DB4E-447A-8092-7AC095407270}.Release|x86.Build.0 = Release|x86
+		{303F3890-5E58-4A63-9E13-7B7BE7698261}.Debug|x86.ActiveCfg = Debug|x86
+		{303F3890-5E58-4A63-9E13-7B7BE7698261}.Release|x86.ActiveCfg = Release|x86
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
