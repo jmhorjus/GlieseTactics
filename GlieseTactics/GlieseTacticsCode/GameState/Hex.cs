@@ -347,7 +347,8 @@ namespace Gliese581g
                 this.IsHighlighted &&
                 m_map.SelectedHex.Unit != null)
             {
-                ApplyDamageTemplate(m_map.SelectedHex.Unit, new DoubleHighlightEffect(m_map));
+                HexEffectStats stats = ApplyDamageTemplate(m_map.SelectedHex.Unit, new DoubleHighlightEffect(m_map, m_map.SelectedHex.Unit));
+                m_map.ExpectedAttackStats = stats;
                 m_currentlyOriginOfDoubleHighlightArea = true;
             }
         }
@@ -400,13 +401,13 @@ namespace Gliese581g
         }
 
 
-        public void ApplyDamageTemplate(Unit attackingUnit, HexEffect effect)
+        public HexEffectStats ApplyDamageTemplate(Unit attackingUnit, HexEffect effect)
         {
             if (attackingUnit == null)
                 throw new Exception("invalid unit!");
             // Apply the attack to this hex, using the proper template and effect. 
             Hex attackOrigin = (TemplateOriginHex == null) ? this : TemplateOriginHex;
-            attackingUnit.AttackTemplate.OnApply(
+            return attackingUnit.AttackTemplate.OnApply(
                 m_map,
                 new MapLocation(attackOrigin.m_mapPosition, attackingUnit.FacingDirection),
                 effect);

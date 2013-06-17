@@ -173,7 +173,7 @@
     <None Include="Resources\Image1.png" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Gliese581gContent\GlieseTacticsContent.contentproj">
+    <ProjectReference Include="..\GlieseTacticsContent\GlieseTacticsContent.contentproj">
       <Name>GlieseTacticsContent %28Content%29</Name>
       <XnaReferenceType>Content</XnaReferenceType>
       <Project>{303F3890-5E58-4A63-9E13-7B7BE7698261}</Project>

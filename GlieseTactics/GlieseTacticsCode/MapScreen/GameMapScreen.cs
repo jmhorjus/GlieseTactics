@@ -124,6 +124,8 @@ namespace Gliese581g
         UnitStatsDisplayPanel m_unitDisplay;
         PlayerDisplaySocket m_player1Display;
         PlayerDisplaySocket m_player2Display;
+        TextLabel m_damagePreviewLabel;
+        TextLabel m_killsPreviewLabel;
 
         //TextLabel m_gameOverLabel;
 
@@ -327,6 +329,19 @@ namespace Gliese581g
             //else
             //    m_unitDisplay.UnitToDisplay = null;
 
+            
+            // Are there stats we should display for the current attack?
+            if (m_map.ExpectedAttackStats.IsZero())
+            {
+                m_damagePreviewLabel.Text = "";
+                m_killsPreviewLabel.Text = "";
+            }
+            else
+            {
+                m_damagePreviewLabel.Text = "Damage: " + m_map.ExpectedAttackStats.Damage;
+                m_killsPreviewLabel.Text = "Kills:" + m_map.ExpectedAttackStats.Kills;
+            }
+
 
             // Screen size used for scroll/zoom mouse triggers.  
             Vector2 screenSize = new Vector2(GetMainApp().GraphicsDevice.Viewport.Width, GetMainApp().GraphicsDevice.Viewport.Height);
@@ -466,12 +481,20 @@ namespace Gliese581g
             //Load the cursor sprite
             m_defaultMouseCursor = Cursor.LoadDefaultCursor();
             m_moveCursor = Cursor.LoadMoveCursor();
-            
             m_targetCursor = Cursor.LoadTargetCursor();
-            //m_targetCursor.ToolTip = new TextLabel("DAMAGE!!", m_defaultFont, Vector2.Zero, Color.Black, true);
-
             m_rechargeCursor = Cursor.LoadRechargeCursor();
             ActiveMouseCursor = m_defaultMouseCursor;
+
+            m_damagePreviewLabel = new TextLabel("", m_defaultFont, Vector2.Zero, Color.Red, true);
+            m_damagePreviewLabel.Offset = new Vector2(0, 
+                (m_targetCursor.Texture.Height / -2) + (m_defaultFont.MeasureString("D").Y / 2)*0);
+            m_targetCursor.TextLabels.Add(m_damagePreviewLabel);
+
+            m_killsPreviewLabel = new TextLabel("", m_defaultFont, Vector2.Zero, Color.Red, true);
+            m_killsPreviewLabel.Offset = new Vector2(0, 
+                (m_targetCursor.Texture.Height / 2) + (m_defaultFont.MeasureString("D").Y / 2)*0);
+            m_targetCursor.TextLabels.Add(m_killsPreviewLabel);
+            
 
             //-----------------
 

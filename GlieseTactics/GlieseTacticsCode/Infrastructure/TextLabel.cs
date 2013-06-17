@@ -16,6 +16,7 @@ namespace Gliese581g
         public string Text;
         public SpriteFont Font;
         public Vector2 Position;
+        public Vector2 Offset = Vector2.Zero;
         public Color Tint;
         public bool Visible = true;
 
@@ -39,7 +40,7 @@ namespace Gliese581g
             if (!Visible)
                 return;
 
-            Vector2 pos = Position;
+            Vector2 pos = Position + Offset;
             if(m_centerOnPosition)
                 pos -= Font.MeasureString(Text) / 2;
             spriteBatch.DrawString(Font, Text, pos, Tint);

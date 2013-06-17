@@ -10,8 +10,8 @@ namespace Gliese581g
     public abstract class MapTemplate
     {
         protected static Hex nullOutputDestination = null;
-        public abstract void OnApply(Map map, MapLocation location, HexEffect effect, out Hex onlyOneHex);
-        public abstract void OnApply(Map map, MapLocation location, HexEffect effect);
+        public abstract HexEffectStats OnApply(Map map, MapLocation location, HexEffect effect, out Hex onlyOneHex);
+        public abstract HexEffectStats OnApply(Map map, MapLocation location, HexEffect effect);
     }
 
 
@@ -30,13 +30,14 @@ namespace Gliese581g
             m_includeSourceHex = includeSourceHex;
         }
 
-        public override void OnApply(Map map, MapLocation location, HexEffect effect)
+        public override HexEffectStats OnApply(Map map, MapLocation location, HexEffect effect)
         {
-            OnApply(map, location, effect, out nullOutputDestination);
+            return OnApply(map, location, effect, out nullOutputDestination);
         }
 
-        public override void OnApply(Map map, MapLocation location, HexEffect effect, out Hex onlyOneHex)
+        public override HexEffectStats OnApply(Map map, MapLocation location, HexEffect effect, out Hex onlyOneHex)
         {
+            HexEffectStats retVal = new HexEffectStats();
             onlyOneHex = null;
             bool isFirstHex = true;
             for (int ii = 0; ii < m_length; ii++)
@@ -59,7 +60,7 @@ namespace Gliese581g
                     onlyOneHex = hex;
                     
                 // Apply the effect.
-                effect.ApplyToHex(hex);
+                retVal += effect.ApplyToHex(hex);
                 isFirstHex = false;
 
                 if (doneAfterThisHex)
@@ -67,6 +68,7 @@ namespace Gliese581g
                 // Move to the next hex in the line.
                 location.StepForward();
             }
+            return retVal;
         }
 
     }
@@ -99,14 +101,15 @@ namespace Gliese581g
             m_unitWhoseAlliesDontBlockMovement = unitWhoseAlliesDontBlockMovement;
         }
 
-        public override void OnApply(Map map, MapLocation location, HexEffect effect)
+        public override HexEffectStats OnApply(Map map, MapLocation location, HexEffect effect)
         {
-            OnApply(map, location, effect, out nullOutputDestination);
+            return OnApply(map, location, effect, out nullOutputDestination);
         }
 
         // The public OnApply
-        public override void OnApply(Map map, MapLocation location, HexEffect effect, out Hex onlyOneHex)
+        public override HexEffectStats OnApply(Map map, MapLocation location, HexEffect effect, out Hex onlyOneHex)
         {
+            HexEffectStats retVal = new HexEffectStats();
             // Ranged template never only one hex
             onlyOneHex = null;
 
@@ -116,8 +119,9 @@ namespace Gliese581g
                 effect,
                 location.Location, location.Location,
                 m_range, m_range,
-                (m_unitWhoseAlliesDontBlockMovement != null) ? m_unitWhoseAlliesDontBlockMovement.Owner : null);
-
+                (m_unitWhoseAlliesDontBlockMovement != null) ? m_unitWhoseAlliesDontBlockMovement.Owner : null,
+                ref retVal);
+            return retVal;
         }
  
         // This one is private and is called recursively. 
@@ -128,7 +132,8 @@ namespace Gliese581g
             Point pos,
             int totalRange,
             int rangeRemaining,
-            Player friendlyPlayer // the units of this player are friendly and can be moved through.
+            Player friendlyPlayer, // the units of this player are friendly and can be moved through.
+            ref HexEffectStats stats
             )
         {
             Hex hex = map.GetHex(pos);
@@ -143,7 +148,7 @@ namespace Gliese581g
             {
                 if (!hex.IsMarked && (pos != startingPos || m_includeSourceHex))
                 {
-                    effect.ApplyToHex(hex);
+                    stats += effect.ApplyToHex(hex);
                     map.MarkHex(hex);
                     hex.CurrentMoveCost = totalRange - rangeRemaining;
                 }
@@ -159,17 +164,17 @@ namespace Gliese581g
             {
                 // Recurse in each of the six directions.  
                 RecursiveApply(map, effect, startingPos, new Point(pos.X + 1, pos.Y), totalRange, rangeRemaining - 1,
-                    friendlyPlayer);
+                    friendlyPlayer, ref stats);
                 RecursiveApply(map, effect, startingPos, new Point(pos.X - 1, pos.Y), totalRange, rangeRemaining - 1,
-                    friendlyPlayer);
+                    friendlyPlayer, ref stats);
                 RecursiveApply(map, effect, startingPos, new Point(pos.X + (pos.Y % 2), pos.Y + 1), totalRange, rangeRemaining - 1,
-                    friendlyPlayer);
+                    friendlyPlayer, ref stats);
                 RecursiveApply(map, effect, startingPos, new Point(pos.X - 1 + (pos.Y % 2), pos.Y + 1), totalRange, rangeRemaining - 1,
-                    friendlyPlayer);
+                    friendlyPlayer, ref stats);
                 RecursiveApply(map, effect, startingPos, new Point(pos.X - 1 + (pos.Y % 2), pos.Y - 1), totalRange, rangeRemaining - 1,
-                    friendlyPlayer);
+                    friendlyPlayer, ref stats);
                 RecursiveApply(map, effect, startingPos, new Point(pos.X + (pos.Y % 2), pos.Y - 1), totalRange, rangeRemaining - 1,
-                    friendlyPlayer);
+                    friendlyPlayer, ref stats);
             }
             return;
         }

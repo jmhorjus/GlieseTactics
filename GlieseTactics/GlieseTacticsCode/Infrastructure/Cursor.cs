@@ -15,8 +15,9 @@ namespace Gliese581g
         public Vector2 MousePointInTexture;
         public Color Tint;
         public float Rotation = 0f;
-        public TextLabel ToolTip = null;
-        public Vector2 ToolTipOffset = Vector2.Zero;
+
+        public List<TextLabel> TextLabels = new List<TextLabel>();
+
 
         public Cursor(Texture2D texture, Vector2 mousePointInTexture, Color tint)
         {
@@ -32,10 +33,10 @@ namespace Gliese581g
                 Rotation, MousePointInTexture, 
                 1f, SpriteEffects.None, 0f);
 
-            if (ToolTip != null)
+            for (int ii = 0; ii < TextLabels.Count; ii++)
             {
-                ToolTip.Position = mouseLocation + ToolTipOffset;
-                ToolTip.Draw(spriteBatchMouse, time); 
+                TextLabels[ii].Position = mouseLocation;
+                TextLabels[ii].Draw(spriteBatchMouse, time);
             }
         }
 

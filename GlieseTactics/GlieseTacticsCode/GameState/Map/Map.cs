@@ -68,6 +68,10 @@ namespace Gliese581g
             }
         }
 
+
+        // Stats for displaying in the GUI.
+        public HexEffectStats ExpectedAttackStats = new HexEffectStats();
+
         /// First Layer of highlighting - user for move and attack ranges.
         List<Hex> m_highlightedHexes = new List<Hex>();
         public void HighlightHex(Hex hex)
@@ -94,6 +98,7 @@ namespace Gliese581g
             foreach (Hex hex in m_doubleHighlightedHexes)
                 hex.IsDoubleHighlighted = false;
             m_doubleHighlightedHexes.Clear();
+            ExpectedAttackStats.Clear();
         }
 
 
