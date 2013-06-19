@@ -340,6 +340,9 @@ namespace Gliese581g
             {
                 m_damagePreviewLabel.Text = "Damage: " + m_map.ExpectedAttackStats.Damage;
                 m_killsPreviewLabel.Text = "Kills:" + m_map.ExpectedAttackStats.Kills;
+
+                if (m_map.ExpectedAttackStats.FriendlyDamage > 0)
+                    m_killsPreviewLabel.Text += "\n<WARNING: FRIENDLY FIRE>";
             }
 
 
@@ -489,12 +492,13 @@ namespace Gliese581g
             m_damagePreviewLabel.Offset = new Vector2(0, 
                 (m_targetCursor.Texture.Height / -2) + (m_defaultFont.MeasureString("D").Y / 2)*0);
             m_targetCursor.TextLabels.Add(m_damagePreviewLabel);
+            m_moveCursor.TextLabels.Add(m_damagePreviewLabel);
 
             m_killsPreviewLabel = new TextLabel("", m_defaultFont, Vector2.Zero, Color.Red, true);
             m_killsPreviewLabel.Offset = new Vector2(0, 
                 (m_targetCursor.Texture.Height / 2) + (m_defaultFont.MeasureString("D").Y / 2)*0);
             m_targetCursor.TextLabels.Add(m_killsPreviewLabel);
-            
+            m_moveCursor.TextLabels.Add(m_killsPreviewLabel);
 
             //-----------------
 

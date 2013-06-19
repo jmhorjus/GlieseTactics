@@ -77,6 +77,10 @@ namespace Gliese581g
         {
             return dir.m_value;
         }
+        public static explicit operator Direction.ValueType(Direction dir)
+        {
+            return dir.Value;
+        }
 
         // These two must be overridden if you defind == and != operators. 
         public override bool Equals(object obj)

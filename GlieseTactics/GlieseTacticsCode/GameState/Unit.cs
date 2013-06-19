@@ -55,8 +55,8 @@ namespace Gliese581g
                     UnitType.Infantry,
                     "Infantry Battalion " + infantry_id++, //name
                     TextureStore.Get(TexId.unit_infantry), //texture
-                    new RangeTemplate(4, false, false, true),  //move
-                    new RangeTemplate(1, true, true, false), //target template
+                    new RangeTemplate(4, false, false, true, null, true),  //move
+                    new RangeTemplate(1, true, true, false, null, true), //target template
                     new LineTemplate(1, false, false, true),
                     new UnitDamageEffect(40, false), //damage
                     false,
@@ -79,8 +79,8 @@ namespace Gliese581g
                     UnitType.Scout,
                     "Scout Division " + scout_id++, //name
                     TextureStore.Get(TexId.unit_scout), //texture
-                    new RangeTemplate(5, false, false, true),  //move
-                    new RangeTemplate(1, true, true, false),  //attack range
+                    new RangeTemplate(5, false, false, true, null, true),  //move
+                    new RangeTemplate(1, true, true, false, null, true),  //attack range
                     new LineTemplate(1, false, false, true),
                     new UnitDamageEffect(30, false), //damage
                     false,
@@ -103,8 +103,8 @@ namespace Gliese581g
                     UnitType.RoughRider,
                     "Rough Rider Division " + roughrider_id++, //name
                     TextureStore.Get(TexId.unit_roughrider), //texture
-                    new RangeTemplate(4, false, false, true),  //move
-                    new RangeTemplate(3, true, true, false),  //attack range
+                    new RangeTemplate(4, false, false, true, null, true),  //move
+                    new RangeTemplate(3, true, true, false, null, true),  //attack range
                     new LineTemplate(1, false, false, true),
                     new UnitDamageEffect(35, false), //damage
                     false,
@@ -128,8 +128,8 @@ namespace Gliese581g
                     UnitType.Tank,
                     "Armor Battalion " + tank_id++, //name
                     TextureStore.Get(TexId.unit_tank), //texture
-                    new RangeTemplate(3, false, false, true),  //move
-                    new LineTemplate(4, true, true, false),  //attack range
+                    new RangeTemplate(3, false, false, true, null, true),  //move
+                    new LineTemplate(4, true, true, false, true),  //attack range
                     new LineTemplate(1, false, false, true),
                     new UnitDamageEffect(75, false), //damage
                     false,
@@ -152,8 +152,8 @@ namespace Gliese581g
                     UnitType.Commander,
                     "Commander " + playerName, //name
                     TextureStore.Get(TexId.unit_commander), //texture
-                    new RangeTemplate(3, false, false, true),  //move
-                    new LineTemplate(2, false, false, false), //target template
+                    new RangeTemplate(3, false, false, true, null, true),  //move
+                    new LineTemplate(2, false, false, false, true), //target template
                     new LineTemplate(5, false, false, true),
                     new UnitDamageEffect(65, true), //damage
                     true,
@@ -177,8 +177,8 @@ namespace Gliese581g
                     UnitType.Mech,
                     "Techno-mech Guardian", //name
                     TextureStore.Get(TexId.unit_mech), //texture
-                    new RangeTemplate(3, false, false, true),  //move
-                    new LineTemplate(2, false, false, false), //target template
+                    new RangeTemplate(3, false, false, true, null, true),  //move
+                    new LineTemplate(2, false, false, false, true), //target template
                     new LineTemplate(5, false, false, true),
                     new UnitDamageEffect(70, true), //damage
                     true,
@@ -202,8 +202,8 @@ namespace Gliese581g
                     UnitType.Artillery,
                     "Artillery Battalion " + artillery_id++, //name
                     TextureStore.Get(TexId.unit_artillery), //texture
-                    new RangeTemplate(2, false, false, true),  //move
-                    new RangeTemplate(4, true, true, false),  //attack range
+                    new RangeTemplate(2, false, false, true, null, true),  //move
+                    new RangeTemplate(4, true, true, false, null, true),  //attack range
                     new RangeTemplate(1, true, true, true),
                     new UnitDamageEffect(45, true), //damage
                     true,

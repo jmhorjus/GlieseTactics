@@ -103,17 +103,22 @@ namespace Gliese581g
 
 
         // An invisible temporary mark - used to ensure some effect are not applied twice (by the range template). 
-        List<Hex> m_markedHexes = new List<Hex>();
-        public void MarkHex(Hex hex)
+        Dictionary<MapTemplate, List<Hex>> m_markedHexes = new Dictionary<MapTemplate,List<Hex>>();
+        public void MarkHex(MapTemplate template, Hex hex)
         {
-            hex.IsMarked = true;
-            m_markedHexes.Add(hex);
+            if (!m_markedHexes.ContainsKey(template))
+                m_markedHexes[template] = new List<Hex>();
+            hex.IsMarked[template] = true;
+            m_markedHexes[template].Add(hex);
         }
-        public void ClearMarkedHexes()
+        public void ClearMarkedHexes(MapTemplate template)
         {
-            foreach (Hex hex in m_markedHexes)
-                hex.IsMarked = false;
-            m_markedHexes.Clear();
+            if (m_markedHexes.ContainsKey(template))
+            {
+                foreach (Hex hex in m_markedHexes[template])
+                    hex.IsMarked.Remove(template);
+                m_markedHexes.Remove(template);
+            }
         }
 
 

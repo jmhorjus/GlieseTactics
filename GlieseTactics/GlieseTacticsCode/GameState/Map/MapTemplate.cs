@@ -12,6 +12,15 @@ namespace Gliese581g
         protected static Hex nullOutputDestination = null;
         public abstract HexEffectStats OnApply(Map map, MapLocation location, HexEffect effect, out Hex onlyOneHex);
         public abstract HexEffectStats OnApply(Map map, MapLocation location, HexEffect effect);
+        
+        protected bool m_returnMaxStats = false;
+        protected HexEffectStats AccumulateStats(HexEffectStats stats1, HexEffectStats stats2)
+        {
+            if (m_returnMaxStats)
+                return HexEffectStats.Best(stats1, stats2);
+            else
+                return (stats1 + stats2);
+        }
     }
 
 
@@ -22,12 +31,14 @@ namespace Gliese581g
         bool m_stopAtUnit;
         bool m_stopAtBlockingTerrain;
 
-        public LineTemplate(int length, bool stopAtUnit, bool stopAtBlockingTerrain, bool includeSourceHex)
+        public LineTemplate(int length, bool stopAtUnit, bool stopAtBlockingTerrain,
+            bool includeSourceHex, bool returnMaxStats = false)
         {
             m_length = length;
             m_stopAtUnit = stopAtUnit;
             m_stopAtBlockingTerrain = stopAtBlockingTerrain;
             m_includeSourceHex = includeSourceHex;
+            m_returnMaxStats = returnMaxStats;
         }
 
         public override HexEffectStats OnApply(Map map, MapLocation location, HexEffect effect)
@@ -60,7 +71,7 @@ namespace Gliese581g
                     onlyOneHex = hex;
                     
                 // Apply the effect.
-                retVal += effect.ApplyToHex(hex);
+                retVal = AccumulateStats(retVal, effect.ApplyToHex(hex, location.Direction));
                 isFirstHex = false;
 
                 if (doneAfterThisHex)
@@ -92,13 +103,16 @@ namespace Gliese581g
             bool pathThroughBlockHexes, 
             bool pathThroughOtherUnits, 
             bool includeSourceHex,
-            Unit unitWhoseAlliesDontBlockMovement = null)
+            Unit unitWhoseAlliesDontBlockMovement = null,
+            bool returnMaxStats = false)
+
         {
             m_range = range;
             m_pathThroughBlockHexes = pathThroughBlockHexes;
             m_pathThroughOtherUnits = pathThroughOtherUnits;
             m_includeSourceHex = includeSourceHex;
             m_unitWhoseAlliesDontBlockMovement = unitWhoseAlliesDontBlockMovement;
+            m_returnMaxStats = returnMaxStats;
         }
 
         public override HexEffectStats OnApply(Map map, MapLocation location, HexEffect effect)
@@ -113,7 +127,7 @@ namespace Gliese581g
             // Ranged template never only one hex
             onlyOneHex = null;
 
-            map.ClearMarkedHexes(); // We use hex marking to ensure we don't double-apply to some hexes.
+            map.ClearMarkedHexes(this); // We use hex marking to ensure we don't double-apply to some hexes.
             RecursiveApply(
                 map,
                 effect,
@@ -146,10 +160,10 @@ namespace Gliese581g
 
             if (validFinalDest)
             {
-                if (!hex.IsMarked && (pos != startingPos || m_includeSourceHex))
+                if (!hex.IsMarked.ContainsKey(this) && (pos != startingPos || m_includeSourceHex))
                 {
-                    stats += effect.ApplyToHex(hex);
-                    map.MarkHex(hex);
+                    stats = AccumulateStats (stats, effect.ApplyToHex(hex, Direction.Left)); // direction is arbitrary in this context!
+                    map.MarkHex(this, hex);
                     hex.CurrentMoveCost = totalRange - rangeRemaining;
                 }
                 else if (hex.CurrentMoveCost > totalRange - rangeRemaining)

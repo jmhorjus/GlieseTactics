@@ -489,7 +489,6 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="PlayerSetupScreen\" />
     <Folder Include="PortraitsXML\" />
   </ItemGroup>
   <ItemGroup>
@@ -1203,6 +1202,27 @@
       <Name>victory</Name>
       <Importer>Mp3Importer</Importer>
       <Processor>SongProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="PlayerSetupScreen\PowerBoost.bmp">
+      <Name>PowerBoost</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="PlayerSetupScreen\PowerDrain.bmp">
+      <Name>PowerDrain</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="PlayerSetupScreen\RechargeHeal.bmp">
+      <Name>RechargeHeal</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
     </Compile>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\XNA Game Studio\$(XnaFrameworkVersion)\Microsoft.Xna.GameStudio.ContentPipeline.targets" />

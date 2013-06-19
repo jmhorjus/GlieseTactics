@@ -172,6 +172,9 @@ Content\Music\mainmenu.xnb
 Content\Music\battle1.xnb
 Content\Music\victory.xnb
 Content\GameSetupScreen\player_trash_dim.xnb
+Content\PlayerSetupScreen\PowerBoost.xnb
+Content\PlayerSetupScreen\PowerDrain.xnb
+Content\PlayerSetupScreen\RechargeHeal.xnb
 Content\Music\mainmenu.wma
 Content\Music\battle1.wma
 Content\Music\victory.wma

@@ -32,7 +32,7 @@ namespace Gliese581g
         public bool IsHighlighted = false;
         public bool IsDoubleHighlighted = false;
 
-        public bool IsMarked = false; // used for the range template, to indicate if an effect has already been applied.
+        public Dictionary<MapTemplate, bool> IsMarked = new Dictionary<MapTemplate,bool>(); // used for the range template, to indicate if an effect has already been applied.
         public int CurrentMoveCost; // used in range calculations.
         public Hex TemplateOriginHex = null; // used for during damage template placment
 
@@ -350,6 +350,20 @@ namespace Gliese581g
                 HexEffectStats stats = ApplyDamageTemplate(m_map.SelectedHex.Unit, new DoubleHighlightEffect(m_map, m_map.SelectedHex.Unit));
                 m_map.ExpectedAttackStats = stats;
                 m_currentlyOriginOfDoubleHighlightArea = true;
+            }
+
+            // Highlight the total threat range and maximum possible damage and kills.
+            if (IsSelected && Unit != null && 
+                timeHeld > new TimeSpan(0, 0, 2) && 
+                !m_currentlyOriginOfDoubleHighlightArea)
+            {
+                HexEffectStats stats = Unit.MoveTemplate.OnApply(m_map, Unit.MapLocation, 
+                    new RecursiveTemplateEffect(m_map, Unit.TargetTemplate, true,
+                        new RecursiveTemplateEffect(m_map, Unit.AttackTemplate, false,
+                            new DoubleHighlightEffect(m_map, Unit))) );
+                
+                m_currentlyOriginOfDoubleHighlightArea = true;
+                m_map.ExpectedAttackStats = stats;
             }
         }
 
