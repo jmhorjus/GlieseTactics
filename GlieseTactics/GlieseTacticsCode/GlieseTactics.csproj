@@ -170,7 +170,6 @@
   <ItemGroup>
     <Content Include="Game.ico" />
     <Content Include="GameThumbnail.png" />
-    <None Include="Resources\Image1.png" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\GlieseTacticsContent\GlieseTacticsContent.contentproj">
