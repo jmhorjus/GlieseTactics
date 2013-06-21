@@ -97,7 +97,7 @@ namespace Gliese581g
             {
                 hex.Unit.CurrentHP -= retVal.TotalDamage;
                 hex.CreateDrawnTextEffect(retVal.TotalDamage.ToString(), Color.Red);
-                if (retVal.TotalKills <= 0)
+                if (retVal.TotalKills > 0)
                     hex.AddUnitDeathEvent();
             }
             return retVal;
