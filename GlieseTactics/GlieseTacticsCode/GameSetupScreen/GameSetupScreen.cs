@@ -64,7 +64,7 @@ namespace Gliese581g
 
                 GameMapScreen mapScreen = parentScreen.GetMainApp().topActiveScreen() as GameMapScreen;
                 GameSetupScreen setupScreen = parentScreen as GameSetupScreen;
-                List<Player> players = new List<Player>();
+                List<Commander> players = new List<Commander>();
                 players.Add(setupScreen.Player1);
                 players.Add(setupScreen.Player2);
                 mapScreen.Game = new Game(players, setupScreen.VictoryType);
@@ -146,9 +146,9 @@ namespace Gliese581g
         PlayerTrash m_playerTrash;
 
         PlayerDisplaySocket m_playerSocket_player1;
-        public Player Player1 { get { return m_playerSocket_player1.Player; } }
+        public Commander Player1 { get { return m_playerSocket_player1.Player; } }
         PlayerDisplaySocket m_playerSocket_player2;
-        public Player Player2 { get { return m_playerSocket_player2.Player; } }
+        public Commander Player2 { get { return m_playerSocket_player2.Player; } }
         TextLabel m_labelVS;
         SpriteFont m_fontVS;
 
@@ -186,7 +186,7 @@ namespace Gliese581g
                     //Put together the file path
                     string xmlFilePath = playerProfilePath + Path.GetFileNameWithoutExtension(file) + ".xml";
                     // Create the player, and put it in a new socket on the sidebar.
-                    AddEmptySocketToSidebar().Player = new Player(xmlFilePath, GetMainApp().GraphicsDevice);
+                    AddEmptySocketToSidebar().Player = Commander.LoadXmlFile(xmlFilePath, GetMainApp().GraphicsDevice);
                     playerProfileIndex += 1;
                 }
             }

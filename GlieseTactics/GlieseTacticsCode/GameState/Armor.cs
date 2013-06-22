@@ -25,10 +25,9 @@ namespace Gliese581g
         None
     }
 
-
+    [Serializable]
     public class Armor
     {
-
         public class ArmorFactory
         {
             public static Armor MakeArmor(ArmorType type)
@@ -50,13 +49,9 @@ namespace Gliese581g
         }
 
 
-
-
-
-
-
-
         private int[] m_values;
+
+        private Armor() { } // for serialization
 
         protected Armor(int front, int frontFlank, int rearFlank, int rear)
         {

@@ -19,7 +19,7 @@ namespace Gliese581g
         public PlayerDisplaySocket callbackPlayerSocket;
         public Microsoft.Xna.Framework.Graphics.GraphicsDevice graphics;
         
-        private PlayerProfile m_playerProfile = null;
+        private Commander m_playerProfile = null;
         private byte[] m_portrait = null;
         private Color m_unitColor;
         private string m_portraitFileName = null;
@@ -92,7 +92,8 @@ namespace Gliese581g
                 using (FileStream fs = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.None))
                 {
                     System.Drawing.Bitmap b = (System.Drawing.Bitmap)System.Drawing.Image.FromStream(fs);
-                    m_portrait = BmpToBytes(b);
+                    m_portrait = Commander.EncodeJpgBytes(b);
+                    b.Dispose();
                 }
             }
             catch (Exception ex)
@@ -100,53 +101,31 @@ namespace Gliese581g
                 MessageBox.Show(ex.InnerException.Message, ex.Message);
             }
         }
+
         [STAThread]
         private void OnProfileSubmit(object sender, EventArgs e)
         {
             if (!ValidatePlayerProfile())
                 return;
-            if (m_playerProfile == null)
-                m_playerProfile = new PlayerProfile();
-            MemoryStream ms = new MemoryStream(m_portrait);
-            System.Drawing.Image theImage = System.Drawing.Image.FromStream(ms, true, false);
-            //Resizes uploaded image
-            ImageResize ir = new ImageResize(theImage); // is a Bitmap or Image
-            ImageResize resize = new ImageResize(theImage);
-            ir.Height = 100.0;
-            ir.Width = 130.0;
-            System.Drawing.Image theJpeg = ir.GetThumbnail();   // this is a Bitmap at the correct dimensions
+            
 
-            MemoryStream outstream = new MemoryStream();
-            theJpeg.Save(outstream, System.Drawing.Imaging.ImageFormat.Jpeg);   // save in jpeg format in outstream
-            theImage = System.Drawing.Image.FromStream(outstream, true, false);
-            m_portrait = BmpToBytes(theImage);
-
-            PopulatePlayerProfile(m_playerProfile);
+            m_playerProfile = CreateCommanderProfile();
 
             //serializes the profile 
             bool profileConflictFound = false;
-            Microsoft.Xna.Framework.Color xnaColor = new Microsoft.Xna.Framework.Color(
-                m_playerProfile.UnitColor.R, 
-                m_playerProfile.UnitColor.G, 
-                m_playerProfile.UnitColor.B);
+
             //Check if the unit color or name already exists
             if (Directory.Exists(m_playerProfileDirectory))
             {
                 foreach (string file in Directory.EnumerateFiles(m_playerProfileDirectory, "*.xml"))
                 {
                     //Deserialize the xml file
-                    PlayerProfile playerProfile = PlayerProfile.DeserializeXml(m_playerProfileDirectory + Path.GetFileNameWithoutExtension(file) + ".xml");
-                    using (FileStream fileStream = new FileStream(m_playerProfileDirectory + playerProfile.Name + ".jpg", FileMode.Open))
+                    Commander playerProfile = Commander.LoadXmlFile(m_playerProfileDirectory + Path.GetFileNameWithoutExtension(file) + ".xml", graphics);
+
+                    if (m_playerProfile.UnitColor == playerProfile.UnitColor || playerProfile.Name.ToLower() == m_playerProfile.Name.ToLower())
                     {
-                        Microsoft.Xna.Framework.Color xnaSavedColor = new Microsoft.Xna.Framework.Color(
-                            playerProfile.UnitColor.R,
-                            playerProfile.UnitColor.G,
-                            playerProfile.UnitColor.B);
-                        if (xnaColor == xnaSavedColor || playerProfile.Name.ToLower() == m_playerProfile.Name.ToLower())
-                        {
-                            profileConflictFound = true;
-                            break;
-                        }
+                        profileConflictFound = true;
+                        break;
                     }
                 }
             }
@@ -158,16 +137,12 @@ namespace Gliese581g
                     Directory.CreateDirectory(m_playerProfileDirectory);
 
                 string fullXmlFilePath = m_playerProfileDirectory + m_playerProfile.Name + ".xml";
-                string fullJpgFilePath = m_playerProfileDirectory + m_playerProfile.Name + ".jpg";
 
-                // Save the files: xml first.
-                m_playerProfile.SerializeXml(GetStream(fullXmlFilePath));
-                // then jpg.
-                Bitmap bMap = m_playerProfile.BuildPortraitImage(m_playerProfile.Portrait);
-                bMap.Save(fullJpgFilePath, System.Drawing.Imaging.ImageFormat.Jpeg);
+                // Save the file
+                m_playerProfile.SaveXmlFile(fullXmlFilePath);
                 
                 callbackGameSetupScreen.EnableKeysAndMouse();
-                callbackPlayerSocket.Player = new Player(fullXmlFilePath, graphics);
+                callbackPlayerSocket.Player = Commander.LoadXmlFile(fullXmlFilePath, graphics);
                 DialogResult = DialogResult.OK;
             }
             else
@@ -181,13 +156,14 @@ namespace Gliese581g
         #endregion
 
         #region Helpers
-        protected void PopulatePlayerProfile(PlayerProfile playerProfile)
+        protected Commander CreateCommanderProfile()
         {
-            playerProfile.Name = txtBoxName.Text;
-            playerProfile.Portrait = m_portrait;
-            playerProfile.UnitColorAsArgb = m_unitColor.ToArgb();
-            playerProfile.PortraitPath = m_playerProfileDirectory;
-            playerProfile.PortraitFileName = m_portraitFileName;
+            Commander playerProfile = new Commander(txtBoxName.Text,
+                m_portrait,
+                m_unitColor.ToArgb(),
+                m_playerProfileDirectory);
+            return playerProfile;
+
         }
 
         private void ThreadMethod()
@@ -233,43 +209,8 @@ namespace Gliese581g
             txtBoxImagePath.Text = string.Empty;
             txtBoxName.Text = string.Empty;
         }
-        private FileStream GetStream(string fileName)
-        {
-            string parentDir = Directory.GetParent(fileName).FullName;
-            if (!Directory.Exists(parentDir))
-                Directory.CreateDirectory(parentDir);
-            FileStream fs = File.Create(fileName);
-            return fs;
-        }
-        private byte[] BmpToBytes(System.Drawing.Image bmp)
-        {
-            MemoryStream ms = null;
-            byte[] bmpBytes = null;
-            try
-            {
-                ms = new MemoryStream();
-                // Save to memory using the Jpeg format
-                // what format?
 
-                bmp.Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg);
 
-                // read to end
-                bmpBytes = ms.GetBuffer();
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-            finally
-            {
-                bmp.Dispose();
-                if (ms != null)
-                {
-                    ms.Close();
-                }
-            }
-            return bmpBytes;
-        }
         //Hides the minimize, maximize and close menu
         //Online resource obtained from http://stackoverflow.com/questions/7301825/windows-forms-how-to-hide-close-x-button
         private const int WS_SYSMENU = 0x80000;

@@ -50,11 +50,14 @@ namespace Gliese581g
 
 
 
+    [Serializable]
     public class UnitDamageEffect : HexEffect
     {
         public Unit OwningUnit; 
         public int BaseDamage;
         public bool ShakeScreenOnAttack;
+
+        private UnitDamageEffect() { }
 
         public UnitDamageEffect(int baseDamage, bool shakeScreen)
         {

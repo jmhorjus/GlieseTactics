@@ -146,7 +146,7 @@ namespace Gliese581g
             Point pos,
             int totalRange,
             int rangeRemaining,
-            Player friendlyPlayer, // the units of this player are friendly and can be moved through.
+            Commander friendlyPlayer, // the units of this player are friendly and can be moved through.
             ref HexEffectStats stats
             )
         {

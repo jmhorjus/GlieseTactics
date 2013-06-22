@@ -118,7 +118,7 @@
     <Compile Include="GameState\IDrawnEffect.cs" />
     <Compile Include="GameState\Map\MapTemplate.cs" />
     <Compile Include="GameState\Unit.cs" />
-    <Compile Include="GameState\Player.cs" />
+    <Compile Include="GameState\Commander.cs" />
     <Compile Include="Infrastructure\CheckBox.cs" />
     <Compile Include="Infrastructure\Animation.cs" />
     <Compile Include="Infrastructure\ImageResize.cs" />
@@ -161,7 +161,6 @@
     <Compile Include="Infrastructure\ClickableSprite.cs" />
     <Compile Include="MainMenuScreen\MainMenuScreen.cs" />
     <Compile Include="Infrastructure\GameScreen.cs" />
-    <Compile Include="NewPlayerSetupScreen\PlayerProfile.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="MainApplication.cs" />

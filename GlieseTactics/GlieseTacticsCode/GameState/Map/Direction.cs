@@ -29,7 +29,7 @@ namespace Gliese581g
         NegA_NegAB = 11
     }
  
-
+    [Serializable]
     public class Direction
     {
         public enum ValueType
@@ -51,6 +51,7 @@ namespace Gliese581g
             set { m_value = (int)value; }
         }
 
+        public Direction() { } // for serialization
         public Direction(ValueType direction)
         { m_value = (int)direction; }
 

@@ -21,6 +21,7 @@ namespace Gliese581g
 
 
     // Unit needs to inherit from ClickableSprite especially for Animation support.
+    [Serializable]
     public class Unit : ClickableSprite
     {
         public class UnitFactory
@@ -224,10 +225,8 @@ namespace Gliese581g
         
 
 
-
-
-        protected Player m_owner;
-        public Player Owner
+        protected Commander m_owner;
+        public Commander Owner
         {
             get { return m_owner; }
             set
@@ -236,6 +235,7 @@ namespace Gliese581g
                 Tint = value.UnitColor;
             }
         }
+
 
         protected Hex m_currentHex = null;
         public MapLocation MapLocation
@@ -270,9 +270,13 @@ namespace Gliese581g
 
 
         //Sounds
+        [NonSerialized]
         List<SoundEffect> SfxSelected = new List<SoundEffect>();
+        [NonSerialized]
         List<SoundEffect> SfxMove = new List<SoundEffect>();
+        [NonSerialized]
         List<SoundEffect> SfxFire = new List<SoundEffect>();
+        [NonSerialized]
         List<SoundEffect> SfxKilled = new List<SoundEffect>();
 
         public TimeSpan PlaySfxSelected()
@@ -301,9 +305,6 @@ namespace Gliese581g
             return soundToPlay.Duration;
         } 
 
-
-
-
         protected Direction m_facingDirection;
         public Direction FacingDirection
         { 
@@ -324,8 +325,9 @@ namespace Gliese581g
             (float)Math.PI / 6f
         };
 
- 
 
+
+        private Unit(): base(null, Rectangle.Empty, Color.White, 0f,0f,Vector2.Zero,0f) { } // needed in order to be serializable
 
         /// When Created, the unit is not visible or clickable until placed on a Map.
         /// That way it can be part of an army before the game starts.  

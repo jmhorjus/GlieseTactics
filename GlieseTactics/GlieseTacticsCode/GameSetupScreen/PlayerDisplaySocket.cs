@@ -36,12 +36,12 @@ namespace Gliese581g
 
     public class PlayerDisplaySocket : ClickableSprite
     {
-        Player m_player;
+        Commander m_player;
         Texture2D m_emptyPortrait;
         SpriteFont m_font;
         Vector2 m_fontScale;
 
-        public Player Player
+        public Commander Player
         {
             get { return m_player; }
             set 
@@ -138,7 +138,7 @@ namespace Gliese581g
             
             if (s_dragSourceSocket == this && s_dragDestSocket != null)
             {
-                Player temp = s_dragDestSocket.Player;
+                Commander temp = s_dragDestSocket.Player;
                 Rectangle tempDestRect = s_dragDestSocket.DisplayRect;
                 Rectangle tempSourceRect = s_dragSourceSocket.DisplayRect;
 

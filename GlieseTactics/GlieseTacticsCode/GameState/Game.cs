@@ -56,7 +56,7 @@ namespace Gliese581g
         }
 
         public VictoryType VictoryCondition;
-        public List<Player> Players;
+        public List<Commander> Players;
 
         private bool m_surrender;
 
@@ -70,13 +70,13 @@ namespace Gliese581g
         // The current overall turn, player, and stage within that player's turn.
         int m_currentTurn;
         public int CurrentTurn { get { return m_currentTurn; } }
-        Player m_currentPlayer;
-        public Player CurrentPlayer { get { return m_currentPlayer; } }
+        Commander m_currentPlayer;
+        public Commander CurrentPlayer { get { return m_currentPlayer; } }
 
         // Remains null until the game is over and a winner has been determined.
-        protected Player m_winningPlayer = null;
-        public Player WinningPlayer { get { return m_winningPlayer; } }
-        public Player LosingPlayer { get { return m_winningPlayer == Players[0] ? Players[1] : Players[0]; } }
+        protected Commander m_winningPlayer = null;
+        public Commander WinningPlayer { get { return m_winningPlayer; } }
+        public Commander LosingPlayer { get { return m_winningPlayer == Players[0] ? Players[1] : Players[0]; } }
 
         TurnStage m_currentTurnStage;
         public TurnStage CurrentTurnStage
@@ -90,7 +90,7 @@ namespace Gliese581g
             }
         }
 
-        public Game(List<Player> players, VictoryType victoryCondition)
+        public Game(List<Commander> players, VictoryType victoryCondition)
         {
             Players = players;
             VictoryCondition = victoryCondition;
@@ -129,7 +129,7 @@ namespace Gliese581g
             
         }
 
-        public Player NextPlayer
+        public Commander NextPlayer
         { get { return Players[(Players.IndexOf(CurrentPlayer) + 1) % Players.Count]; } }
 
         public void EndTurn()
@@ -141,9 +141,9 @@ namespace Gliese581g
         public void CheckForGameOver()
         {
             int remainingPlayers = Players.Count;
-            Player lastManStanding = null;
+            Commander lastManStanding = null;
             
-            foreach (Player player in Players)
+            foreach (Commander player in Players)
             {
                 bool playerStillInTheRunning;
                 switch (VictoryCondition)
