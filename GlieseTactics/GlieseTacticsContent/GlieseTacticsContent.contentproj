@@ -488,9 +488,7 @@
       <Processor>TextureProcessor</Processor>
     </Compile>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="PortraitsXML\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <Compile Include="Units\recharge_numbers.bmp">
       <Name>recharge_numbers</Name>
@@ -1205,22 +1203,84 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="PlayerSetupScreen\PowerBoost.bmp">
+    <Compile Include="SkillsScreen\PowerBoost.bmp">
       <Name>PowerBoost</Name>
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="PlayerSetupScreen\PowerDrain.bmp">
+    <Compile Include="SkillsScreen\PowerDrain.bmp">
       <Name>PowerDrain</Name>
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="PlayerSetupScreen\RechargeHeal.bmp">
+    <Compile Include="SkillsScreen\RechargeHeal.bmp">
       <Name>RechargeHeal</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="SkillsScreen\Ace Pilot%28blue%29.bmp">
+      <Name>Ace Pilot%28blue%29</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="SkillsScreen\Ace Pilot.bmp">
+      <Name>Ace Pilot</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="SkillsScreen\Commander Armor%28blue%29.bmp">
+      <Name>Commander Armor%28blue%29</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="SkillsScreen\Commander Armor.bmp">
+      <Name>Commander Armor</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="SkillsScreen\Commander Gun%28blue%29.bmp">
+      <Name>Commander Gun%28blue%29</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="SkillsScreen\Commander Gun.bmp">
+      <Name>Commander Gun</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="SkillsScreen\Damage Unit, Napalm.bmp">
+      <Name>Damage Unit, Napalm</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="SkillsScreen\Damage Unit, Self Destruct.bmp">
+      <Name>Damage Unit, Self Destruct</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="SkillsScreen\PowerBoost%28Purple%29.bmp">
+      <Name>PowerBoost%28Purple%29</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="SkillsScreen\PowerDrane%28Purple%29.bmp">
+      <Name>PowerDrane%28Purple%29</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="SkillsScreen\RechargeHeal%28Purple%29.bmp">
+      <Name>RechargeHeal%28Purple%29</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="SkillsScreen\Single Target Heal.bmp">
+      <Name>Single Target Heal</Name>
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
     </Compile>

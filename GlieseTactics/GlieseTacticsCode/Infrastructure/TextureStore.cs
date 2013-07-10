@@ -331,9 +331,9 @@ namespace Gliese581g
                     return "GameSetupScreen/button_arrow_up_lit";
 
                 case TexId.button_mm_dim:
-                    return "Buttons/escape_mm_dim";
+                    return "Buttons/mm_dim";
                 case TexId.button_mm_lit:
-                    return "Buttons/escape_mm_lit";           
+                    return "Buttons/mm_lit";           
                 case TexId.button_g_mm_dim:
                     return "Buttons/g_mm_dim";
                 case TexId.button_g_mm_lit:

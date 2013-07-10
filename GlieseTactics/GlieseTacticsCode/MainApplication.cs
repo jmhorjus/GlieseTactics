@@ -20,11 +20,11 @@ namespace Gliese581g
         MainMenu_Options,
         GameSetup,
         NewPlayerSetup,
+        SkillsScreen,
         GameSetup_ArmySetup,
         MainGame,
         MainGame_EscMenu,
         GameOver,
-        testScreen,
         VictoryScreen
     };
     
@@ -90,13 +90,14 @@ namespace Gliese581g
         /// (not sure the advantage of using Initialize)
         protected override void Initialize()
         {
-            /// Create the game screen objects, and put them in the dictionary.  
+            /// Create the game screen objects, and put them in the dictionary.
             m_allGameScreens[game_screen_key.Intro] = new IntroScreen(this);
             m_allGameScreens[game_screen_key.MainMenu] = new MainMenuScreen(this);
             m_allGameScreens[game_screen_key.MainMenu_Options] = new OptionsScreen(this);
             m_allGameScreens[game_screen_key.MainGame] = new GameMapScreen(this);
             m_allGameScreens[game_screen_key.GameSetup] = new GameSetupScreen(this);
             m_allGameScreens[game_screen_key.NewPlayerSetup] = new NewPlayerSetupScreen(this);
+            m_allGameScreens[game_screen_key.SkillsScreen] = new SkillsScreen(this);
             m_allGameScreens[game_screen_key.GameSetup_ArmySetup] = new ArmySetupScreen(this);
             m_allGameScreens[game_screen_key.MainGame_EscMenu] = new EscMenuScreen(this);
             m_allGameScreens[game_screen_key.VictoryScreen] = new VictoryScreen(this);

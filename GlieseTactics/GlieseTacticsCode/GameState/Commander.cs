@@ -42,7 +42,14 @@ namespace Gliese581g
             }
             catch (Exception ex)
             {
-                throw ex;
+                // There was a problem reading one of the player profiles.
+                // Display an error screen, then give them the option of deleting the offending profile.
+
+                // For now just delete it. Run again and it should be gone.
+                fs.Close();
+                File.Delete(xmlFilePath);
+
+                //throw ex;
             }
             finally
             {

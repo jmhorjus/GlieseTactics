@@ -117,6 +117,21 @@ Content\Buttons\g_surrender_dim.xnb
 Content\Buttons\g_surrender_lit.xnb
 Content\IntroScreen\g2s_logo_plain.xnb
 Content\IntroScreen\g2s_logo_swish.xnb
+Content\SkillsScreen\PowerBoost.xnb
+Content\SkillsScreen\PowerDrain.xnb
+Content\SkillsScreen\RechargeHeal.xnb
+Content\SkillsScreen\Ace Pilot(blue).xnb
+Content\SkillsScreen\Ace Pilot.xnb
+Content\SkillsScreen\Commander Armor(blue).xnb
+Content\SkillsScreen\Commander Armor.xnb
+Content\SkillsScreen\Commander Gun(blue).xnb
+Content\SkillsScreen\Commander Gun.xnb
+Content\SkillsScreen\Damage Unit, Napalm.xnb
+Content\SkillsScreen\Damage Unit, Self Destruct.xnb
+Content\SkillsScreen\PowerBoost(Purple).xnb
+Content\SkillsScreen\PowerDrane(Purple).xnb
+Content\SkillsScreen\RechargeHeal(Purple).xnb
+Content\SkillsScreen\Single Target Heal.xnb
 Content\Sounds\menu_mouseover.xnb
 Content\Sounds\menu_click.xnb
 Content\Sounds\rocket_boom.xnb
@@ -172,9 +187,6 @@ Content\Music\mainmenu.xnb
 Content\Music\battle1.xnb
 Content\Music\victory.xnb
 Content\GameSetupScreen\player_trash_dim.xnb
-Content\PlayerSetupScreen\PowerBoost.xnb
-Content\PlayerSetupScreen\PowerDrain.xnb
-Content\PlayerSetupScreen\RechargeHeal.xnb
 Content\Music\mainmenu.wma
 Content\Music\battle1.wma
 Content\Music\victory.wma
