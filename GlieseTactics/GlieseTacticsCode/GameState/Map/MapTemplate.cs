@@ -59,13 +59,13 @@ namespace Gliese581g
                     continue;
                 }
 
-                Hex hex = map.GetHex(location.Location);
+                Hex hex = map.GetHex(location.Position);
                 if (hex == null)
                     break;
 
                 bool doneAfterThisHex = ii + 1 >= m_length ||
                     (m_stopAtUnit && (hex.Unit != null)) ||
-                    (m_stopAtBlockingTerrain && !map.GetHex(location.Location).LandPossible);
+                    (m_stopAtBlockingTerrain && !map.GetHex(location.Position).LandPossible);
 
                 if (isFirstHex && doneAfterThisHex)
                     onlyOneHex = hex;
@@ -131,7 +131,7 @@ namespace Gliese581g
             RecursiveApply(
                 map,
                 effect,
-                location.Location, location.Location,
+                location.Position, location.Position,
                 m_range, m_range,
                 (m_unitWhoseAlliesDontBlockMovement != null) ? m_unitWhoseAlliesDontBlockMovement.Owner : null,
                 ref retVal);

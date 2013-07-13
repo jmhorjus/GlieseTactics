@@ -63,14 +63,14 @@ namespace Gliese581g
             return m_values[(int)zone];
         }
 
-        public int AdjustDamage(MapLocation damageLocation, MapLocation targetLocation, int damage)
+        public int AdjustDamage(Point damageSource, MapLocation targetLocation, int damage)
         {
             ImpactAngle impactAngle;
             // Determine the most prominent direction by finding distance in the 3 directions.  
-            int a = (targetLocation.Location.X-(targetLocation.Location.Y/2)) - 
-                (damageLocation.Location.X-(damageLocation.Location.Y/2));
-            int b = (targetLocation.Location.X+((targetLocation.Location.Y+1)/2)) - 
-                (damageLocation.Location.X+((damageLocation.Location.Y+1)/2));
+            int a = (targetLocation.Position.X-(targetLocation.Position.Y/2)) -
+                (damageSource.X - (damageSource.Y / 2));
+            int b = (targetLocation.Position.X+((targetLocation.Position.Y+1)/2)) -
+                (damageSource.X + ((damageSource.Y + 1) / 2));
             int ab = 0;
             if ((a > 0) == (b > 0)){
                 if (Math.Abs(a) < Math.Abs(b))

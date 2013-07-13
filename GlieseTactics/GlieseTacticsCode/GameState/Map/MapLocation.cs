@@ -8,12 +8,12 @@ namespace Gliese581g
 {
     public class MapLocation
     {
-        public Point Location;
+        public Point Position;
         public Direction Direction;
 
         public MapLocation(Point location, Direction direction)
         {
-            Location = location;
+            Position = location;
             Direction = direction;
         }
 
@@ -26,26 +26,26 @@ namespace Gliese581g
             switch (dir.Value)
             {
                 case Direction.ValueType.Right:
-                    Location.X += 1;
+                    Position.X += 1;
                     break;
                 case Direction.ValueType.DownRight:
-                    Location.X += Location.Y % 2;
-                    Location.Y += 1;
+                    Position.X += Position.Y % 2;
+                    Position.Y += 1;
                     break;
                 case Direction.ValueType.DownLeft:
-                    Location.X -= 1 - (Location.Y % 2);
-                    Location.Y += 1;
+                    Position.X -= 1 - (Position.Y % 2);
+                    Position.Y += 1;
                     break;
                 case Direction.ValueType.Left:
-                    Location.X -= 1;
+                    Position.X -= 1;
                     break;
                 case Direction.ValueType.UpLeft:
-                    Location.X -= 1 - (Location.Y % 2);
-                    Location.Y -= 1;
+                    Position.X -= 1 - (Position.Y % 2);
+                    Position.Y -= 1;
                     break;
                 case Direction.ValueType.UpRight:
-                    Location.X += Location.Y % 2;
-                    Location.Y -= 1;
+                    Position.X += Position.Y % 2;
+                    Position.Y -= 1;
                     break;
                 default:
                     throw new Exception("invalid direction!");

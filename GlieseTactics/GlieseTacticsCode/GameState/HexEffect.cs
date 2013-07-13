@@ -45,7 +45,12 @@ namespace Gliese581g
 
     public abstract class HexEffect
     {
-        public abstract HexEffectStats ApplyToHex(Hex hex, Direction templateDirection);
+        public abstract HexEffectStats ApplyToHex(Hex hex, Direction templateDirection, Hex effectSourceHex);
+
+        public virtual HexEffectStats ApplyToHex(Hex hex, Direction templateDirection)
+        {
+            return ApplyToHex(hex, templateDirection, hex);
+        }
     }
 
 
@@ -66,13 +71,13 @@ namespace Gliese581g
             ShakeScreenOnAttack = shakeScreen;
         }
 
-        public static HexEffectStats CalculateDamageStats(Unit attacker, Unit defender)
+        public static HexEffectStats CalculateDamageStats(Unit attacker, Hex attackSourceHex, Unit defender)
         {
             HexEffectStats retVal = new HexEffectStats();
             if (defender != null)
             {
                 int damage = defender.Armor.AdjustDamage(
-                    attacker.MapLocation, 
+                    attackSourceHex.MapPosition, 
                     defender.MapLocation, 
                     attacker.AttackEffect.BaseDamage);
                 
@@ -92,9 +97,9 @@ namespace Gliese581g
             return retVal;
         }
 
-        public override HexEffectStats ApplyToHex(Hex hex, Direction templateDirection)
+        public override HexEffectStats ApplyToHex(Hex hex, Direction templateDirection, Hex effectSourceHex)
         {
-            HexEffectStats retVal = CalculateDamageStats(OwningUnit, hex.Unit);
+            HexEffectStats retVal = CalculateDamageStats(OwningUnit, effectSourceHex, hex.Unit);
                 
             if (hex.Unit != null)
             {
@@ -121,7 +126,7 @@ namespace Gliese581g
             SetTemplateOriginHex = setTemplateOriginHex;
         }
 
-        public override HexEffectStats ApplyToHex(Hex hex, Direction templateDirection)
+        public override HexEffectStats ApplyToHex(Hex hex, Direction templateDirection, Hex effectSourceHex)
         {
             m_map.HighlightHex(hex);
             hex.TemplateOriginHex = SetTemplateOriginHex;
@@ -141,11 +146,12 @@ namespace Gliese581g
             m_owningUnit = owningUnit;
         }
 
-        public override HexEffectStats ApplyToHex(Hex hex, Direction templateDirection)
+        public override HexEffectStats ApplyToHex(Hex hex, Direction templateDirection, Hex effectSourceHex)
         {
             m_map.DoubleHighlightHex(hex);
-            return UnitDamageEffect.CalculateDamageStats(m_owningUnit, hex.Unit);
+            return UnitDamageEffect.CalculateDamageStats(m_owningUnit, effectSourceHex, hex.Unit);
         }
+
     }
 
 
@@ -170,7 +176,7 @@ namespace Gliese581g
             m_returnMaxStats = returnMaxStats;
         }
 
-        public override HexEffectStats ApplyToHex(Hex hex, Direction templateDirection)
+        public override HexEffectStats ApplyToHex(Hex hex, Direction templateDirection, Hex effectOriginHex)
         {
             
             // Apply the sub-template in all 6 directions.  

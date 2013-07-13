@@ -155,7 +155,7 @@ namespace Gliese581g
                     TextureStore.Get(TexId.unit_commander), //texture
                     new RangeTemplate(3, false, false, true, null, true),  //move
                     new LineTemplate(2, false, false, false, true), //target template
-                    new LineTemplate(5, false, false, true),
+                    new LineTemplate(4, false, false, true),
                     new UnitDamageEffect(65, true), //damage
                     true,
                     140, //hp
@@ -180,7 +180,7 @@ namespace Gliese581g
                     TextureStore.Get(TexId.unit_mech), //texture
                     new RangeTemplate(3, false, false, true, null, true),  //move
                     new LineTemplate(2, false, false, false, true), //target template
-                    new LineTemplate(5, false, false, true),
+                    new LineTemplate(4, false, false, true),
                     new UnitDamageEffect(70, true), //damage
                     true,
                     160, //hp
@@ -238,6 +238,8 @@ namespace Gliese581g
 
 
         protected Hex m_currentHex = null;
+        public Hex CurrentHex
+        { get { return m_currentHex; } }
         public MapLocation MapLocation
         {
             get 
