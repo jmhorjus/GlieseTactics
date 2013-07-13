@@ -16,7 +16,7 @@ namespace Gliese581g
     public partial class NewPlayerScreen : Form
     {
         public GameSetupScreen callbackGameSetupScreen;
-        public PlayerDisplaySocket callbackPlayerSocket;
+        public CommanderDisplaySocket callbackPlayerSocket;
         public Microsoft.Xna.Framework.Graphics.GraphicsDevice graphics;
         
         private Commander m_playerProfile = null;
@@ -142,7 +142,7 @@ namespace Gliese581g
                 m_playerProfile.SaveXmlFile(fullXmlFilePath);
                 
                 callbackGameSetupScreen.EnableKeysAndMouse();
-                callbackPlayerSocket.Player = Commander.LoadXmlFile(fullXmlFilePath, graphics);
+                callbackPlayerSocket.Commander = Commander.LoadXmlFile(fullXmlFilePath, graphics);
                 DialogResult = DialogResult.OK;
             }
             else

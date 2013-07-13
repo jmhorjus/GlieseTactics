@@ -110,8 +110,12 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ArmySetupScreen\UnitTileSocket.cs" />
+    <Compile Include="ArmySetupScreen\UnitTileBox.cs" />
+    <Compile Include="ArmySetupScreen\UnitTile.cs" />
     <Compile Include="EscMenu\EscMenuScreen.cs" />
-    <Compile Include="GameSetupScreen\PlayerDisplaySocket.cs" />
+    <Compile Include="GameSetupScreen\CommanderTrashBin.cs" />
+    <Compile Include="GameSetupScreen\CommanderDisplaySocket.cs" />
     <Compile Include="GameState\Armor.cs" />
     <Compile Include="GameState\DrawnTextEffect.cs" />
     <Compile Include="GameState\Game.cs" />
@@ -119,17 +123,17 @@
     <Compile Include="GameState\Map\MapTemplate.cs" />
     <Compile Include="GameState\Unit.cs" />
     <Compile Include="GameState\Commander.cs" />
-    <Compile Include="Infrastructure\CheckBox.cs" />
+    <Compile Include="Infrastructure\GUI\CheckBox.cs" />
     <Compile Include="Infrastructure\Animation.cs" />
     <Compile Include="Infrastructure\ImageResize.cs" />
-    <Compile Include="Infrastructure\SfxStore.cs" />
+    <Compile Include="Infrastructure\ContentStores\SfxStore.cs" />
     <Compile Include="Infrastructure\ConfigManager.cs" />
     <Compile Include="Infrastructure\IDrawnObject.cs" />
     <Compile Include="Infrastructure\IUpdatedObject.cs" />
-    <Compile Include="Infrastructure\RadioButton.cs" />
-    <Compile Include="Infrastructure\TextLabel.cs" />
-    <Compile Include="Infrastructure\SliderBar.cs" />
-    <Compile Include="Infrastructure\TextureStore.cs" />
+    <Compile Include="Infrastructure\GUI\RadioButton.cs" />
+    <Compile Include="Infrastructure\GUI\TextLabel.cs" />
+    <Compile Include="Infrastructure\GUI\SliderBar.cs" />
+    <Compile Include="Infrastructure\ContentStores\TextureStore.cs" />
     <Compile Include="Infrastructure\SpriteBatchEx.cs" />
     <Compile Include="Infrastructure\ScreenRectangle.cs" />
     <Compile Include="Infrastructure\Cursor.cs" />
@@ -144,20 +148,20 @@
     <Compile Include="MapScreen\MapEnvironment.cs" />
     <Compile Include="MapScreen\ShakeForm.cs" />
     <Compile Include="MapScreen\UnitStatsDisplayPanel.cs" />
-    <Compile Include="NewPlayerSetupScreen\NewPlayerScreen.cs">
+    <Compile Include="NewPlayerScreen\NewPlayerScreen.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="NewPlayerSetupScreen\NewPlayerScreen.Designer.cs">
+    <Compile Include="NewPlayerScreen\NewPlayerScreen.Designer.cs">
       <DependentUpon>NewPlayerScreen.cs</DependentUpon>
     </Compile>
-    <Compile Include="NewPlayerSetupScreen\NewPlayerSetupScreen.cs" />
+    <Compile Include="NewPlayerScreen\NewPlayerSetupScreen.cs" />
     <Compile Include="Infrastructure\Event.cs" />
-    <Compile Include="MainMenuScreen\OptionsScreen.cs" />
+    <Compile Include="OptionsScreen\OptionsScreen.cs" />
     <Compile Include="MapScreen\Camera.cs" />
     <Compile Include="GameState\Map\Map.cs" />
     <Compile Include="GameState\Hex.cs" />
     <Compile Include="MapScreen\GameMapScreen.cs" />
-    <Compile Include="Infrastructure\MenuButton.cs" />
+    <Compile Include="Infrastructure\GUI\MenuButton.cs" />
     <Compile Include="Infrastructure\ClickableSprite.cs" />
     <Compile Include="MainMenuScreen\MainMenuScreen.cs" />
     <Compile Include="Infrastructure\GameScreen.cs" />
@@ -206,7 +210,7 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="NewPlayerSetupScreen\NewPlayerScreen.resx">
+    <EmbeddedResource Include="NewPlayerScreen\NewPlayerScreen.resx">
       <DependentUpon>NewPlayerScreen.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>

@@ -22,7 +22,7 @@ namespace Gliese581g
             public override void OnEvent(GameScreen parentScreen)
             {
                 parentScreen.EnableKeysAndMouse();
-                parentScreen.GetMainApp().changeToNewBaseActiveScreen(game_screen_key.MainMenu);
+                parentScreen.GetMainApp().changeToNewBaseActiveScreen(game_screen_key.MainMenuScreen);
             }
         }
 
@@ -32,8 +32,8 @@ namespace Gliese581g
         }
        
         MenuButton MainMenuButton;
-        PlayerDisplaySocket player_winner;
-        PlayerDisplaySocket player_loser;
+        CommanderDisplaySocket player_winner;
+        CommanderDisplaySocket player_loser;
         Game m_game;
         public Game Game
         {
@@ -42,8 +42,8 @@ namespace Gliese581g
         
             { 
                 m_game = value;
-                player_winner.Player = m_game.WinningPlayer;
-                player_loser.Player = m_game.LosingPlayer;
+                player_winner.Commander = m_game.WinningPlayer;
+                player_loser.Commander = m_game.LosingPlayer;
             }
         
         }
@@ -61,11 +61,11 @@ namespace Gliese581g
 
 
             // The player display panels:
-            player_winner = new PlayerDisplaySocket(
+            player_winner = new CommanderDisplaySocket(
                 TextureStore.Get(TexId.portrait_empty),
                 m_fixedRectangles["winner_display"],
                 m_defaultFont);
-            player_loser = new PlayerDisplaySocket(TextureStore.Get(TexId.portrait_empty),
+            player_loser = new CommanderDisplaySocket(TextureStore.Get(TexId.portrait_empty),
                 m_fixedRectangles["loser_display"],
                 m_defaultFont);
             player_winner.Enabled = false; // Player display panels not enabled for clicking/dragging.

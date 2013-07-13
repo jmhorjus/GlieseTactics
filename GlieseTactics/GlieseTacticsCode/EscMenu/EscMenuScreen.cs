@@ -40,7 +40,7 @@ namespace Gliese581g
             public override void OnEvent(GameScreen parentScreen)
             {
                 parentScreen.EnableKeysAndMouse();
-                parentScreen.GetMainApp().changeToNewBaseActiveScreen(game_screen_key.MainMenu);
+                parentScreen.GetMainApp().changeToNewBaseActiveScreen(game_screen_key.MainMenuScreen);
             }
         }
 
@@ -51,7 +51,7 @@ namespace Gliese581g
             public override void OnEvent(GameScreen parentScreen)
             {
                 parentScreen.EnableKeysAndMouse();
-                parentScreen.GetMainApp().spawnNewSubScreen(game_screen_key.MainMenu_Options, new ScreenRectangle(.20f, .15f, .6f, .6f));
+                parentScreen.GetMainApp().spawnNewSubScreen(game_screen_key.OptionsScreen, new ScreenRectangle(.20f, .15f, .6f, .6f));
             }
         }
 

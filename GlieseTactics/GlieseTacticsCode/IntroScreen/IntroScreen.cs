@@ -109,7 +109,7 @@ namespace Gliese581g
                     alphaPlain = 1f - (m_phaseTimer / phaseTimings[(int)m_currentPhase]);
                     break;
                 case IntroPhase.LoadMenu:
-                    GetMainApp().changeToNewBaseActiveScreen(game_screen_key.MainMenu);
+                    GetMainApp().changeToNewBaseActiveScreen(game_screen_key.MainMenuScreen);
                     break;
             }
 

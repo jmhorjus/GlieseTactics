@@ -104,8 +104,8 @@ namespace Gliese581g
                 m_map.Game = value;
                 if (value == null)
                     return;
-                m_player1Display.Player = value.Players[0];
-                m_player2Display.Player = value.Players[1];
+                m_player1Display.Commander = value.Players[0];
+                m_player2Display.Commander = value.Players[1];
             }
         }
 
@@ -122,8 +122,8 @@ namespace Gliese581g
 
         MenuButton m_endTurnButton;
         UnitStatsDisplayPanel m_unitDisplay;
-        PlayerDisplaySocket m_player1Display;
-        PlayerDisplaySocket m_player2Display;
+        CommanderDisplaySocket m_player1Display;
+        CommanderDisplaySocket m_player2Display;
         TextLabel m_damagePreviewLabel;
         TextLabel m_killsPreviewLabel;
 
@@ -158,11 +158,11 @@ namespace Gliese581g
 
 
             // The player display panels:
-            m_player1Display = new PlayerDisplaySocket(
+            m_player1Display = new CommanderDisplaySocket(
                 TextureStore.Get(TexId.portrait_empty),
                 gameAlreadyStarted ? m_fixedRectangles["player1_display_shown"] : m_fixedRectangles["player1_display_onload"],
                 m_defaultFont);
-            m_player2Display = new PlayerDisplaySocket(TextureStore.Get(TexId.portrait_empty),
+            m_player2Display = new CommanderDisplaySocket(TextureStore.Get(TexId.portrait_empty),
                 gameAlreadyStarted ? m_fixedRectangles["player2_display_shown"] : m_fixedRectangles["player2_display_onload"],
                 m_defaultFont);
             m_player1Display.Enabled = false; // Player display panels not enabled for clicking/dragging.
@@ -172,8 +172,8 @@ namespace Gliese581g
 
             if (m_map != null)
             {
-                m_player1Display.Player = m_map.Game.Players[0];
-                m_player2Display.Player = m_map.Game.Players[1];
+                m_player1Display.Commander = m_map.Game.Players[0];
+                m_player2Display.Commander = m_map.Game.Players[1];
             }
 
             // Animations.
@@ -275,7 +275,7 @@ namespace Gliese581g
                 m_victoryConfettiFountain_2.Enabled = true;
                 m_victoryConfettiFountain_2.Visible = true;
 
-                PlayerDisplaySocket winner;
+                CommanderDisplaySocket winner;
                 if (Game.WinningPlayer == Game.Players[0])
                 {
                     winner = m_player1Display;

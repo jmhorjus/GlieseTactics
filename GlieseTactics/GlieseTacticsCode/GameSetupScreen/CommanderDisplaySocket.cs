@@ -1,4 +1,5 @@
-﻿using System; using System.Collections.Generic;
+﻿using System; 
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
@@ -10,38 +11,14 @@ using Microsoft.Xna.Framework.Media;
 namespace Gliese581g
 {
 
-    public class PlayerTrash : ClickableSprite
-    {
-        Texture2D m_dim;
-        Texture2D m_lit;
-        public PlayerTrash(Rectangle DisplayRect) : 
-            base(TextureStore.Get(TexId.player_trash_dim), DisplayRect, Color.White, 1f, 0f, Vector2.Zero, .5f) 
-        {
-            m_dim = TextureStore.Get(TexId.player_trash_dim);
-            m_lit = TextureStore.Get(TexId.player_trash_lit);
-        }
-
-        public override void OnStartMouseover()
-        {
-            PlayerDisplaySocket.s_dragTrash = true;
-            Texture = m_lit;
-        }
-        
-        public override void OnStopMouseover(TimeSpan timeHeld)
-        {
-            PlayerDisplaySocket.s_dragTrash = false;
-            Texture = m_dim;
-        }
-    }
-
-    public class PlayerDisplaySocket : ClickableSprite
+    public class CommanderDisplaySocket : ClickableSprite
     {
         Commander m_player;
         Texture2D m_emptyPortrait;
         SpriteFont m_font;
         Vector2 m_fontScale;
 
-        public Commander Player
+        public Commander Commander
         {
             get { return m_player; }
             set 
@@ -63,7 +40,7 @@ namespace Gliese581g
 
 
 
-        public PlayerDisplaySocket(Texture2D emptyPortrait, Rectangle dispRect, SpriteFont font)
+        public CommanderDisplaySocket(Texture2D emptyPortrait, Rectangle dispRect, SpriteFont font)
             : base(emptyPortrait, dispRect, Color.White, 1f, 0f, Vector2.Zero, 1f)
         {
             m_emptyPortrait = emptyPortrait;
@@ -84,8 +61,8 @@ namespace Gliese581g
 
 
         /// Static socket pointers to facilitate dragging and dropping between sockets.
-        private static PlayerDisplaySocket s_dragSourceSocket = null;
-        private static PlayerDisplaySocket s_dragDestSocket = null;
+        private static CommanderDisplaySocket s_dragSourceSocket = null;
+        private static CommanderDisplaySocket s_dragDestSocket = null;
 
         public static bool s_dragTrash = false;
 
@@ -93,6 +70,7 @@ namespace Gliese581g
         /// Mouse functions
         public override void OnLeftClick(Vector2 mousePosInTexture)
         {
+            // If empty, add the defined click-when-empty event to the parent screen.
             if (m_player == null && m_clickWhenEmptyEvent != null && m_parentScreen != null)
             {
                 m_clickWhenEmptyEvent.Reset();
@@ -100,6 +78,7 @@ namespace Gliese581g
             }
         }
 
+        
         public override void OnLeftClickDragStart()
         {
             if (s_dragSourceSocket == null)
@@ -108,7 +87,7 @@ namespace Gliese581g
 
         public override void OnStartMouseover()
         {
-            if (s_dragSourceSocket != null && s_dragSourceSocket != this)
+            if (s_dragSourceSocket != null && s_dragSourceSocket != this && s_dragDestSocket == null)
             {
                 s_dragDestSocket = this;
                 Tint = Color.LightGray;
@@ -129,22 +108,22 @@ namespace Gliese581g
             if (s_dragSourceSocket == this && s_dragTrash == true)
             {
                 NewPlayerScreen npScreen = NewPlayerScreen.GetInstance;
-                if (npScreen.ConfirmationDialog(string.Format(@"Are you sure you want to delete {0}?", Player.Name)))
+                if (npScreen.ConfirmationDialog(string.Format(@"Are you sure you want to delete {0}?", Commander.Name)))
                 {
-                    Player.DeleteProfile();
-                    Player = null;
+                    Commander.DeleteProfile();
+                    Commander = null;
                 }
             }
             
             if (s_dragSourceSocket == this && s_dragDestSocket != null)
             {
-                Commander temp = s_dragDestSocket.Player;
+                Commander temp = s_dragDestSocket.Commander;
                 Rectangle tempDestRect = s_dragDestSocket.DisplayRect;
                 Rectangle tempSourceRect = s_dragSourceSocket.DisplayRect;
 
-                s_dragDestSocket.Player = s_dragSourceSocket.Player;
+                s_dragDestSocket.Commander = s_dragSourceSocket.Commander;
                 s_dragDestSocket.Tint = Color.White;
-                s_dragSourceSocket.Player = temp;
+                s_dragSourceSocket.Commander = temp;
 
                 //Not only swap players but also locations - then animate back to their original places with the new players.
                 s_dragDestSocket.DisplayRect = tempSourceRect;

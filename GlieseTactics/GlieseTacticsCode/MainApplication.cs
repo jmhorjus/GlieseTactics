@@ -15,13 +15,13 @@ namespace Gliese581g
     /// Enum for use as a key into a dictionary of screens.  
     public enum game_screen_key
     {
-        Intro,
-        MainMenu,
-        MainMenu_Options,
-        GameSetup,
-        NewPlayerSetup,
+        IntroScreen,
+        MainMenuScreen,
+        OptionsScreen,
+        GameSetupScreen,
+        NewPlayerScreen,
         SkillsScreen,
-        GameSetup_ArmySetup,
+        ArmyCustomizationScreen,
         MainGame,
         MainGame_EscMenu,
         GameOver,
@@ -91,14 +91,14 @@ namespace Gliese581g
         protected override void Initialize()
         {
             /// Create the game screen objects, and put them in the dictionary.
-            m_allGameScreens[game_screen_key.Intro] = new IntroScreen(this);
-            m_allGameScreens[game_screen_key.MainMenu] = new MainMenuScreen(this);
-            m_allGameScreens[game_screen_key.MainMenu_Options] = new OptionsScreen(this);
+            m_allGameScreens[game_screen_key.IntroScreen] = new IntroScreen(this);
+            m_allGameScreens[game_screen_key.MainMenuScreen] = new MainMenuScreen(this);
+            m_allGameScreens[game_screen_key.OptionsScreen] = new OptionsScreen(this);
             m_allGameScreens[game_screen_key.MainGame] = new GameMapScreen(this);
-            m_allGameScreens[game_screen_key.GameSetup] = new GameSetupScreen(this);
-            m_allGameScreens[game_screen_key.NewPlayerSetup] = new NewPlayerSetupScreen(this);
+            m_allGameScreens[game_screen_key.GameSetupScreen] = new GameSetupScreen(this);
+            m_allGameScreens[game_screen_key.NewPlayerScreen] = new NewPlayerSetupScreen(this);
             m_allGameScreens[game_screen_key.SkillsScreen] = new SkillsScreen(this);
-            m_allGameScreens[game_screen_key.GameSetup_ArmySetup] = new ArmySetupScreen(this);
+            m_allGameScreens[game_screen_key.ArmyCustomizationScreen] = new ArmySetupScreen(this);
             m_allGameScreens[game_screen_key.MainGame_EscMenu] = new EscMenuScreen(this);
             m_allGameScreens[game_screen_key.VictoryScreen] = new VictoryScreen(this);
 
@@ -106,7 +106,7 @@ namespace Gliese581g
             m_activeGameScreens = new List<GameScreen>();
 
             //m_activeGameScreens.Add(m_allGameScreens[game_screen_key.MainMenu]);
-            m_activeGameScreens.Add(m_allGameScreens[game_screen_key.Intro]);
+            m_activeGameScreens.Add(m_allGameScreens[game_screen_key.IntroScreen]);
 
             ///Shake
             ShakeForm.s_MainApp = this;

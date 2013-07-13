@@ -16,10 +16,14 @@ namespace Gliese581g
         public ArmySetupScreen(MainApplication mainApp):base(mainApp)
         {
         }
+
+
         public override void InitScreen(ScreenRectangle portionOfScreen, GraphicsDevice graphicsDevice)
         {
             
         }
+
+
         public override void UninitScreen()
         {
             m_spriteBatchExMain.DrawnObjects.Clear();

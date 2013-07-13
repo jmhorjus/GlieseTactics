@@ -24,15 +24,15 @@ namespace Gliese581g
             public override void OnEvent(GameScreen parentScreen)
             {   // This event exits the program.
                 parentScreen.EnableKeysAndMouse();
-                parentScreen.GetMainApp().changeToNewBaseActiveScreen(game_screen_key.MainMenu);
+                parentScreen.GetMainApp().changeToNewBaseActiveScreen(game_screen_key.MainMenuScreen);
             }
         }
         private class NewPlayerEvent : Event
         {
-            PlayerDisplaySocket m_socket;
+            CommanderDisplaySocket m_socket;
 
-            public NewPlayerEvent(PlayerDisplaySocket socket) : base(new TimeSpan(0)) { m_socket = socket; }
-            public NewPlayerEvent(PlayerDisplaySocket socket, TimeSpan time) : base(time) { m_socket = socket; }
+            public NewPlayerEvent(CommanderDisplaySocket socket) : base(new TimeSpan(0)) { m_socket = socket; }
+            public NewPlayerEvent(CommanderDisplaySocket socket, TimeSpan time) : base(time) { m_socket = socket; }
 
             public override void OnEvent(GameScreen parentScreen)
             {
@@ -108,7 +108,7 @@ namespace Gliese581g
             m_sidebarScrollPosition = newScrollPos;
             for(int ii = 0; ii < m_playerSidebarList.Count; ii++)
             {
-                PlayerDisplaySocket socket = m_playerSidebarList[ii];
+                CommanderDisplaySocket socket = m_playerSidebarList[ii];
                 int reletivePosition = m_sidebarScrollPosition - ii;
                 Rectangle destination = Rectangle.Empty;
                 if (reletivePosition > 1)
@@ -142,13 +142,13 @@ namespace Gliese581g
         int m_sidebarScrollPosition;
         const int PLAYER_SIDEBAR_MIN_TOTAL_SLOTS = 8;
         const int PLAYER_SIDEBAR_MIN_EMPTY_SLOTS = 2;
-        List<PlayerDisplaySocket> m_playerSidebarList = new List<PlayerDisplaySocket>();
-        PlayerTrash m_playerTrash;
+        List<CommanderDisplaySocket> m_playerSidebarList = new List<CommanderDisplaySocket>();
+        CommanderTrashBin m_playerTrash;
 
-        PlayerDisplaySocket m_playerSocket_player1;
-        public Commander Player1 { get { return m_playerSocket_player1.Player; } }
-        PlayerDisplaySocket m_playerSocket_player2;
-        public Commander Player2 { get { return m_playerSocket_player2.Player; } }
+        CommanderDisplaySocket m_playerSocket_player1;
+        public Commander Player1 { get { return m_playerSocket_player1.Commander; } }
+        CommanderDisplaySocket m_playerSocket_player2;
+        public Commander Player2 { get { return m_playerSocket_player2.Commander; } }
         TextLabel m_labelVS;
         SpriteFont m_fontVS;
 
@@ -171,7 +171,7 @@ namespace Gliese581g
         {
             m_currentScreenRectangle = portionOfScreen;
             m_spriteBatchExMain.Transform = m_currentScreenRectangle.GetMatrixTransform(graphicsDevice);
-            m_playerTrash = new PlayerTrash(m_fixedRectangles["player_trash"]);
+            m_playerTrash = new CommanderTrashBin(m_fixedRectangles["player_trash"]);
             m_spriteBatchExMain.DrawnObjects.Add(m_playerTrash);
 
             //Get the full path of the profile folder
@@ -186,7 +186,7 @@ namespace Gliese581g
                     //Put together the file path
                     string xmlFilePath = playerProfilePath + Path.GetFileNameWithoutExtension(file) + ".xml";
                     // Create the player, and put it in a new socket on the sidebar.
-                    AddEmptySocketToSidebar().Player = Commander.LoadXmlFile(xmlFilePath, GetMainApp().GraphicsDevice);
+                    AddEmptySocketToSidebar().Commander = Commander.LoadXmlFile(xmlFilePath, GetMainApp().GraphicsDevice);
                     playerProfileIndex += 1;
                 }
             }
@@ -220,9 +220,9 @@ namespace Gliese581g
             m_spriteBatchExMain.DrawnObjects.Add(m_buttonArrowUp);
                
 
-            m_playerSocket_player1 = new PlayerDisplaySocket(TextureStore.Get(TexId.portrait_empty),
+            m_playerSocket_player1 = new CommanderDisplaySocket(TextureStore.Get(TexId.portrait_empty),
                 m_fixedRectangles["player_1"], m_defaultFont);
-            m_playerSocket_player2 = new PlayerDisplaySocket(TextureStore.Get(TexId.portrait_empty),
+            m_playerSocket_player2 = new CommanderDisplaySocket(TextureStore.Get(TexId.portrait_empty),
                m_fixedRectangles["player_2"], m_defaultFont);
 
             m_spriteBatchExMain.DrawnObjects.Add(m_playerSocket_player1);
@@ -333,10 +333,10 @@ namespace Gliese581g
 
 
         // Utility functio that adds an empty socket to the player sidebar list.
-        protected PlayerDisplaySocket AddEmptySocketToSidebar()
+        protected CommanderDisplaySocket AddEmptySocketToSidebar()
         {
-            PlayerDisplaySocket socket;
-            socket = new PlayerDisplaySocket(TextureStore.Get(TexId.portrait_newplayer),
+            CommanderDisplaySocket socket;
+            socket = new CommanderDisplaySocket(TextureStore.Get(TexId.portrait_newplayer),
                 m_fixedRectangles["player_sidebar_off_bottom"], m_defaultFont);
             socket.SetClickWhenEmptyEvent(new NewPlayerEvent(socket), this);
             m_playerSidebarList.Add(socket);
@@ -348,8 +348,8 @@ namespace Gliese581g
         {  
             get 
             {
-                return m_playerSocket_player1.Player != null &&
-                    m_playerSocket_player2.Player != null &&
+                return m_playerSocket_player1.Commander != null &&
+                    m_playerSocket_player2.Commander != null &&
                     VictoryType != Game.VictoryType.NotSet &&
                     MapSize != Game.MapSize.NotSet &&
                     ArmySize != Game.ArmySize.NotSet &&
