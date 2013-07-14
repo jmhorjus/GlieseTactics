@@ -10,8 +10,13 @@ namespace Gliese581g
     public abstract class MapTemplate
     {
         protected static Hex nullOutputDestination = null;
-        public abstract HexEffectStats OnApply(Map map, MapLocation location, HexEffect effect, out Hex onlyOneHex);
-        public abstract HexEffectStats OnApply(Map map, MapLocation location, HexEffect effect);
+        public abstract HexEffectStats OnApply(Map map, MapLocation location, HexEffect effect, Hex effectSourceHex, out Hex onlyOneHex);
+
+        //public abstract HexEffectStats OnApply(Map map, MapLocation location, HexEffect effect, Hex effectOriginHex);
+        public virtual HexEffectStats OnApply(Map map, MapLocation location, HexEffect effect, Hex effectSourceHex)
+        {
+            return OnApply(map, location, effect, effectSourceHex, out nullOutputDestination);
+        }
         
         protected bool m_returnMaxStats = false;
         protected HexEffectStats AccumulateStats(HexEffectStats stats1, HexEffectStats stats2)
@@ -41,16 +46,15 @@ namespace Gliese581g
             m_returnMaxStats = returnMaxStats;
         }
 
-        public override HexEffectStats OnApply(Map map, MapLocation location, HexEffect effect)
-        {
-            return OnApply(map, location, effect, out nullOutputDestination);
-        }
 
-        public override HexEffectStats OnApply(Map map, MapLocation location, HexEffect effect, out Hex onlyOneHex)
+        public override HexEffectStats OnApply(Map map, MapLocation location, HexEffect effect, Hex effectSourceHex, out Hex onlyOneHex)
         {
             HexEffectStats retVal = new HexEffectStats();
             onlyOneHex = null;
             bool isFirstHex = true;
+            Hex sourceHex =
+                effectSourceHex != null ? effectSourceHex : map.GetHex(location.Position);
+
             for (int ii = 0; ii < m_length; ii++)
             {
                 if (ii == 0 && !m_includeSourceHex)
@@ -71,7 +75,7 @@ namespace Gliese581g
                     onlyOneHex = hex;
                     
                 // Apply the effect.
-                retVal = AccumulateStats(retVal, effect.ApplyToHex(hex, location.Direction));
+                retVal = AccumulateStats(retVal, effect.ApplyToHex(hex, location.Direction, sourceHex));
                 isFirstHex = false;
 
                 if (doneAfterThisHex)
@@ -115,13 +119,9 @@ namespace Gliese581g
             m_returnMaxStats = returnMaxStats;
         }
 
-        public override HexEffectStats OnApply(Map map, MapLocation location, HexEffect effect)
-        {
-            return OnApply(map, location, effect, out nullOutputDestination);
-        }
 
         // The public OnApply
-        public override HexEffectStats OnApply(Map map, MapLocation location, HexEffect effect, out Hex onlyOneHex)
+        public override HexEffectStats OnApply(Map map, MapLocation location, HexEffect effect, Hex effectSourceHex, out Hex onlyOneHex)
         {
             HexEffectStats retVal = new HexEffectStats();
             // Ranged template never only one hex
@@ -131,6 +131,7 @@ namespace Gliese581g
             RecursiveApply(
                 map,
                 effect,
+                effectSourceHex, 
                 location.Position, location.Position,
                 m_range, m_range,
                 (m_unitWhoseAlliesDontBlockMovement != null) ? m_unitWhoseAlliesDontBlockMovement.Owner : null,
@@ -142,6 +143,7 @@ namespace Gliese581g
         void RecursiveApply(
             Map map,
             HexEffect effect,
+            Hex effectSourceHex,
             Point startingPos,
             Point pos,
             int totalRange,
@@ -162,8 +164,14 @@ namespace Gliese581g
             {
                 if (!hex.IsMarked.ContainsKey(this) && (pos != startingPos || m_includeSourceHex))
                 {
-                    stats = AccumulateStats (stats, effect.ApplyToHex(hex, Direction.Left)); // direction is arbitrary in this context!
                     map.MarkHex(this, hex);
+
+                    stats = AccumulateStats (stats, 
+                        effect.ApplyToHex(
+                            hex,
+                            new Direction(0), // direction is arbitrary in this context!
+                            effectSourceHex != null ? effectSourceHex : map.GetHex(startingPos))); 
+                    
                     hex.CurrentMoveCost = totalRange - rangeRemaining;
                 }
                 else if (hex.CurrentMoveCost > totalRange - rangeRemaining)
@@ -177,17 +185,17 @@ namespace Gliese581g
                 )
             {
                 // Recurse in each of the six directions.  
-                RecursiveApply(map, effect, startingPos, new Point(pos.X + 1, pos.Y), totalRange, rangeRemaining - 1,
+                RecursiveApply(map, effect, effectSourceHex, startingPos, new Point(pos.X + 1, pos.Y), totalRange, rangeRemaining - 1,
                     friendlyPlayer, ref stats);
-                RecursiveApply(map, effect, startingPos, new Point(pos.X - 1, pos.Y), totalRange, rangeRemaining - 1,
+                RecursiveApply(map, effect, effectSourceHex, startingPos, new Point(pos.X - 1, pos.Y), totalRange, rangeRemaining - 1,
                     friendlyPlayer, ref stats);
-                RecursiveApply(map, effect, startingPos, new Point(pos.X + (pos.Y % 2), pos.Y + 1), totalRange, rangeRemaining - 1,
+                RecursiveApply(map, effect, effectSourceHex, startingPos, new Point(pos.X + (pos.Y % 2), pos.Y + 1), totalRange, rangeRemaining - 1,
                     friendlyPlayer, ref stats);
-                RecursiveApply(map, effect, startingPos, new Point(pos.X - 1 + (pos.Y % 2), pos.Y + 1), totalRange, rangeRemaining - 1,
+                RecursiveApply(map, effect, effectSourceHex, startingPos, new Point(pos.X - 1 + (pos.Y % 2), pos.Y + 1), totalRange, rangeRemaining - 1,
                     friendlyPlayer, ref stats);
-                RecursiveApply(map, effect, startingPos, new Point(pos.X - 1 + (pos.Y % 2), pos.Y - 1), totalRange, rangeRemaining - 1,
+                RecursiveApply(map, effect, effectSourceHex, startingPos, new Point(pos.X - 1 + (pos.Y % 2), pos.Y - 1), totalRange, rangeRemaining - 1,
                     friendlyPlayer, ref stats);
-                RecursiveApply(map, effect, startingPos, new Point(pos.X + (pos.Y % 2), pos.Y - 1), totalRange, rangeRemaining - 1,
+                RecursiveApply(map, effect, effectSourceHex, startingPos, new Point(pos.X + (pos.Y % 2), pos.Y - 1), totalRange, rangeRemaining - 1,
                     friendlyPlayer, ref stats);
             }
             return;

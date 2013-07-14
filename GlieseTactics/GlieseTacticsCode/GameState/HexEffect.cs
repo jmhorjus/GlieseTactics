@@ -6,6 +6,10 @@ using Microsoft.Xna.Framework;
 
 namespace Gliese581g
 {
+
+    /// <summary>
+    /// The HexEffectStats class - stats about what an effect does when applied by a template.
+    /// </summary>
     public class HexEffectStats
     {
         public int Damage = 0;
@@ -43,18 +47,20 @@ namespace Gliese581g
         }
     }
 
+
+    /// <summary>
+    /// The HexEffect interface - defines the ApplyToHex function. (All HexEffects can be applied to a hex.)
+    /// </summary>
     public abstract class HexEffect
     {
         public abstract HexEffectStats ApplyToHex(Hex hex, Direction templateDirection, Hex effectSourceHex);
-
-        public virtual HexEffectStats ApplyToHex(Hex hex, Direction templateDirection)
-        {
-            return ApplyToHex(hex, templateDirection, hex);
-        }
     }
 
 
 
+    /// <summary>
+    /// An effect that damages any unit in the hex.
+    /// </summary>
     [Serializable]
     public class UnitDamageEffect : HexEffect
     {
@@ -115,6 +121,9 @@ namespace Gliese581g
     }
 
 
+    /// <summary>
+    /// An effect that highlights the hex on the map.
+    /// </summary>
     public class HighlightEffect : HexEffect
     {
         Map m_map;
@@ -135,6 +144,9 @@ namespace Gliese581g
     }
 
 
+    /// <summary>
+    /// An effect that double-highlights the hex on the map (for highlighting 
+    /// </summary>
     public class DoubleHighlightEffect : HexEffect
     {
         Map m_map;
@@ -156,38 +168,50 @@ namespace Gliese581g
 
 
 
-
+    /// <summary>
+    /// An effect that recursively applies another effect based on a template starting at this hex. 
+    /// </summary>
     public class RecursiveTemplateEffect : HexEffect
     {
         Map m_map;
         MapTemplate m_subTemplate;
         HexEffect m_subTemplateEffect;
         bool m_allDirections;
+        bool m_redefineEffectSourceHex;
         bool m_returnMaxStats;
 
 
-        public RecursiveTemplateEffect(Map map, MapTemplate subTemplate, bool allDirections, HexEffect subTemplateEffect,
-             bool returnMaxStats = true)
+        public RecursiveTemplateEffect(
+            Map map, 
+            MapTemplate subTemplate, 
+            bool allDirections,
+            bool redefineEffectSourceHex,
+            HexEffect subTemplateEffect,
+            bool returnMaxStats = true)
         {
             m_map = map;
             m_subTemplate = subTemplate;
             m_subTemplateEffect = subTemplateEffect;
             m_allDirections = allDirections;
+            m_redefineEffectSourceHex = redefineEffectSourceHex;
             m_returnMaxStats = returnMaxStats;
         }
 
         public override HexEffectStats ApplyToHex(Hex hex, Direction templateDirection, Hex effectOriginHex)
         {
-            
-            // Apply the sub-template in all 6 directions.  
+            Direction currentDirection = templateDirection;
             HexEffectStats retVal = new HexEffectStats();
-            //for (Direction dir = new Direction((Direction.ValueType)0); 
-            //    dir.Value < Direction.ValueType.NumDirections; 
-            //    dir.Value = dir.Value+1)
+            // loop through to apply the sub-template in all 6 directions (if configured to)
             for (int ii = 0; ii < (int)Direction.ValueType.NumDirections; ii++)
             {
-                MapLocation loc = new MapLocation(hex.MapPosition, templateDirection);
-                HexEffectStats stats = m_subTemplate.OnApply(m_map, loc, m_subTemplateEffect);
+                MapLocation loc = new MapLocation(hex.MapPosition, currentDirection);
+                
+                HexEffectStats stats = m_subTemplate.OnApply(
+                    m_map,
+                    loc,
+                    m_subTemplateEffect,
+                    m_redefineEffectSourceHex ? hex : effectOriginHex);
+
                 if (!m_returnMaxStats)
                     retVal += stats;
                 else
@@ -195,7 +219,7 @@ namespace Gliese581g
 
                 if (!m_allDirections)
                     break;
-                templateDirection++;
+                currentDirection++;
             }
             return retVal;
         }

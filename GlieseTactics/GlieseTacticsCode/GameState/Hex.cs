@@ -10,31 +10,48 @@ using System.Text;
 
 namespace Gliese581g
 {
+    [Serializable]
     public class Hex : ClickableSprite 
     {
-
+        [NonSerialized]
         public const int HEX_SIZE = 80;
+        [NonSerialized]
         public const int HEX_SPACING = 2;
-        
+        [NonSerialized]
         public static Color SELECTED_TINT = new Color(50, 50, 50, 255);
+        [NonSerialized]
         public static Color MOUSEOVER_TINT = new Color(100, 100, 100, 255);
-
+        [NonSerialized]
         public static Color HIGHLIGHT_TINT_MOVE = new Color(50, 150, 150, 255);
+        [NonSerialized]
         public static Color HIGHLIGHT_TINT_ATTACK = new Color(150, 150, 50, 255);
-
+        [NonSerialized]
         public static Color DOUBLE_HIGHLIGHT_TINT = new Color(100, 50, 50, 255);
 
         // Pointer to the map that this hex is a part of.
         Map m_map;
 
         // Hex properties related to current map input. 
-        public bool IsSelected = false; 
+        [NonSerialized]
+        public bool IsSelected = false;
+        [NonSerialized]
         public bool IsHighlighted = false;
+        [NonSerialized]
         public bool IsDoubleHighlighted = false;
 
-        public Dictionary<MapTemplate, bool> IsMarked = new Dictionary<MapTemplate,bool>(); // used for the range template, to indicate if an effect has already been applied.
-        public int CurrentMoveCost; // used in range calculations.
-        public Hex TemplateOriginHex = null; // used for during damage template placment
+        [NonSerialized] // used for the range template, to indicate if an effect has already been applied.
+        public Dictionary<MapTemplate, bool> IsMarked = new Dictionary<MapTemplate,bool>();
+        [NonSerialized] // used in range calculations.
+        public int CurrentMoveCost;
+        [NonSerialized] // used in range calculations.
+        public Hex TemplateOriginHex = null; // used during damage template placment
+        [NonSerialized]
+        List<IDrawnEffect> drawnEffectList = new List<IDrawnEffect>();
+
+
+        ///
+        ///Perminant, serializable properties. 
+        ///
 
         // Can units move onto-through this Hex?
         public bool LandPossible;
@@ -42,15 +59,12 @@ namespace Gliese581g
         // Is there a unit currently occupying this Hex?
         protected Unit m_unit = null;
         public Unit Unit { get { return m_unit; } }
-
         public void PlaceUnit(Unit unit) { m_unit = unit; }
         public void ClearUnit() { m_unit = null; }
         
         // Is a valid destination if it's possable and not already occupied.
         public bool IsValidDestination
         { get { return LandPossible && Unit == null; } }
-
-        List<IDrawnEffect> drawnEffectList = new List<IDrawnEffect>();
 
         // Appearance variables.  
         protected Point m_mapPosition;
@@ -82,6 +96,10 @@ namespace Gliese581g
             Tint = Color.White;
             m_map = owningMap;
         }
+        // Needed to make Hex Serializable.
+        public Hex()
+            : base(null, Rectangle.Empty, Color.White, 1f, 0f, Vector2.Zero, 0f)
+        { }
 
 
         // Support the draw interface (we're using the composite design pattern)
@@ -190,7 +208,8 @@ namespace Gliese581g
                     m_map.SelectedHex.Unit.MoveTemplate.OnApply(
                         m_map,
                         new MapLocation(m_map.SelectedHex.m_mapPosition, m_map.SelectedHex.Unit.FacingDirection),
-                        new HighlightEffect(m_map));
+                        new HighlightEffect(m_map),
+                        null);
                     
                     m_map.Game.CurrentTurnStage = Game.TurnStage.ChooseMoveDestination;
 
@@ -218,7 +237,8 @@ namespace Gliese581g
                         this.Unit.MoveTemplate.OnApply(
                             m_map,
                             new MapLocation(this.m_mapPosition, this.Unit.FacingDirection),
-                            new HighlightEffect(m_map));
+                            new HighlightEffect(m_map),
+                            null);
 
                         if (Unit.Owner == m_map.Game.CurrentPlayer)
                         {
@@ -258,7 +278,8 @@ namespace Gliese581g
                         tempUnit.TargetTemplate.OnApply(
                             m_map,
                             new MapLocation(this.m_mapPosition, tempUnit.FacingDirection),
-                            new HighlightEffect(m_map)); 
+                            new HighlightEffect(m_map), 
+                            null); 
 
                         m_map.Game.CurrentTurnStage = Game.TurnStage.ChooseHeading;
                         Unit.PlaySfxMove();
@@ -358,9 +379,10 @@ namespace Gliese581g
                 !m_currentlyOriginOfDoubleHighlightArea)
             {
                 HexEffectStats stats = Unit.MoveTemplate.OnApply(m_map, Unit.MapLocation, 
-                    new RecursiveTemplateEffect(m_map, Unit.TargetTemplate, true,
-                        new RecursiveTemplateEffect(m_map, Unit.AttackTemplate, false,
-                            new DoubleHighlightEffect(m_map, Unit))) );
+                    new RecursiveTemplateEffect(m_map, Unit.TargetTemplate, true, true,
+                        new RecursiveTemplateEffect(m_map, Unit.AttackTemplate, false, false,
+                            new DoubleHighlightEffect(m_map, Unit))), 
+                            Unit.CurrentHex);
                 
                 m_currentlyOriginOfDoubleHighlightArea = true;
                 m_map.ExpectedAttackStats = stats;
@@ -403,6 +425,7 @@ namespace Gliese581g
                 m_map,
                 new MapLocation(m_mapPosition, Unit.FacingDirection),
                 new HighlightEffect(m_map), 
+                null,
                 out onlyOneHex);
 
             if (onlyOneHex != null)
@@ -410,7 +433,8 @@ namespace Gliese581g
                 Unit.AttackTemplate.OnApply(
                     m_map,
                     new MapLocation(onlyOneHex.MapPosition, Unit.FacingDirection),
-                    new HighlightEffect(m_map, onlyOneHex));
+                    new HighlightEffect(m_map, onlyOneHex), 
+                    Unit.CurrentHex);
             }
         }
 
@@ -424,7 +448,8 @@ namespace Gliese581g
             return attackingUnit.AttackTemplate.OnApply(
                 m_map,
                 new MapLocation(attackOrigin.m_mapPosition, attackingUnit.FacingDirection),
-                effect);
+                effect,
+                attackingUnit.CurrentHex);
         }
 
     }
