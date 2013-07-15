@@ -170,9 +170,9 @@ namespace Gliese581g
         public override void InitScreen(ScreenRectangle portionOfScreen, Microsoft.Xna.Framework.Graphics.GraphicsDevice graphicsDevice)
         {
             m_currentScreenRectangle = portionOfScreen;
-            m_spriteBatchExMain.Transform = m_currentScreenRectangle.GetMatrixTransform(graphicsDevice);
+            m_mainScreenLayer.Transform = m_currentScreenRectangle.GetMatrixTransform(graphicsDevice);
             m_playerTrash = new CommanderTrashBin(m_fixedRectangles["player_trash"]);
-            m_spriteBatchExMain.DrawnObjects.Add(m_playerTrash);
+            m_mainScreenLayer.DrawnObjects.Add(m_playerTrash);
 
             //Get the full path of the profile folder
             string playerProfilePath = ConfigManager.GlobalManager.PlayerProfileDirectory;
@@ -216,8 +216,8 @@ namespace Gliese581g
                 SfxStore.Get(SfxId.menu_click),
                 new PlayerScrollEvent(-1), 
                 false, this);
-            m_spriteBatchExMain.DrawnObjects.Add(m_buttonArrowDown);
-            m_spriteBatchExMain.DrawnObjects.Add(m_buttonArrowUp);
+            m_mainScreenLayer.DrawnObjects.Add(m_buttonArrowDown);
+            m_mainScreenLayer.DrawnObjects.Add(m_buttonArrowUp);
                
 
             m_playerSocket_player1 = new CommanderDisplaySocket(TextureStore.Get(TexId.portrait_empty),
@@ -225,11 +225,11 @@ namespace Gliese581g
             m_playerSocket_player2 = new CommanderDisplaySocket(TextureStore.Get(TexId.portrait_empty),
                m_fixedRectangles["player_2"], m_defaultFont);
 
-            m_spriteBatchExMain.DrawnObjects.Add(m_playerSocket_player1);
-            m_spriteBatchExMain.DrawnObjects.Add(m_playerSocket_player2);
+            m_mainScreenLayer.DrawnObjects.Add(m_playerSocket_player1);
+            m_mainScreenLayer.DrawnObjects.Add(m_playerSocket_player2);
 
             m_labelVS = new TextLabel("VS", m_fontVS, m_fixedPositions["vs_label"], Color.Black, true);
-            m_spriteBatchExMain.DrawnObjects.Add(m_labelVS);
+            m_mainScreenLayer.DrawnObjects.Add(m_labelVS);
 
             ///
             /// The four groups of radio buttons.
@@ -256,20 +256,20 @@ namespace Gliese581g
             m_victoryAssassination = new RadioButton(TextureStore.Get(TexId.button_victory_assassination),
                 m_fixedRectangles["victory_assassination"], this, "victory", 1);
             m_victoryElimination = new RadioButton(TextureStore.Get(TexId.button_victory_elimination),
-                m_fixedRectangles["victory_elimination"], this, "victory", 2); m_spriteBatchExMain.DrawnObjects.Add(m_mapSmall);
+                m_fixedRectangles["victory_elimination"], this, "victory", 2); m_mainScreenLayer.DrawnObjects.Add(m_mapSmall);
             
-            m_spriteBatchExMain.DrawnObjects.Add(m_mapMedium);
-            m_spriteBatchExMain.DrawnObjects.Add(m_mapLarge);
+            m_mainScreenLayer.DrawnObjects.Add(m_mapMedium);
+            m_mainScreenLayer.DrawnObjects.Add(m_mapLarge);
           
-            m_spriteBatchExMain.DrawnObjects.Add(m_mapRandom);
-            m_spriteBatchExMain.DrawnObjects.Add(m_mapSymmetrical);
+            m_mainScreenLayer.DrawnObjects.Add(m_mapRandom);
+            m_mainScreenLayer.DrawnObjects.Add(m_mapSymmetrical);
             
-            m_spriteBatchExMain.DrawnObjects.Add(m_armySmall);
-            m_spriteBatchExMain.DrawnObjects.Add(m_armyMedium);
-            m_spriteBatchExMain.DrawnObjects.Add(m_armyLarge);
+            m_mainScreenLayer.DrawnObjects.Add(m_armySmall);
+            m_mainScreenLayer.DrawnObjects.Add(m_armyMedium);
+            m_mainScreenLayer.DrawnObjects.Add(m_armyLarge);
 
-            m_spriteBatchExMain.DrawnObjects.Add(m_victoryAssassination);
-            m_spriteBatchExMain.DrawnObjects.Add(m_victoryElimination);
+            m_mainScreenLayer.DrawnObjects.Add(m_victoryAssassination);
+            m_mainScreenLayer.DrawnObjects.Add(m_victoryElimination);
        
             /// Clear any previously sellected buttons. 
             RadioButton.ClearGroup("map"); 
@@ -288,7 +288,7 @@ namespace Gliese581g
                 new CancelEvent(),
                 true,
                 this);
-            m_spriteBatchExMain.DrawnObjects.Add(m_cancelButton);
+            m_mainScreenLayer.DrawnObjects.Add(m_cancelButton);
             m_cancelButton.AddAnimation( new Animation(new TimeSpan(0,0,1), m_fixedRectangles["cancel_shown"]) );
 
             // Start Button
@@ -302,14 +302,14 @@ namespace Gliese581g
                 true,
                 this);
             m_startButton.Enabled = false;
-            m_spriteBatchExMain.DrawnObjects.Add(m_startButton);
+            m_mainScreenLayer.DrawnObjects.Add(m_startButton);
 
         }
 
 
         public override void UninitScreen()
         {
-            m_spriteBatchExMain.DrawnObjects.Clear();
+            base.UninitScreen();
             m_playerSidebarList.Clear();
         }
 
@@ -340,7 +340,7 @@ namespace Gliese581g
                 m_fixedRectangles["player_sidebar_off_bottom"], m_defaultFont);
             socket.SetClickWhenEmptyEvent(new NewPlayerEvent(socket), this);
             m_playerSidebarList.Add(socket);
-            m_spriteBatchExMain.DrawnObjects.Add(socket);
+            m_mainScreenLayer.DrawnObjects.Add(socket);
             return socket;
         }
 

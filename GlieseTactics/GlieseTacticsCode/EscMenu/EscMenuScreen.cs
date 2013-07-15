@@ -121,7 +121,7 @@ namespace Gliese581g
         public override void InitScreen(ScreenRectangle portionOfScreen, GraphicsDevice graphicsDevice)
         {
             m_currentScreenRectangle = portionOfScreen;
-            m_spriteBatchExMain.Transform = m_currentScreenRectangle.GetMatrixTransform(graphicsDevice);
+            m_mainScreenLayer.Transform = m_currentScreenRectangle.GetMatrixTransform(graphicsDevice);
 
             //Cancel
             m_cancelButton = new MenuButton(
@@ -133,7 +133,7 @@ namespace Gliese581g
             new ExitEvent(),
             true,
             this);
-            m_spriteBatchExMain.DrawnObjects.Add(m_cancelButton);
+            m_mainScreenLayer.DrawnObjects.Add(m_cancelButton);
 
             //Return to Main Menu
             m_mainMenuButton = new MenuButton(
@@ -145,7 +145,7 @@ namespace Gliese581g
                 new MainMenuEvent(),
                 true,
                 this);
-            m_spriteBatchExMain.DrawnObjects.Add(m_mainMenuButton);
+            m_mainScreenLayer.DrawnObjects.Add(m_mainMenuButton);
 
 
             //Options
@@ -158,7 +158,7 @@ namespace Gliese581g
                 new OptionsEvent(),
                 true,
                 this);
-            m_spriteBatchExMain.DrawnObjects.Add(m_optionsButton);
+            m_mainScreenLayer.DrawnObjects.Add(m_optionsButton);
 
             m_surrenderButton = new MenuButton(
                     TextureStore.Get(TexId.button_g_surrender_lit),
@@ -169,7 +169,7 @@ namespace Gliese581g
                     new SurrenderGameEvent(),
                     true,
                     this);
-            m_spriteBatchExMain.DrawnObjects.Add(m_surrenderButton);
+            m_mainScreenLayer.DrawnObjects.Add(m_surrenderButton);
 
             ////m_loadButton = new MenuButton(
             ////    TextureStore.Get(TexId.button_g_load_lit),
@@ -183,11 +183,6 @@ namespace Gliese581g
             ////m_spriteBatchExMain.DrawnObjects.Add(m_loadButton);
 
             m_justLoadedScreen = true;
-        }
-
-        public override void UninitScreen()
-        {
-            m_spriteBatchExMain.DrawnObjects.Clear();
         }
 
 

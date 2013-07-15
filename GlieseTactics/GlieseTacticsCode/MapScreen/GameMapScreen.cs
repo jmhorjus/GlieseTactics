@@ -46,8 +46,9 @@ namespace Gliese581g
         // (also none of this needs to be static or public!)
         MapEnvironment m_mapEnvironment;
 
-        SpriteBatch spriteBatch;
-        int m_lastMouseScrollValue = 1; //Previous Mouse Scroll Wheel Value (Neil)
+        ScreenLayer m_mapScreenLayer;
+        
+        int m_lastMouseScrollValue = 1; //Previous Mouse Scroll Wheel Value (Neil) //TODO:clean up
 
         Map m_map;
         public void SetNewMap(Game.MapSize mapSize, MapEnvironment environment, Game.MapType mapType)
@@ -78,7 +79,8 @@ namespace Gliese581g
                 m_mapCamera,
                 m_mapEnvironment.DefaultHexTexture, 
                 m_mapEnvironment.BlockingHexTexture);
-            
+            m_mapScreenLayer.DrawnObjects.Add(m_map);
+
             Game = game;
 
             if (mapType == Game.MapType.Random)
@@ -116,7 +118,9 @@ namespace Gliese581g
 
         public GameMapScreen(MainApplication mainApp) : base(mainApp)
 		{
-            spriteBatch = new SpriteBatch(mainApp.GraphicsDevice);
+            m_mapScreenLayer = new ScreenLayer(mainApp.GraphicsDevice);
+            
+            m_screenLayers.Insert(0, m_mainScreenLayer); // map layer goes on the bottom.
 		}
 
 
@@ -138,7 +142,7 @@ namespace Gliese581g
 
             ///Initialize m_currentScreenRectangle and m_spriteBatchExMain
             m_currentScreenRectangle = portionOfScreen;
-            m_spriteBatchExMain.Transform = m_currentScreenRectangle.GetMatrixTransform(graphicsDevice);
+            m_mainScreenLayer.Transform = m_currentScreenRectangle.GetMatrixTransform(graphicsDevice);
 
             /// Play the active music.
             MediaPlayer.Play(m_activeMusic);
@@ -149,7 +153,7 @@ namespace Gliese581g
 
             // The Unit Display panel
             m_unitDisplay = new UnitStatsDisplayPanel(m_fixedPositions["unit_display"]);
-            m_spriteBatchExMain.DrawnObjects.Add(m_unitDisplay);
+            m_mainScreenLayer.DrawnObjects.Add(m_unitDisplay);
 
             bool gameAlreadyStarted = (m_map != null) && (m_map.Game != null) &&
                 (m_map.Game.CurrentTurn != 0 ||
@@ -167,8 +171,8 @@ namespace Gliese581g
                 m_defaultFont);
             m_player1Display.Enabled = false; // Player display panels not enabled for clicking/dragging.
             m_player2Display.Enabled = false;
-            m_spriteBatchExMain.DrawnObjects.Add(m_player1Display);
-            m_spriteBatchExMain.DrawnObjects.Add(m_player2Display);
+            m_mainScreenLayer.DrawnObjects.Add(m_player1Display);
+            m_mainScreenLayer.DrawnObjects.Add(m_player2Display);
 
             if (m_map != null)
             {
@@ -209,27 +213,21 @@ namespace Gliese581g
                 new EndTurnEvent(),
                 true,
                 this);
-            m_spriteBatchExMain.DrawnObjects.Add(m_endTurnButton);
+            m_mainScreenLayer.DrawnObjects.Add(m_endTurnButton);
 
 
             m_victoryBanner = new ClickableSprite(TextureStore.Get(TexId.graphic_victory), m_fixedRectangles["victory_banner"], Color.White, 1f, 0f, Vector2.Zero, 0f);
             m_victoryBanner.Visible = false;
-            m_spriteBatchExMain.DrawnObjects.Add(m_victoryBanner);
+            m_mainScreenLayer.DrawnObjects.Add(m_victoryBanner);
 
             m_victoryConfettiFountain = new ConfettiFountain(m_fixedPositions["confetti1"]);
-            m_spriteBatchExMain.DrawnObjects.Add(m_victoryConfettiFountain);
+            m_mainScreenLayer.DrawnObjects.Add(m_victoryConfettiFountain);
             m_victoryConfettiFountain_2 = new ConfettiFountain(m_fixedPositions["confetti2"]);
-            m_spriteBatchExMain.DrawnObjects.Add(m_victoryConfettiFountain_2);
+            m_mainScreenLayer.DrawnObjects.Add(m_victoryConfettiFountain_2);
 
          
             
         }
-
-        public override void UninitScreen()
-        {
-            m_spriteBatchExMain.DrawnObjects.Clear();
-        }
-
 
 
         static float s_zoomSpeed = 1.04f;
@@ -439,19 +437,14 @@ namespace Gliese581g
 
             if (m_map != null)
             {
-                spriteBatch.Begin(SpriteSortMode.Deferred,
-                                 BlendState.AlphaBlend,
-                                 null, null, null, null,
-                                 m_mapCamera.Transform * m_currentScreenRectangle.GetMatrixTransform(GetMainApp().GraphicsDevice)
-                                 );
-
-                m_map.Draw(spriteBatch, gameTime);
-                spriteBatch.End();
+                m_mapScreenLayer.Transform = m_mapCamera.Transform * m_currentScreenRectangle.GetMatrixTransform(GetMainApp().GraphicsDevice);
+                m_mapScreenLayer.Draw(gameTime);
             }
+
 
             // The main spritebatchEx is used for the gui interface, and needs 
             // to be drawn after the map.
-            m_spriteBatchExMain.Draw(gameTime);
+            m_mainScreenLayer.Draw(gameTime);
 
             if (isTopActiveScreen)
                 DrawMouseCursorLast(gameTime);

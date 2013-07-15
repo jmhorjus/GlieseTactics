@@ -51,13 +51,13 @@ namespace Gliese581g
         public override void InitScreen(ScreenRectangle portionOfScreen, GraphicsDevice graphicsDevice)
         {
             m_currentScreenRectangle = portionOfScreen;
-            m_spriteBatchExMain.Transform = m_currentScreenRectangle.GetMatrixTransform(graphicsDevice);
+            m_mainScreenLayer.Transform = m_currentScreenRectangle.GetMatrixTransform(graphicsDevice);
 
 
             MainMenuButton = new MenuButton
             (TextureStore.Get(TexId.button_mm_lit), TextureStore.Get(TexId.button_mm_dim),
             m_fixedRectangles["MainMenuButton"], SfxStore.Get(SfxId.menu_mouseover), SfxStore.Get(SfxId.menu_click), new MainMenuEvent(), true, this);
-            m_spriteBatchExMain.DrawnObjects.Add(MainMenuButton);
+            m_mainScreenLayer.DrawnObjects.Add(MainMenuButton);
 
 
             // The player display panels:
@@ -70,18 +70,12 @@ namespace Gliese581g
                 m_defaultFont);
             player_winner.Enabled = false; // Player display panels not enabled for clicking/dragging.
             player_loser.Enabled = false;
-            m_spriteBatchExMain.DrawnObjects.Add(player_winner);
-            m_spriteBatchExMain.DrawnObjects.Add(player_loser);
+            m_mainScreenLayer.DrawnObjects.Add(player_winner);
+            m_mainScreenLayer.DrawnObjects.Add(player_loser);
 
 
 
         }
-
-        public override void UninitScreen()
-        {
-            m_spriteBatchExMain.DrawnObjects.Clear();
-        }
-
 
 
 

@@ -51,8 +51,10 @@ namespace Gliese581g
         protected Texture2D m_backgroundTexture;
         protected Color m_backgroundColor = Color.White;
 
-        /// You'll want at least one main spritebatch/transfor/clickableList in each screen, 
-        protected SpriteBatchEx m_spriteBatchExMain;
+        /// The list of screen layers - for processing input and drawwing in layers on the same screen. 
+        protected List<ScreenLayer> m_screenLayers = new List<ScreenLayer>();
+        /// You'll want at least one main layer in each screen, 
+        protected ScreenLayer m_mainScreenLayer;
         
         /// You'll probably want a default SpriteFont
         protected SpriteFont m_defaultFont;
@@ -60,7 +62,7 @@ namespace Gliese581g
         /// Every screen will want a sprite for the mouse.
         public Cursor ActiveMouseCursor;
         /// The mouse texture has it's own batch because we never want to transform it.
-        protected SpriteBatch m_spriteBatchMouse;
+        protected SpriteBatch m_mouseSpriteBatch;
         /// If the mouse is changed to some other texture, this one is used to change it back.
         protected Cursor m_defaultMouseCursor;
         public void MouseRevertToDefault() { ActiveMouseCursor = m_defaultMouseCursor; }
@@ -91,9 +93,12 @@ namespace Gliese581g
         public GameScreen(MainApplication mainApp)
         {
             m_wpMainApp = new WeakReference(mainApp);
-            m_spriteBatchExMain = new SpriteBatchEx(mainApp.GraphicsDevice);
+
+            m_mainScreenLayer = new ScreenLayer(mainApp.GraphicsDevice);
+            m_screenLayers.Add(m_mainScreenLayer);
+
             m_backgroundSpriteBatch = new SpriteBatch(mainApp.GraphicsDevice);
-            m_spriteBatchMouse = new SpriteBatch(mainApp.GraphicsDevice);
+            m_mouseSpriteBatch = new SpriteBatch(mainApp.GraphicsDevice);
         }
 
         /// Get a pointer to the main application from the weak refferance. Invarient (not virtual).
@@ -122,7 +127,11 @@ namespace Gliese581g
         abstract public void InitScreen(ScreenRectangle portionOfScreen, GraphicsDevice graphicsDevice);
 
         /// This function is called whenever the screen closes or transitions to a differnet screen.
-        abstract public void UninitScreen();
+        virtual public void UninitScreen()
+        {
+            foreach (ScreenLayer layer in m_screenLayers)
+                layer.DrawnObjects.Clear();
+        }
 
         /// Called only once at applecation startup to Load the content needed for this screen.
         abstract public void LoadContent(ContentManager Content, GraphicsDevice graphicsDevice);
@@ -138,26 +147,10 @@ namespace Gliese581g
 
             if (m_keysAndMouseEnabled)
             {
-                if (m_spriteBatchExMain.DrawnObjects != null)
-                {
-                    try
-                    {
-                        // We only need to notify the ClickableSprites, not every object in DrawnObjects.
-                        foreach (IDrawnObject obj in m_spriteBatchExMain.DrawnObjects)
-                        {
-                            IUpdatedObject updated = obj as IUpdatedObject;
-                            if (updated != null)
-                                updated.Update(mouseState, m_spriteBatchExMain.Transform, gameTime);
-                        }
-                    }
-                    catch (InvalidOperationException)
-                    {
-                        // This exception happens if the list of clickables is modified by an action taken by a clickable.
-                        // in this case we immediately abort the current loop and don't worry about it since 
-                        // it'll all be fine by the next Update iteration.  
-                    }
-                }
+                for (int ii = m_screenLayers.Count - 1; ii >= 0; --ii) // Layers are updated from the top down; starting with the top layer.
+                    m_screenLayers[ii].Update(mouseState, gameTime);
             }
+
             // Update the EventManager - this takes care of executing any events that have been submitted at the right time.
             m_eventMgr.Update(gameTime, this);
 
@@ -196,11 +189,11 @@ namespace Gliese581g
             if (ActiveMouseCursor == null)
                 throw new Exception("ActiveMouseCursor missing! Did you forget to set it in LoadContent?");
 
-            m_spriteBatchMouse.Begin(SpriteSortMode.BackToFront, BlendState.AlphaBlend);
+            m_mouseSpriteBatch.Begin(SpriteSortMode.BackToFront, BlendState.AlphaBlend);
 
-            ActiveMouseCursor.Draw(m_spriteBatchMouse, time, new Vector2(m_lastMouseState.X, m_lastMouseState.Y));
+            ActiveMouseCursor.Draw(m_mouseSpriteBatch, time, new Vector2(m_lastMouseState.X, m_lastMouseState.Y));
             
-            m_spriteBatchMouse.End();
+            m_mouseSpriteBatch.End();
         }
 
 
@@ -213,7 +206,8 @@ namespace Gliese581g
         {
             DrawBackgroundFirst(graphicsDevice);
 
-            m_spriteBatchExMain.Draw(gameTime);
+            for (int ii = 0; ii < m_screenLayers.Count; ii++) // Draw screen layers from the bottom up (0 to count).
+                m_screenLayers[ii].Draw(gameTime);
 
             if (isTopActiveScreen)
                 DrawMouseCursorLast(gameTime);

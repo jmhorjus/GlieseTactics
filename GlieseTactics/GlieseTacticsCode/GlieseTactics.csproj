@@ -134,7 +134,7 @@
     <Compile Include="Infrastructure\GUI\TextLabel.cs" />
     <Compile Include="Infrastructure\GUI\SliderBar.cs" />
     <Compile Include="Infrastructure\ContentStores\TextureStore.cs" />
-    <Compile Include="Infrastructure\SpriteBatchEx.cs" />
+    <Compile Include="Infrastructure\ScreenLayer.cs" />
     <Compile Include="Infrastructure\ScreenRectangle.cs" />
     <Compile Include="Infrastructure\Cursor.cs" />
     <Compile Include="ArmySetupScreen\ArmySetupScreen.cs" />

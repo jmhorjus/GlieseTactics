@@ -44,7 +44,7 @@ namespace Gliese581g
         public override void InitScreen(ScreenRectangle portionOfScreen, Microsoft.Xna.Framework.Graphics.GraphicsDevice graphicsDevice)
         {
             m_currentScreenRectangle = portionOfScreen;
-            m_spriteBatchExMain.Transform = m_currentScreenRectangle.GetMatrixTransform(graphicsDevice);
+            m_mainScreenLayer.Transform = m_currentScreenRectangle.GetMatrixTransform(graphicsDevice);
 
             // Cancel Button
             m_cancelButton = new MenuButton(
@@ -56,7 +56,7 @@ namespace Gliese581g
                 new CancelEvent(), 
                 true,
                 this);
-            m_spriteBatchExMain.DrawnObjects.Add(m_cancelButton);
+            m_mainScreenLayer.DrawnObjects.Add(m_cancelButton);
             //gender male radio button
            // genderMaleRadioButton = new RadioButton(TextureStore.Get(TexId.rdbutton_false),
              //   m_fixedPositions["gender_male_rdbutton"],
@@ -73,49 +73,43 @@ namespace Gliese581g
                 m_defaultFont,
                 m_fixedPositions["name_label"] + m_fixedPositions["profile_names_offset"],
                 Color.Black);
-            m_spriteBatchExMain.DrawnObjects.Add(m_nameLabel);
+            m_mainScreenLayer.DrawnObjects.Add(m_nameLabel);
 
             m_genderLabel = new TextLabel(
                 "Gender",
                 m_defaultFont,
                 m_fixedPositions["gender_label"] + m_fixedPositions["profile_names_offset"],
                 Color.Black);
-            m_spriteBatchExMain.DrawnObjects.Add(m_genderLabel);
+            m_mainScreenLayer.DrawnObjects.Add(m_genderLabel);
 
             m_genderMaleLabel = new TextLabel(
                 "Male",
                 m_defaultFont,
                 m_fixedPositions["gender_male_label"] + m_fixedPositions["profile_names_offset"],
                 Color.Black);
-            m_spriteBatchExMain.DrawnObjects.Add(m_genderMaleLabel);
+            m_mainScreenLayer.DrawnObjects.Add(m_genderMaleLabel);
 
             m_genderFemaleLabel = new TextLabel(
                 "Female",
                 m_defaultFont,
                 m_fixedPositions["gender_female_label"] + m_fixedPositions["profile_names_offset"],
                 Color.Black);
-            m_spriteBatchExMain.DrawnObjects.Add(m_genderFemaleLabel);
+            m_mainScreenLayer.DrawnObjects.Add(m_genderFemaleLabel);
 
             m_portraitLabel = new TextLabel(
                "Portrait",
                m_defaultFont,
                m_fixedPositions["portrait_label"] + m_fixedPositions["profile_names_offset"],
                Color.Black);
-            m_spriteBatchExMain.DrawnObjects.Add(m_portraitLabel);
+            m_mainScreenLayer.DrawnObjects.Add(m_portraitLabel);
 
             m_unitcolorLabel = new TextLabel(
                "Unit Color",
                m_defaultFont,
                m_fixedPositions["unitcolor_label"] + m_fixedPositions["profile_names_offset"],
                Color.Black);
-            m_spriteBatchExMain.DrawnObjects.Add(m_unitcolorLabel);
+            m_mainScreenLayer.DrawnObjects.Add(m_unitcolorLabel);
         }
-        
-        public override void UninitScreen()
-        {
-            m_spriteBatchExMain.DrawnObjects.Clear();
-        }
-
 
 
 

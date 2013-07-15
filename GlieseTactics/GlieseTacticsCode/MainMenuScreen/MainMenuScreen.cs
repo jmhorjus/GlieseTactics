@@ -86,7 +86,7 @@ namespace Gliese581g
         public override void InitScreen(ScreenRectangle portionOfScreen, GraphicsDevice graphicsDevice)
         {
             m_currentScreenRectangle = portionOfScreen;
-            m_spriteBatchExMain.Transform = m_currentScreenRectangle.GetMatrixTransform(graphicsDevice);
+            m_mainScreenLayer.Transform = m_currentScreenRectangle.GetMatrixTransform(graphicsDevice);
 
             // Play the main-menu music.  
             MediaPlayer.Play(m_activeMusic);
@@ -102,7 +102,7 @@ namespace Gliese581g
                 new NewGameEvent(), 
                 true,
                 this);
-            m_spriteBatchExMain.DrawnObjects.Add(m_newGameButton);
+            m_mainScreenLayer.DrawnObjects.Add(m_newGameButton);
 
             m_loadGameButton = new MenuButton(
                  TextureStore.Get(TexId.button_loadgame_lit),
@@ -113,7 +113,7 @@ namespace Gliese581g
                 new LoadGameEvent(),
                 true,
                 this);
-            m_spriteBatchExMain.DrawnObjects.Add(m_loadGameButton);
+            m_mainScreenLayer.DrawnObjects.Add(m_loadGameButton);
 
             m_optionsButton = new MenuButton(
                 TextureStore.Get(TexId.button_options_lit),
@@ -124,7 +124,7 @@ namespace Gliese581g
                 new OptionsEvent(),
                 true,
                 this);
-            m_spriteBatchExMain.DrawnObjects.Add(m_optionsButton);
+            m_mainScreenLayer.DrawnObjects.Add(m_optionsButton);
 
             m_exitButton = new MenuButton(
                 TextureStore.Get(TexId.button_exit_lit),
@@ -135,13 +135,8 @@ namespace Gliese581g
                 new ExitEvent(),
                 true,
                 this);
-            m_spriteBatchExMain.DrawnObjects.Add(m_exitButton);
+            m_mainScreenLayer.DrawnObjects.Add(m_exitButton);
 
-        }
-
-        public override void UninitScreen()
-        {
-            m_spriteBatchExMain.DrawnObjects.Clear();
         }
 
 

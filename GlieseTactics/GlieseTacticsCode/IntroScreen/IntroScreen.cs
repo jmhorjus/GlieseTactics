@@ -28,7 +28,7 @@ namespace Gliese581g
         public override void InitScreen(Gliese581g.ScreenRectangle portionOfScreen, Microsoft.Xna.Framework.Graphics.GraphicsDevice graphicsDevice)
         {
             m_currentScreenRectangle = portionOfScreen;
-            m_spriteBatchExMain.Transform = m_currentScreenRectangle.GetMatrixTransform(graphicsDevice);
+            m_mainScreenLayer.Transform = m_currentScreenRectangle.GetMatrixTransform(graphicsDevice);
 
             m_currentPhase = IntroPhase.BlackScreen;
             m_phaseTimer = 0f;
@@ -122,12 +122,12 @@ namespace Gliese581g
                     SfxStore.Get(SfxId.mech_fire).Play();
             }
 
-
+            
             //Draw manually.
-            m_spriteBatchExMain.Batch.Begin();
-            m_spriteBatchExMain.Batch.Draw(m_teamLogoTextureSwish, m_teamLogoRectangle, Color.White * alphaSwish);
-            m_spriteBatchExMain.Batch.Draw(m_teamLogoTexturePlain, m_teamLogoRectangle, Color.White * alphaPlain);
-            m_spriteBatchExMain.Batch.End();
+            m_mainScreenLayer.Batch.Begin();
+            m_mainScreenLayer.Batch.Draw(m_teamLogoTextureSwish, m_teamLogoRectangle, Color.White * alphaSwish);
+            m_mainScreenLayer.Batch.Draw(m_teamLogoTexturePlain, m_teamLogoRectangle, Color.White * alphaPlain);
+            m_mainScreenLayer.Batch.End();
 
             m_phaseTimer += newTime;
         }

@@ -138,7 +138,7 @@ namespace Gliese581g
         public override void InitScreen(ScreenRectangle portionOfScreen, GraphicsDevice graphicsDevice)
         {
             m_currentScreenRectangle = portionOfScreen;
-            m_spriteBatchExMain.Transform = m_currentScreenRectangle.GetMatrixTransform(graphicsDevice);
+            m_mainScreenLayer.Transform = m_currentScreenRectangle.GetMatrixTransform(graphicsDevice);
             
             // Initial value 
             ApplyResolution = new Point(graphicsDevice.Viewport.Width, graphicsDevice.Viewport.Height);
@@ -179,7 +179,7 @@ namespace Gliese581g
                 this,
                 resolutionSelectRect,
                 new ResolutionSliderEvent() );
-            m_spriteBatchExMain.DrawnObjects.Add(m_resolutionSlider);
+            m_mainScreenLayer.DrawnObjects.Add(m_resolutionSlider);
            
             // The resolution slider's label.  
             m_resolutionLabel = new TextLabel(
@@ -187,7 +187,7 @@ namespace Gliese581g
                 m_defaultFont,
                 m_fixedPositions["slider_bar_1"] + m_fixedPositions["slider_label_offset"],
                 Color.Black);
-            m_spriteBatchExMain.DrawnObjects.Add(m_resolutionLabel);
+            m_mainScreenLayer.DrawnObjects.Add(m_resolutionLabel);
 
 
             // The music volume slider-bar
@@ -205,14 +205,14 @@ namespace Gliese581g
                 this,
                 musicVolumeSelectRect,
                 new MusicVolumeSliderEvent());
-            m_spriteBatchExMain.DrawnObjects.Add(m_musicVolumeSlider);
+            m_mainScreenLayer.DrawnObjects.Add(m_musicVolumeSlider);
             // The music volume slider's label.  
             m_musicVolumeLabel = new TextLabel(
                 "Music Volume",
                 m_defaultFont,
                 m_fixedPositions["slider_bar_2"] + m_fixedPositions["slider_label_offset"],
                 Color.Black);
-            m_spriteBatchExMain.DrawnObjects.Add(m_musicVolumeLabel);
+            m_mainScreenLayer.DrawnObjects.Add(m_musicVolumeLabel);
 
 
             // The sfx volume slider-bar
@@ -230,14 +230,14 @@ namespace Gliese581g
                 this,
                 sfxVolumeSelectRect,
                 new SfxVolumeSliderEvent());
-            m_spriteBatchExMain.DrawnObjects.Add(m_sfxVolumeSlider);
+            m_mainScreenLayer.DrawnObjects.Add(m_sfxVolumeSlider);
             // The music volume slider's label.  
             m_sfxVolumeLabel = new TextLabel(
                 "Sound Effects Volume",
                 m_defaultFont,
                 m_fixedPositions["slider_bar_3"] + m_fixedPositions["slider_label_offset"],
                 Color.Black);
-            m_spriteBatchExMain.DrawnObjects.Add(m_sfxVolumeLabel);
+            m_mainScreenLayer.DrawnObjects.Add(m_sfxVolumeLabel);
 
             //---------------------------
 
@@ -255,14 +255,14 @@ namespace Gliese581g
                 this,
                 scrollSpeedSelectRect,
                 new ScrollSpeedSliderEvent());
-            m_spriteBatchExMain.DrawnObjects.Add(m_scrollSpeedSlider);
+            m_mainScreenLayer.DrawnObjects.Add(m_scrollSpeedSlider);
             // The music volume slider's label.  
             m_scrollSpeedLabel = new TextLabel(
                 "Map Scroll Speed",
                 m_defaultFont,
                 m_fixedPositions["slider_bar_4"] + m_fixedPositions["slider_label_offset"],
                 Color.Black);
-            m_spriteBatchExMain.DrawnObjects.Add(m_scrollSpeedLabel);
+            m_mainScreenLayer.DrawnObjects.Add(m_scrollSpeedLabel);
 
 
             // The unit voice checkbox
@@ -270,7 +270,7 @@ namespace Gliese581g
                 TextureStore.Get(TexId.chkbox_true),
                 m_fixedPositions["unitvoice_chkbox"],
                 SfxStore.Get(SfxId.menu_click));
-            m_spriteBatchExMain.DrawnObjects.Add(m_unitVoicesChkBox);
+            m_mainScreenLayer.DrawnObjects.Add(m_unitVoicesChkBox);
             // Initial value set properly. 
             m_unitVoicesChkBox.Checked = ConfigManager.GlobalManager.UnitVoicesEnabled;
 
@@ -279,7 +279,7 @@ namespace Gliese581g
                 TextureStore.Get(TexId.chkbox_true),
                 m_fixedPositions["mousescroll_chkbox"],
                 SfxStore.Get(SfxId.menu_click));
-            m_spriteBatchExMain.DrawnObjects.Add(m_mouseScrollChkBox);
+            m_mainScreenLayer.DrawnObjects.Add(m_mouseScrollChkBox);
             // Initial value set properly. 
             m_mouseScrollChkBox.Checked = ConfigManager.GlobalManager.MouseScrollEnabled;
 
@@ -289,7 +289,7 @@ namespace Gliese581g
                 m_defaultFont,
                 m_fixedPositions["unitvoice_label"],
                 Color.Black);
-            m_spriteBatchExMain.DrawnObjects.Add(m_unitVoicesLabel);
+            m_mainScreenLayer.DrawnObjects.Add(m_unitVoicesLabel);
 
             // Label for the mouse scroll check box
             m_mouseScrollLabel = new TextLabel(
@@ -297,7 +297,7 @@ namespace Gliese581g
                 m_defaultFont,
                 m_fixedPositions["mousescroll_label"],
                 Color.Black);
-            m_spriteBatchExMain.DrawnObjects.Add(m_mouseScrollLabel);
+            m_mainScreenLayer.DrawnObjects.Add(m_mouseScrollLabel);
 
             //---------------------------
 
@@ -309,7 +309,7 @@ namespace Gliese581g
                 SfxStore.Get(SfxId.menu_mouseover),
                 SfxStore.Get(SfxId.menu_click),
                 this);
-            m_spriteBatchExMain.DrawnObjects.Add(m_applyButton);
+            m_mainScreenLayer.DrawnObjects.Add(m_applyButton);
 
             // Cancel Button
             m_cancelButton = new MenuButton(
@@ -321,13 +321,10 @@ namespace Gliese581g
                 new ExitEvent(),
                 true,
                 this);
-            m_spriteBatchExMain.DrawnObjects.Add(m_cancelButton);
+            m_mainScreenLayer.DrawnObjects.Add(m_cancelButton);
         }
 
-        public override void UninitScreen()
-        {
-            m_spriteBatchExMain.DrawnObjects.Clear();
-        }
+
 
         public override void Update(GameTime gameTime, MouseState mouseState, KeyboardState keyboardState)
         {

@@ -27,15 +27,9 @@ namespace Gliese581g
         public override void InitScreen(ScreenRectangle portionOfScreen, GraphicsDevice graphicsDevice)
         {
             m_currentScreenRectangle = portionOfScreen;
-            m_spriteBatchExMain.Transform = m_currentScreenRectangle.GetMatrixTransform(graphicsDevice);
-
+            m_mainScreenLayer.Transform = m_currentScreenRectangle.GetMatrixTransform(graphicsDevice);
         }
 
-
-        public override void UninitScreen()
-        {
-            m_spriteBatchExMain.DrawnObjects.Clear();
-        }
 
 
         public override void LoadContent(Microsoft.Xna.Framework.Content.ContentManager Content, GraphicsDevice graphicsDevice)

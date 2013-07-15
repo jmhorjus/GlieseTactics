@@ -41,9 +41,11 @@ namespace Gliese581g
 
         public enum TurnStage
         {
+            NotYetStarted,
+
             PlacementBegin,
-            PlacementChooseHex,
             PlacementChooseUnit,
+            PlacementChooseHex,
 
             BeginTurn,
             ChooseUnit,
@@ -52,6 +54,7 @@ namespace Gliese581g
             ChooseAttackType,
             ChooseAttackTarget,
             EndTurn,
+
             GameOver
         }
 

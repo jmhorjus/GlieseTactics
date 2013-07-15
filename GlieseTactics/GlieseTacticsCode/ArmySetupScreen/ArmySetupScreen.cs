@@ -26,7 +26,7 @@ namespace Gliese581g
 
         public override void UninitScreen()
         {
-            m_spriteBatchExMain.DrawnObjects.Clear();
+            base.UninitScreen();
         }
 
 
