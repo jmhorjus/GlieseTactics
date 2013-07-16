@@ -198,7 +198,20 @@ namespace Gliese581g
         }
         public virtual bool TestMouseOver(Point transformedPoint)
         {
-            return DisplayRect.Contains(transformedPoint);
+            Rectangle displayRect = DisplayRect;
+
+            if (!displayRect.Contains(transformedPoint))
+                return false;
+
+            // Look for transparency.
+            Rectangle pointRect = new Rectangle(
+                (int)((transformedPoint.X - displayRect.X) / Scale.X),
+                (int)((transformedPoint.Y - displayRect.Y) / Scale.Y), 
+                1, 1);
+            int size = 1;
+            Color[] buffer = new Color[size];
+            m_texture.GetData(0, pointRect, buffer, 0, size);
+            return !buffer.All(c => c == Color.Transparent);
         }
 
 

@@ -488,7 +488,13 @@
       <Processor>TextureProcessor</Processor>
     </Compile>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Compile Include="GameSetupScreen\player_stats_frame_skills.bmp">
+      <Name>player_stats_frame_skills</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+  </ItemGroup>
   <ItemGroup>
     <Compile Include="Units\recharge_numbers.bmp">
       <Name>recharge_numbers</Name>
