@@ -156,10 +156,10 @@ namespace Gliese581g
         /// </summary>
         protected MouseState m_lastMouseState = new MouseState();
         public Direction ChooseHeadingDirection = new Direction(Direction.ValueType.Right);
-        public void Update(MouseState mouseState, Matrix transformMatrix, GameTime time)
+        public bool Update(MouseState mouseState, Matrix transformMatrix, GameTime time)
         {
             if (!Enabled)
-                return;
+                return false;
 
             Vector2 mousePos = new Vector2(mouseState.X, mouseState.Y);
             Vector2 transformedMousePos = Vector2.Transform(mousePos, Matrix.Invert(transformMatrix));
@@ -226,18 +226,21 @@ namespace Gliese581g
 
 
             // Call update on each hex in the map.
+            bool retVal = false;
             for (int y = 0; y < Columns; y++)
             {
                 for (int x = 0; x < Rows; x++)
                 {
                     if (m_hexArray[x, y] != null)
-                        m_hexArray[x, y].Update(mouseState, transformedMousePos, time);
+                        retVal = m_hexArray[x, y].Update(mouseState, transformedMousePos, time) || retVal;
                 }
             }
 
 
             // Keep track of last mouse state.  
             m_lastMouseState = mouseState;
+
+            return retVal;
         }
         
         /// The Inverse of the above function.

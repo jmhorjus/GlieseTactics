@@ -11,6 +11,7 @@ namespace Gliese581g
 {
     public interface IUpdatedObject
     {
-        void Update(MouseState mouseState, Matrix transformMatrix, GameTime time);
+        // Returns true if the updated element detected a mouse-over.
+        bool Update(MouseState mouseState, Matrix transformMatrix, GameTime time);
     }
 }

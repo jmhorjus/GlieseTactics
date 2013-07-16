@@ -148,7 +148,10 @@ namespace Gliese581g
             if (m_keysAndMouseEnabled)
             {
                 for (int ii = m_screenLayers.Count - 1; ii >= 0; --ii) // Layers are updated from the top down; starting with the top layer.
-                    m_screenLayers[ii].Update(mouseState, gameTime);
+                {
+                    if (m_screenLayers[ii].Update(mouseState, gameTime))
+                        break; //For now, we'll stop calling update to lower layers when one layer intercepts the mouse.
+                }
             }
 
             // Update the EventManager - this takes care of executing any events that have been submitted at the right time.

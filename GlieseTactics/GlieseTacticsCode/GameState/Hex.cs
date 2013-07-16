@@ -102,6 +102,8 @@ namespace Gliese581g
         { }
 
 
+
+
         // Support the draw interface (we're using the composite design pattern)
         public override void Draw(SpriteBatch spriteBatch, GameTime time)
         {
@@ -114,7 +116,7 @@ namespace Gliese581g
                 DOUBLE_HIGHLIGHT_TINT.R = (byte)(100 + 154 * Math.Abs(Math.Sin(time.TotalGameTime.TotalSeconds * 3)));
                 Tint = DOUBLE_HIGHLIGHT_TINT;
             }
-            else if (m_lastMouseover)
+            else if (LastMouseOver)
                 Tint = MOUSEOVER_TINT;
             else if (IsHighlighted)
                 if (m_map.Game.CurrentTurnStage == Game.TurnStage.ChooseHeading ||
@@ -131,7 +133,7 @@ namespace Gliese581g
             if (Unit != null)
                 Unit.Draw(spriteBatch, time);
 
-            // Draw Explosion - they are removed from the list when finished
+            // Draw any effects (explosions, etc) - they are removed from the list when finished
             for (int ii = 0; ii < drawnEffectList.Count; ii++)
             {
                 drawnEffectList[ii].Draw(spriteBatch, time);
@@ -143,6 +145,8 @@ namespace Gliese581g
             }
 
         }
+
+
 
 
         /// <summary>

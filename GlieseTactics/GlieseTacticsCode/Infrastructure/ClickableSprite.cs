@@ -192,6 +192,10 @@ namespace Gliese581g
         /// Be default we just check whether the point is in the 
         /// display rectangle, but this function is made virtual
         /// so that sprites with non-rectangular shapes can override it.
+        public virtual bool TestMouseOver(Vector2 transformedPoint)
+        {
+            return TestMouseOver(new Point((int)transformedPoint.X,(int)transformedPoint.Y));
+        }
         public virtual bool TestMouseOver(Point transformedPoint)
         {
             return DisplayRect.Contains(transformedPoint);
@@ -272,20 +276,20 @@ namespace Gliese581g
 
         /// Determines all the mouse states, using the transformMatrix to transform the 
         /// mouse co-ordinates before testing for mouse-over.
-        public void Update(MouseState mouseState, Matrix transformMatrix, GameTime time)
+        public bool Update(MouseState mouseState, Matrix transformMatrix, GameTime time)
         {
-            if (!Enabled)
-                return;
-
             // Transform the mouse co-ordinates with the same transform being used on the sprite.
             Vector2 pos = new Vector2((float)mouseState.X, (float)mouseState.Y);
             Vector2 transformedPos = Vector2.Transform(pos, Matrix.Invert(transformMatrix) );
-            
-            Update(mouseState, transformedPos, time);
+
+            if (Enabled)
+                Update(mouseState, transformedPos, time);
+
+            return Visible && TestMouseOver(transformedPos); // Don't allow invisible objects to intercept the mouse. 
         }
 
         /// Use this version of update if you already know the transformed mouse position.  
-        public void Update(MouseState mouseState, Vector2 transformedPos, GameTime time)
+        public bool Update(MouseState mouseState, Vector2 transformedPos, GameTime time)
         {
             Point transformedPoint = new Point((int)transformedPos.X, (int)transformedPos.Y);
 
@@ -460,6 +464,8 @@ namespace Gliese581g
 
             // Last of all, set the last mouse state to the current one.  
             m_lastMouseState = mouseState;
+
+            return isMouseOverNow;
         }
 
 

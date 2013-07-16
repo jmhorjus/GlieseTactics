@@ -119,8 +119,8 @@ namespace Gliese581g
         public GameMapScreen(MainApplication mainApp) : base(mainApp)
 		{
             m_mapScreenLayer = new ScreenLayer(mainApp.GraphicsDevice);
-            
-            m_screenLayers.Insert(0, m_mainScreenLayer); // map layer goes on the bottom.
+
+            m_screenLayers.Insert(0, m_mapScreenLayer); // map layer goes on the bottom.
 		}
 
 
@@ -291,7 +291,7 @@ namespace Gliese581g
             }
 
 
-            m_map.Update(mouseState, m_mapCamera.Transform, gameTime);
+            //m_map.Update(mouseState, m_mapCamera.Transform, gameTime);
            
             
 
