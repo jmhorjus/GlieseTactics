@@ -45,7 +45,7 @@ namespace Gliese581g
 
             PlacementBegin,
             PlacementChooseUnit,
-            PlacementChooseHex,
+            PlacementChooseDestination,
 
             BeginTurn,
             ChooseUnit,
@@ -75,6 +75,7 @@ namespace Gliese581g
         public int CurrentTurn { get { return m_currentTurn; } }
         Commander m_currentPlayer;
         public Commander CurrentPlayer { get { return m_currentPlayer; } }
+        public int CurrentPlayerIndex { get { return Players.IndexOf(m_currentPlayer); } }
 
         // Remains null until the game is over and a winner has been determined.
         protected Commander m_winningPlayer = null;
@@ -100,14 +101,21 @@ namespace Gliese581g
 
             m_currentTurn = 0;
             m_currentPlayer = Players[0];
-            m_currentTurnStage = TurnStage.BeginTurn;
+            m_currentTurnStage = TurnStage.PlacementBegin;
         }
+
+
+        public void BeginPlacement()
+        {
+            if (m_currentTurnStage == TurnStage.PlacementBegin)
+            {
+                m_currentTurnStage = TurnStage.PlacementChooseUnit;
+            }
+        } 
 
 
         public void BeginTurn()
         {
-            
-
             if (m_currentTurnStage == TurnStage.BeginTurn)
             {
                 // At the beginning of the turn, the units of the current player recharge
@@ -129,11 +137,23 @@ namespace Gliese581g
                 else
                     m_currentTurnStage = TurnStage.ChooseUnit;
             }
-            
         }
+
 
         public Commander NextPlayer
         { get { return Players[(Players.IndexOf(CurrentPlayer) + 1) % Players.Count]; } }
+
+        public void EndPlacement()
+        {
+            m_currentPlayer = NextPlayer;
+
+            // If the next player is the first player again, then 
+            // everyone is done placing - goto BeginTurn.
+            if (m_currentPlayer == Players[0])
+                m_currentTurnStage = TurnStage.BeginTurn;
+            else 
+                m_currentTurnStage = TurnStage.PlacementBegin;
+        }
 
         public void EndTurn()
         {

@@ -76,6 +76,8 @@ namespace Gliese581g
         List<Hex> m_highlightedHexes = new List<Hex>();
         public void HighlightHex(Hex hex)
         {
+            if (hex == null) 
+                return;
             hex.IsHighlighted = true;
             m_highlightedHexes.Add(hex);
         }
@@ -84,6 +86,14 @@ namespace Gliese581g
             foreach (Hex hex in m_highlightedHexes)
                 hex.IsHighlighted = false;
             m_highlightedHexes.Clear();
+        }
+        public void HighlightStartingArea(int playerIndex)
+        {
+            ClearHighlightedHexes();
+            for (int y = 0; y < m_hexArray.GetLength(1); y++)
+                for (int x = 0; x < m_hexArray.GetLength(0); x++)
+                    if (m_hexArray[x, y] != null && m_hexArray[x, y].PlayerStartingArea == playerIndex) 
+                        HighlightHex(m_hexArray[x, y]);
         }
 
         // Second Layer of Highlighting - used for attack area of effect.  
@@ -138,7 +148,6 @@ namespace Gliese581g
         /// </summary>
         public void Draw(SpriteBatch spriteBatch, GameTime gameTime)
         {
-
             for (int y = 0; y < m_hexArray.GetLength(1); y++)
             {
                 for (int x = 0; x < m_hexArray.GetLength(0); x++)
@@ -222,6 +231,11 @@ namespace Gliese581g
                     //    return; // Don't immediately update the hexes.
                     //}
                     break;
+
+                case Gliese581g.Game.TurnStage.PlacementBegin:
+                    HighlightStartingArea(Game.CurrentPlayerIndex);
+                    Game.BeginPlacement();
+                    break;
             }
 
 
@@ -283,19 +297,25 @@ namespace Gliese581g
             {
                 for (int y = 0; y < Columns; y++)
                 {
-                    if (IsValidStartHex(x, 0) || IsValidStartHex(x, 1))
+                    if (IsValidStartHex(x, 0))
                     {
-                        m_hexArray[x, y] = new Hex(m_defaultHexTexture, new Point(x, y), true, this);
+                        m_hexArray[x, y] = new Hex(this, m_defaultHexTexture, new Point(x, y), true, 0);
                         continue;
                     }
+                    else if (IsValidStartHex(x, 1))
+                    {
+                        m_hexArray[x, y] = new Hex(this, m_defaultHexTexture, new Point(x, y), true, 1);
+                        continue;
+                    }
+
                     
                     switch (random.Next(0, 5)) //green a lot or not (0,adjust)
                     {
                         case 0:
-                            m_hexArray[x, y] = new Hex(m_blockingHexTexture, new Point(x, y), false, this);
+                            m_hexArray[x, y] = new Hex(this, m_blockingHexTexture, new Point(x, y), false, -1);
                             break;
                         default:
-                            m_hexArray[x, y] = new Hex(m_defaultHexTexture, new Point(x, y), true, this);
+                            m_hexArray[x, y] = new Hex(this, m_defaultHexTexture, new Point(x, y), true, -1);
                             break;
                     }
                 }
@@ -434,20 +454,22 @@ namespace Gliese581g
                         if (ch == 'X' || ch == 'x')
                         {
                             m_hexArray[currentHexInRow, currentRow] = new Hex(
+                                this,
                                 m_blockingHexTexture,
                                 new Point(currentHexInRow, currentRow),
                                 false,
-                                this);
+                                -1);
                             currentHexInRow++;
                             state = ParseState.LookForSpace;
                         }
                         else if (isNumeral(ch))
                         {
                             m_hexArray[currentHexInRow, currentRow] = new Hex(
+                                this,
                                 m_defaultHexTexture,
                                 new Point(currentHexInRow, currentRow),
                                 true,
-                                this);
+                                -1);
                             currentUnitType = (UnitType)chToInt(ch);
                             state = ParseState.SecondHexChar;
                         }

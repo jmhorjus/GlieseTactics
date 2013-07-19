@@ -54,7 +54,12 @@ namespace Gliese581g
         ///
 
         // Can units move onto-through this Hex?
-        public bool LandPossible;
+        public bool LandMovementAllowed;
+
+        // Is this hex part of any player's starting area?
+        // (-1 means no.  0 means player 1, 1 means player 2 player 2, etc - index into the player list)
+        public int PlayerStartingArea;
+
         
         // Is there a unit currently occupying this Hex?
         protected Unit m_unit = null;
@@ -64,7 +69,7 @@ namespace Gliese581g
         
         // Is a valid destination if it's possable and not already occupied.
         public bool IsValidDestination
-        { get { return LandPossible && Unit == null; } }
+        { get { return LandMovementAllowed && Unit == null; } }
 
         // Appearance variables.  
         protected Point m_mapPosition;
@@ -87,14 +92,16 @@ namespace Gliese581g
         }
 
         // Constructor
-        public Hex(Texture2D texture, Point mapPosition, bool landPossible, Map owningMap)
+        public Hex(Map owningMap, Texture2D texture, Point mapPosition, bool landMovementAllowed, int playerStartingArea)
             : base(texture, Rectangle.Empty, Color.White, 1f, 0f, Vector2.Zero, 0f)
         {
+            m_map = owningMap;
             Texture = texture;
             MapPosition = mapPosition;
-            LandPossible = landPossible;
+            LandMovementAllowed = landMovementAllowed;
+            PlayerStartingArea = playerStartingArea;
+
             Tint = Color.White;
-            m_map = owningMap;
         }
         // Needed to make Hex Serializable.
         public Hex()
@@ -186,20 +193,26 @@ namespace Gliese581g
 
 
 
+        /// <summary>
+        /// The Right click fuction is used to go back or undo actions becofe the turn is completed.
+        /// </summary>
         public override void OnRightClick(Vector2 mousePosInTexture)
         {
             switch (m_map.Game.CurrentTurnStage)
             {
+                // Right clicking unselects any hex.
                 case Game.TurnStage.ChooseUnit:
                     m_map.SelectedHex = null;
                     break;
+
+                // If choosing a move destination, right click brings you back to the chooseUnit phase and unselects the unit.
                 case Game.TurnStage.ChooseMoveDestination:
                     m_map.SelectedHex = null;
                     m_map.Game.CurrentTurnStage = Game.TurnStage.ChooseUnit;
                     break;
-                case Game.TurnStage.ChooseHeading:
 
-                    // Move the unit back to its previous location and heading; then return to ChooseMoveDestination.
+                // Move the unit back to its previous location and heading; then return to ChooseMoveDestination.
+                case Game.TurnStage.ChooseHeading:
                     Unit tempUnit = m_map.SelectedHex.Unit;
                     tempUnit.PlaceOnMap(m_map.SelectedUnitOriginHex, m_map.SelectedUnitOriginDirection);
 
@@ -218,10 +231,10 @@ namespace Gliese581g
                     m_map.Game.CurrentTurnStage = Game.TurnStage.ChooseMoveDestination;
 
                     break;
-                case Game.TurnStage.ChooseAttackTarget:
-                    // Go back to ChooseHeading
-                    m_map.SelectedHex.HighlightAttackRange();
 
+                // Go back to ChooseHeading
+                case Game.TurnStage.ChooseAttackTarget:
+                    m_map.SelectedHex.HighlightAttackRange();
                     m_map.Game.CurrentTurnStage = Game.TurnStage.ChooseHeading;
                     break;
             }
@@ -229,11 +242,16 @@ namespace Gliese581g
 
         
         
-
+        /// <summary>
+        /// Left clicking a hex is used to select units, movement, and targets and confirm choices.
+        /// </summary>
         public override void OnLeftClick(Vector2 mousePosInTexture)
         {
+            Unit tempUnit; // placeholder unit pointer used in various operations in the state machine.
+
             switch (m_map.Game.CurrentTurnStage)
             {
+                // Left clicking should select a unit and allow you to move it (if its yours)
                 case Game.TurnStage.ChooseUnit:
                     m_map.SelectedHex = this;
                     if (Unit != null)
@@ -258,44 +276,48 @@ namespace Gliese581g
                     break;
 
 
+                /// Left click to move a unit. 
+                // 'this' is hex that's just been clicked to move the unit to.
+                // m_map.selectedHex is the hex that the unit is moving from.                 
                 case Game.TurnStage.ChooseMoveDestination:
-                    // This is hex that's just been clicked to move the unit to.
-                    // m_map.selectedHex is the hex that the unit is moving from. 
-                    if (this.IsHighlighted)
-                    {   // Move the unit, and transition into choose-heading.
-
-                        //Remember the origin position.
-                        m_map.SelectedUnitOriginDirection = m_map.SelectedHex.Unit.FacingDirection;
-                        m_map.SelectedUnitOriginHex = m_map.SelectedHex;
-                        
-                        
-                        //Move the unit and selected hex
-                        Unit tempUnit = m_map.SelectedHex.Unit;
-                        tempUnit.PlaceOnMap(this);
-
-                        m_map.SelectedHex = this;
-                        // Put the unit on recharge.
-                        Unit.CurrentRechargeTime = Unit.MaxRechargeTime;
-                        // Transition the game state.
-                        m_map.ClearHighlightedHexes();
-
-                        tempUnit.TargetTemplate.OnApply(
-                            m_map,
-                            new MapLocation(this.m_mapPosition, tempUnit.FacingDirection),
-                            new HighlightEffect(m_map), 
-                            null); 
-
-                        m_map.Game.CurrentTurnStage = Game.TurnStage.ChooseHeading;
-                        Unit.PlaySfxMove();
-                    }
-                    else
-                    { // Go back to chooseUnit.  
+                    
+                    if (!this.IsHighlighted)
+                    {   // If this isn't a valid move destination, go to ChooseUnit and then 
+                        // treat it as if they had clicked here during that phase. 
                         m_map.Game.CurrentTurnStage = Game.TurnStage.ChooseUnit;
                         OnLeftClick(mousePosInTexture);
+                        break;
                     }
+
+                    // Move the unit, and transition into choose-heading.
+
+                    //Remember the origin position (for undoing move).
+                    m_map.SelectedUnitOriginDirection = m_map.SelectedHex.Unit.FacingDirection;
+                    m_map.SelectedUnitOriginHex = m_map.SelectedHex;
+                        
+                    //Move the unit and selected hex
+                    tempUnit = m_map.SelectedHex.Unit;
+                    tempUnit.PlaceOnMap(this);
+                    m_map.SelectedHex = this;
+
+                    // Put the unit on recharge.
+                    Unit.CurrentRechargeTime = Unit.MaxRechargeTime;
+                        
+                    // Transition the game state: highlight target-template hexes and go to choose-heading.
+                    m_map.ClearHighlightedHexes();
+                    tempUnit.TargetTemplate.OnApply(
+                        m_map,
+                        new MapLocation(this.m_mapPosition, tempUnit.FacingDirection),
+                        new HighlightEffect(m_map), 
+                        null); 
+                    m_map.Game.CurrentTurnStage = Game.TurnStage.ChooseHeading;
+                    Unit.PlaySfxMove();
                 
                     break;
 
+
+                /// If this is a valid target hex, then go to ChooseAttackTarget immediately, and 
+                /// then perform the action for the attack (call OnLeftClick again in the ChooseAttackTarget state).
                 case Game.TurnStage.ChooseHeading:
                     // Valid attack targets are already highlighted. The selected hex can be clicked for recharge.
                     if (this.IsHighlighted || this.IsSelected)
@@ -307,10 +329,12 @@ namespace Gliese581g
                     }
                     break;
 
+
+                /// If this is a valid hex to perform an attack/recharge action, then do so and proceed 
+                /// to end the turn.  
                 case Game.TurnStage.ChooseAttackTarget:
                     if (this.IsHighlighted)
                     {
-                       
 
                         // The clicked hex is a valid target hex: attack it.
                         Unit attackingUnit = m_map.SelectedHex.Unit;
@@ -353,9 +377,41 @@ namespace Gliese581g
 
                     break;
 
+
+                /// The turn is over...can't do anything or get to any other state by 
+                /// clicking on hexes.
                 case Game.TurnStage.EndTurn:
                     // Let them continue to look at units before ending the turn.
                     m_map.SelectedHex = this;
+                    break;
+
+
+                /// Select a unit on the map (if it's yours) and get ready 
+                /// to move it anywhere in the current player's starting area.
+                case Game.TurnStage.PlacementChooseUnit:
+                    m_map.SelectedHex = this;
+
+                    if (this.Unit != null && this.Unit.Owner == m_map.Game.CurrentPlayer)
+                    {
+                        m_map.HighlightStartingArea(m_map.Game.CurrentPlayerIndex);
+
+                        m_map.Game.CurrentTurnStage = Game.TurnStage.PlacementChooseDestination;
+                    }
+                    break;
+                
+
+                /// If the hex is in the current player's starting area, move the selected unit
+                /// there and go back to PlacementChooseUnit.
+                case Game.TurnStage.PlacementChooseDestination:
+                    
+                    if (this.PlayerStartingArea == m_map.Game.CurrentPlayerIndex && IsValidDestination)
+                    {
+                        tempUnit = m_map.SelectedHex.Unit;
+                        tempUnit.PlaceOnMap(this);
+                        m_map.SelectedHex = this;
+                    }
+
+                    m_map.Game.CurrentTurnStage = Game.TurnStage.PlacementChooseUnit;
                     break;
 
                 default:

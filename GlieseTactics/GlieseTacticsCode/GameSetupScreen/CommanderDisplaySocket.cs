@@ -18,6 +18,14 @@ namespace Gliese581g
         SpriteFont m_font;
         Vector2 m_fontScale;
 
+
+        /// <summary>
+        ///  Members related to the skills frame
+        /// </summary>
+        bool m_showingSkills;
+
+
+
         public Commander Commander
         {
             get { return m_player; }

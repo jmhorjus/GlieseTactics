@@ -69,7 +69,7 @@ namespace Gliese581g
 
                 bool doneAfterThisHex = ii + 1 >= m_length ||
                     (m_stopAtUnit && (hex.Unit != null)) ||
-                    (m_stopAtBlockingTerrain && !map.GetHex(location.Position).LandPossible);
+                    (m_stopAtBlockingTerrain && !map.GetHex(location.Position).LandMovementAllowed);
 
                 if (isFirstHex && doneAfterThisHex)
                     onlyOneHex = hex;
@@ -156,7 +156,7 @@ namespace Gliese581g
             if (hex == null)
                 return;
 
-            bool validFinalDest = (((hex.LandPossible || m_pathThroughBlockHexes) &&
+            bool validFinalDest = (((hex.LandMovementAllowed || m_pathThroughBlockHexes) &&
                 (hex.Unit == null || m_pathThroughOtherUnits)) ||  // Hex is a valid final destination.
                 ((pos == startingPos) && m_includeSourceHex));
 

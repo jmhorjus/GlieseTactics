@@ -21,7 +21,12 @@ namespace Gliese581g
             public override void OnEvent(GameScreen parentScreen)
             {
                 GameMapScreen screen = parentScreen as GameMapScreen;
-                screen.Game.EndTurn();
+                
+                if (screen.Game.CurrentTurnStage != Game.TurnStage.EndTurn)
+                    screen.Game.EndPlacement();
+                else 
+                    screen.Game.EndTurn();
+                
                 screen.EnableKeysAndMouse();
             }
         }
@@ -158,7 +163,7 @@ namespace Gliese581g
             bool gameAlreadyStarted = (m_map != null) && (m_map.Game != null) &&
                 (m_map.Game.CurrentTurn != 0 ||
                 m_map.Game.CurrentPlayer != m_map.Game.Players[0] ||
-                m_map.Game.CurrentTurnStage != Game.TurnStage.BeginTurn);
+                m_map.Game.CurrentTurnStage != Game.TurnStage.PlacementBegin);
 
 
             // The player display panels:
@@ -204,15 +209,20 @@ namespace Gliese581g
 
 
             // EndTurn Button
+            bool showEndTurnButton = Game != null && 
+                (Game.CurrentTurnStage == Game.TurnStage.EndTurn || 
+                Game.CurrentTurnStage == Game.TurnStage.PlacementChooseUnit || 
+                Game.CurrentTurnStage == Game.TurnStage.PlacementChooseDestination);
             m_endTurnButton = new MenuButton(
                 TextureStore.Get(TexId.map_endturn_lit),
                 TextureStore.Get(TexId.map_endturn_dim),
-                (Game != null && Game.CurrentTurnStage == Game.TurnStage.EndTurn) ? m_fixedRectangles["endturn_shown"] : m_fixedRectangles["endturn_hidden"],
+                showEndTurnButton ? m_fixedRectangles["endturn_shown"] : m_fixedRectangles["endturn_hidden"],
                 SfxStore.Get(SfxId.menu_mouseover),
                 SfxStore.Get(SfxId.menu_click),
                 new EndTurnEvent(),
                 true,
                 this);
+            m_endTurnButton.Enabled = showEndTurnButton; // Need to disable the button if it is hidden.
             m_mainScreenLayer.DrawnObjects.Add(m_endTurnButton);
 
 
@@ -251,17 +261,20 @@ namespace Gliese581g
 
 
             /// Bring up the player portraits during the player's turn.
-            if (Game.CurrentTurnStage == Game.TurnStage.BeginTurn && Game.CurrentPlayer == Game.Players[0])
+            if (Game.CurrentTurnStage == Game.TurnStage.BeginTurn || Game.CurrentTurnStage == Game.TurnStage.PlacementBegin)
             {
-                m_player1Display.AddAnimation(new Animation(new TimeSpan(0, 0, 1), m_fixedRectangles["player1_display_shown"]));
-                m_player2Display.AddAnimation(new Animation(new TimeSpan(0, 0, 1), m_fixedRectangles["player2_display_hidden"]));
-            }
-            else if (Game.CurrentTurnStage == Game.TurnStage.BeginTurn && Game.CurrentPlayer == Game.Players[1])
-            {
-                m_player1Display.AddAnimation(new Animation(new TimeSpan(0, 0, 1), m_fixedRectangles["player1_display_hidden"]));
-                m_player2Display.AddAnimation(new Animation(new TimeSpan(0, 0, 1), m_fixedRectangles["player2_display_shown"]));
-            }
+                if(Game.CurrentPlayer == Game.Players[0])
+                {
+                    m_player1Display.AddAnimation(new Animation(new TimeSpan(0, 0, 1), m_fixedRectangles["player1_display_shown"]));
+                    m_player2Display.AddAnimation(new Animation(new TimeSpan(0, 0, 1), m_fixedRectangles["player2_display_hidden"]));
+                }
+                else if (Game.CurrentPlayer == Game.Players[1])
+                {
+                    m_player1Display.AddAnimation(new Animation(new TimeSpan(0, 0, 1), m_fixedRectangles["player1_display_hidden"]));
+                    m_player2Display.AddAnimation(new Animation(new TimeSpan(0, 0, 1), m_fixedRectangles["player2_display_shown"]));
+                }
 
+            }
             if (Game.CurrentTurnStage == Game.TurnStage.GameOver && !m_victoryBanner.Visible)
             {
                 m_victoryBanner.Visible = true;
@@ -409,14 +422,17 @@ namespace Gliese581g
             
 
             /// Bring up the end turn button when needed.  
+            bool endTurnShouldBeDisplayed = Game.CurrentTurnStage == Game.TurnStage.EndTurn ||
+                Game.CurrentTurnStage == Game.TurnStage.PlacementChooseUnit ||
+                Game.CurrentTurnStage == Game.TurnStage.PlacementChooseDestination;
             if (m_endTurnButton.Enabled == false &&
-                Game.CurrentTurnStage == Game.TurnStage.EndTurn)
+                endTurnShouldBeDisplayed)
             {
                 m_endTurnButton.Enabled = true;
                 m_endTurnButton.AddAnimation( new Animation(new TimeSpan(0, 0, 1), m_fixedRectangles["endturn_shown"]) );
             }
             else if (m_endTurnButton.Enabled == true &&
-                Game.CurrentTurnStage != Game.TurnStage.EndTurn)
+                !endTurnShouldBeDisplayed)
             {
                 m_endTurnButton.Enabled = false;
                 m_endTurnButton.AddAnimation(new Animation(new TimeSpan(0, 0, 1), m_fixedRectangles["endturn_hidden"]));
