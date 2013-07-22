@@ -214,8 +214,8 @@ namespace Gliese581g
                 Game.CurrentTurnStage == Game.TurnStage.PlacementChooseUnit || 
                 Game.CurrentTurnStage == Game.TurnStage.PlacementChooseDestination);
             m_endTurnButton = new MenuButton(
-                TextureStore.Get(TexId.map_endturn_lit),
-                TextureStore.Get(TexId.map_endturn_dim),
+                TextureStore.Get(TexId.map_end_turn_lit),
+                TextureStore.Get(TexId.map_end_turn_dim),
                 showEndTurnButton ? m_fixedRectangles["endturn_shown"] : m_fixedRectangles["endturn_hidden"],
                 SfxStore.Get(SfxId.menu_mouseover),
                 SfxStore.Get(SfxId.menu_click),
@@ -246,7 +246,9 @@ namespace Gliese581g
         public float ScrollSpeed 
         { 
             get { return s_scrollSpeed_Min + (s_scrollSpeed_Max - s_scrollSpeed_Min) * ConfigManager.GlobalManager.MapScrollSpeed; } 
-        } 
+        }
+
+
 
         public override void Update(GameTime gameTime, MouseState mouseState, KeyboardState keyboardState)
         {
@@ -255,26 +257,30 @@ namespace Gliese581g
                 this.GetMainApp().spawnNewSubScreen(game_screen_key.MainGame_EscMenu, new ScreenRectangle(.33f, .1f, .33f, .8f));
 
 
-            // We need to prevent the map from intercepting mouse events if the other gui elements are 
-            // intercepting those events...how?
-            base.Update(gameTime, mouseState, keyboardState);
 
+            // Update the EventManager - this takes care of executing any events that have been submitted at the right time.
+            m_eventMgr.Update(gameTime, this);
 
-            /// Bring up the player portraits during the player's turn.
-            if (Game.CurrentTurnStage == Game.TurnStage.BeginTurn || Game.CurrentTurnStage == Game.TurnStage.PlacementBegin)
+            m_lastMouseState = mouseState;
+            m_lastKeyboardState = keyboardState;
+
+            bool mouseAlreadyIntercepted = false;
+
+            /// Update the gui layer 
+            if (m_keysAndMouseEnabled)
             {
-                if(Game.CurrentPlayer == Game.Players[0])
-                {
-                    m_player1Display.AddAnimation(new Animation(new TimeSpan(0, 0, 1), m_fixedRectangles["player1_display_shown"]));
-                    m_player2Display.AddAnimation(new Animation(new TimeSpan(0, 0, 1), m_fixedRectangles["player2_display_hidden"]));
-                }
-                else if (Game.CurrentPlayer == Game.Players[1])
-                {
-                    m_player1Display.AddAnimation(new Animation(new TimeSpan(0, 0, 1), m_fixedRectangles["player1_display_hidden"]));
-                    m_player2Display.AddAnimation(new Animation(new TimeSpan(0, 0, 1), m_fixedRectangles["player2_display_shown"]));
-                }
-
+                mouseAlreadyIntercepted = m_mainScreenLayer.Update(mouseState, gameTime, mouseAlreadyIntercepted); 
             }
+
+            BeginPhaseGuiUpdates();
+            if (m_keysAndMouseEnabled)
+            {
+                mouseAlreadyIntercepted = m_mapScreenLayer.Update(mouseState, gameTime, mouseAlreadyIntercepted);
+            }
+
+          
+
+            /// Check for victory 
             if (Game.CurrentTurnStage == Game.TurnStage.GameOver && !m_victoryBanner.Visible)
             {
                 m_victoryBanner.Visible = true;
@@ -303,6 +309,8 @@ namespace Gliese581g
                 //AddEvent(new ShowVictoryScreenEvent(Game));
             }
 
+
+            // Perform the base update here ( this updates the map and individual controls belonging to each layer ).
 
             //m_map.Update(mouseState, m_mapCamera.Transform, gameTime);
            
@@ -429,7 +437,17 @@ namespace Gliese581g
                 endTurnShouldBeDisplayed)
             {
                 m_endTurnButton.Enabled = true;
+                 
+                // When we move to show the button, we also need to put the right texture on it.
+                if (Game.CurrentTurnStage == Game.TurnStage.EndTurn)
+                    m_endTurnButton.SetTextures(TextureStore.Get(TexId.map_end_turn_dim), TextureStore.Get(TexId.map_end_turn_lit));
+                else
+                    m_endTurnButton.SetTextures(TextureStore.Get(TexId.map_end_placement_dim), TextureStore.Get(TexId.map_end_placement_lit));
+
+
                 m_endTurnButton.AddAnimation( new Animation(new TimeSpan(0, 0, 1), m_fixedRectangles["endturn_shown"]) );
+
+
             }
             else if (m_endTurnButton.Enabled == true &&
                 !endTurnShouldBeDisplayed)
@@ -439,6 +457,28 @@ namespace Gliese581g
             }
 
 		}
+        /// <summary>
+        /// called from Update
+        /// </summary>
+        private void BeginPhaseGuiUpdates()
+        {
+            /// Bring up the player portraits during the player's turn.
+            if (Game.CurrentTurnStage == Game.TurnStage.BeginTurn || Game.CurrentTurnStage == Game.TurnStage.PlacementBegin)
+            {
+                if (Game.CurrentPlayer == Game.Players[0])
+                {
+                    m_player1Display.AddAnimation(new Animation(new TimeSpan(0, 0, 1), m_fixedRectangles["player1_display_shown"]));
+                    m_player2Display.AddAnimation(new Animation(new TimeSpan(0, 0, 1), m_fixedRectangles["player2_display_hidden"]));
+                }
+                else if (Game.CurrentPlayer == Game.Players[1])
+                {
+                    m_player1Display.AddAnimation(new Animation(new TimeSpan(0, 0, 1), m_fixedRectangles["player1_display_hidden"]));
+                    m_player2Display.AddAnimation(new Animation(new TimeSpan(0, 0, 1), m_fixedRectangles["player2_display_shown"]));
+                }
+            }
+        }
+
+
 
         
         /// The Draw function is overridden so that the 

@@ -91,8 +91,10 @@ namespace Gliese581g
 
 
         // Map Screen.
-        map_endturn_dim,
-        map_endturn_lit,
+        map_end_placement_dim,
+        map_end_placement_lit,
+        map_end_turn_dim,
+        map_end_turn_lit,
         unit_stats_frame,
 
         background_mountain_river,
@@ -358,11 +360,15 @@ namespace Gliese581g
                     return "Buttons/g_concede_dim";
                 case TexId.button_g_concede_lit:
                     return "Buttons/g_concede_lit";
-                    
 
-                case TexId.map_endturn_dim:
+
+                case TexId.map_end_placement_dim:
+                    return "MapScreen/endplacement_dim";
+                case TexId.map_end_placement_lit:
+                    return "MapScreen/endplacement_lit";
+                case TexId.map_end_turn_dim:
                     return "MapScreen/endturn_dim";
-                case TexId.map_endturn_lit:
+                case TexId.map_end_turn_lit:
                     return "MapScreen/endturn_lit";
                 case TexId.unit_stats_frame:
                     return "MapScreen/unit_stats_frame";

@@ -147,10 +147,12 @@ namespace Gliese581g
 
             if (m_keysAndMouseEnabled)
             {
+                bool mouseAlreadyIntercepted = false;
                 for (int ii = m_screenLayers.Count - 1; ii >= 0; --ii) // Layers are updated from the top down; starting with the top layer.
                 {
-                    if (m_screenLayers[ii].Update(mouseState, gameTime))
-                        break; //For now, we'll stop calling update to lower layers when one layer intercepts the mouse.
+                    
+                    if (m_screenLayers[ii].Update(mouseState, gameTime, mouseAlreadyIntercepted))
+                        mouseAlreadyIntercepted = true; //For now, we'll stop calling update to lower layers when one layer intercepts the mouse.
                 }
             }
 

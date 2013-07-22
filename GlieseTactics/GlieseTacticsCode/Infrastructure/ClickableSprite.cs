@@ -289,13 +289,13 @@ namespace Gliese581g
 
         /// Determines all the mouse states, using the transformMatrix to transform the 
         /// mouse co-ordinates before testing for mouse-over.
-        public bool Update(MouseState mouseState, Matrix transformMatrix, GameTime time)
+        public bool Update(MouseState mouseState, Matrix transformMatrix, GameTime time, bool mouseAlreadyIntercepted)
         {
             // Transform the mouse co-ordinates with the same transform being used on the sprite.
             Vector2 pos = new Vector2((float)mouseState.X, (float)mouseState.Y);
             Vector2 transformedPos = Vector2.Transform(pos, Matrix.Invert(transformMatrix) );
 
-            if (Enabled)
+            if (Enabled && !mouseAlreadyIntercepted)
                 Update(mouseState, transformedPos, time);
 
             return Visible && TestMouseOver(transformedPos); // Don't allow invisible objects to intercept the mouse. 

@@ -165,16 +165,14 @@ namespace Gliese581g
         /// </summary>
         protected MouseState m_lastMouseState = new MouseState();
         public Direction ChooseHeadingDirection = new Direction(Direction.ValueType.Right);
-        public bool Update(MouseState mouseState, Matrix transformMatrix, GameTime time)
+        public bool Update(MouseState mouseState, Matrix transformMatrix, GameTime time, bool mouseAlreadyIntercepted)
         {
-            if (!Enabled)
-                return false;
-
             Vector2 mousePos = new Vector2(mouseState.X, mouseState.Y);
             Vector2 transformedMousePos = Vector2.Transform(mousePos, Matrix.Invert(transformMatrix));
             Point transformedPoint = new Point((int)transformedMousePos.X, (int)transformedMousePos.Y);
 
             /// Actions which depend on the turn stage but are not related to a specific hex.
+            /// These happen even if the map is not intercepting the mouse. 
             switch (Game.CurrentTurnStage)
             {
                 case Game.TurnStage.BeginTurn:
@@ -208,7 +206,7 @@ namespace Gliese581g
                             ChooseHeadingDirection = Direction.DownRight;
                             break;
                         //default:
-                            //throw new Exception("this should never happen.");
+                        //throw new Exception("this should never happen.");
                     }
                     if (m_selectedHex.Unit.FacingDirection != ChooseHeadingDirection)
                     {
@@ -217,19 +215,6 @@ namespace Gliese581g
                         m_selectedHex.HighlightAttackRange();
                     }
 
-                    // If it's a click, then apply the ChooseHeadingDirection.
-                    //if (m_lastMouseState.LeftButton == ButtonState.Released &&
-                    //    mouseState.LeftButton == ButtonState.Pressed)
-                    //{
-                    //    // Highlight attack targets and transition turn state.
-                    //    m_selectedHex.Unit.FacingDirection = ChooseHeadingDirection;
-                    //    //m_selectedHex.Unit.TargetTemplate.OnApply(
-                    //    //    this,
-                    //    //    new MapLocation(m_selectedHex.MapPosition, m_selectedHex.Unit.FacingDirection),
-                    //    //    new HighlightEffect(this));
-                    //    Game.CurrentTurnStage = Game.TurnStage.ChooseAttackTarget;
-                    //    return; // Don't immediately update the hexes.
-                    //}
                     break;
 
                 case Gliese581g.Game.TurnStage.PlacementBegin:
@@ -239,6 +224,12 @@ namespace Gliese581g
             }
 
 
+            /// Now we check the mouse - actions after this point in the function
+            /// depend on mouse input.
+            if (!Enabled || mouseAlreadyIntercepted)
+                return false;
+
+            
             // Call update on each hex in the map.
             bool retVal = false;
             for (int y = 0; y < Columns; y++)

@@ -62,7 +62,7 @@ namespace Gliese581g
         /// Update all the updatable objects in the list; poll them to determine if any intercepted a mouse-over.
         /// Return true if this layer intercepted the mouse-over. 
         /// </summary>
-        public bool Update(MouseState mouseState, GameTime gameTime)
+        public bool Update(MouseState mouseState, GameTime gameTime, bool mouseAlreadyIntercepted)
         {
             if (DrawnObjects == null)
                 return false;
@@ -75,7 +75,7 @@ namespace Gliese581g
                 {
                     IUpdatedObject updated = obj as IUpdatedObject;
                     if (updated != null)
-                        retVal = updated.Update(mouseState, Transform, gameTime) || retVal;
+                        retVal = updated.Update(mouseState, Transform, gameTime, mouseAlreadyIntercepted) || retVal;
                 }
             }
             catch (InvalidOperationException)

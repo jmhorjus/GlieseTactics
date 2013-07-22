@@ -67,6 +67,14 @@ namespace Gliese581g
         }
 
 
+        public void SetTextures(Texture2D dim, Texture2D lit)
+        {
+            m_darkTexture = dim;
+            m_lightTexture = lit;
+            Texture = (LastMouseOver) ? m_lightTexture : m_darkTexture;
+        }
+
+
         public override void OnStartMouseover()
         {
             Texture = m_lightTexture;
@@ -90,5 +98,10 @@ namespace Gliese581g
                 m_parentScreen.AddEvent(m_clickEvent);
             }
         }
+
+
+
+
+
     }
 }
