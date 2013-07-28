@@ -41,7 +41,7 @@ namespace Gliese581g
 
         public int Width  { get { return (int)(m_texture.Width * Scale.X); } }
         public int Height { get { return (int)(m_texture.Height * Scale.Y); } }
-        public Rectangle DisplayRect
+        public virtual Rectangle DisplayRect
         {
             get 
             {
@@ -67,8 +67,12 @@ namespace Gliese581g
         public bool RotateInPlace = true;
         public float LayerDepth;
 
-        public bool Enabled = true;// Do we process Update()?
-        public bool Visible = true;// Do We process Draw()?
+        private bool m_enabled = true;
+        /// Do we process Update()?
+        public virtual bool Enabled { get { return m_enabled; } set { m_enabled = value; } }
+        private bool m_visible = true;
+        /// Do We process Draw()?
+        public virtual bool Visible { get { return m_visible; } set { m_visible = value; } }
 
         /// Things having to do with detecting clicks/mouseover.
         MouseState m_lastMouseState;
@@ -289,7 +293,7 @@ namespace Gliese581g
 
         /// Determines all the mouse states, using the transformMatrix to transform the 
         /// mouse co-ordinates before testing for mouse-over.
-        public bool Update(MouseState mouseState, Matrix transformMatrix, GameTime time, bool mouseAlreadyIntercepted)
+        public virtual bool Update(MouseState mouseState, Matrix transformMatrix, GameTime time, bool mouseAlreadyIntercepted)
         {
             // Transform the mouse co-ordinates with the same transform being used on the sprite.
             Vector2 pos = new Vector2((float)mouseState.X, (float)mouseState.Y);

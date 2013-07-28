@@ -52,6 +52,7 @@ namespace Gliese581g
         gamesetup_start_dim,
         gamesetup_start_lit,
         player_stats_frame,
+        player_stats_frame_skill_panel,
 
         button_frame_lit,
         button_frame_dim,
@@ -138,7 +139,9 @@ namespace Gliese581g
 
         hp_bar_white,
         recharge_numbers,
+        commander_star,
 
+        //Units
         unit_infantry,
         unit_tank,
         unit_commander,
@@ -146,7 +149,28 @@ namespace Gliese581g
         unit_scout,
         unit_roughrider,
         unit_mech,
-        commander_star,
+        
+
+        //Skills
+        skill_ace_pilot_red,
+        skill_ace_pilot_blue,
+        skill_commander_armor_red,
+        skill_commander_armor_blue,
+        skill_commander_gun_red,
+        skill_commander_gun_blue,
+        skill_napalm ,
+        skill_self_destruct,
+        skill_power_boost,
+        skill_power_boost_purple,
+        skill_power_drain,
+        skill_power_drain_purple,
+        skill_healing,
+        skill_healing_purple,
+        skill_repair_unit,
+        skill_empty_socket,
+
+
+
 
         graphic_victory,
         confetti_1,
@@ -292,7 +316,8 @@ namespace Gliese581g
                     return "GameSetupScreen/start_lit";
                 case TexId.player_stats_frame:
                     return "GameSetupScreen/player_stats_frame";
-
+                case TexId.player_stats_frame_skill_panel:
+                    return "GameSetupScreen/player_stats_frame_skills";
 
                 case TexId.button_frame_dim:
                     return "GameSetupScreen/button_frame_dim";
@@ -446,7 +471,11 @@ namespace Gliese581g
                     return "Units/hp_bar_white";
                 case TexId.recharge_numbers:
                     return "Units/recharge_numbers";
+                case TexId.commander_star:
+                    return "Units/commander_star";
 
+
+                //Units:
                 case TexId.unit_infantry:
                     return "Units/Infantry_big";
                 case TexId.unit_tank:
@@ -461,9 +490,44 @@ namespace Gliese581g
                     return "Units/RoughRider_big";
                 case TexId.unit_mech:
                     return "Units/Mech";
-                case TexId.commander_star:
-                    return "Units/commander_star";
-                    
+
+               
+                //Skills:
+                case TexId.skill_ace_pilot_red:
+                    return "SkillsScreen/Ace Pilot";
+                case TexId.skill_ace_pilot_blue:
+                    return "SkillsScreen/Ace Pilot(blue)";
+                case TexId.skill_commander_armor_red:
+                    return "SkillsScreen/Commander Armor";
+                case TexId.skill_commander_armor_blue:
+                    return "SkillsScreen/Commander Armor(blue)";
+                case TexId.skill_commander_gun_red:
+                    return "SkillsScreen/Commander Gun";
+                case TexId.skill_commander_gun_blue:
+                    return "SkillsScreen/Commander Gun(blue)";
+                case TexId.skill_napalm :
+                    return "SkillsScreen/Damage Unit, Napalm";
+                case TexId.skill_self_destruct:
+                    return "SkillsScreen/Damage Unit, Self Destruct";
+                case TexId.skill_power_boost:
+                    return "SkillsScreen/PowerBoost";
+                case TexId.skill_power_boost_purple:
+                    return "SkillsScreen/PowerBoost(Purple)";
+                case TexId.skill_power_drain:
+                    return "SkillsScreen/PowerDrain";
+                case TexId.skill_power_drain_purple:
+                    return "SkillsScreen/PowerDrane(Purple)";
+                case TexId.skill_healing:
+                    return "SkillsScreen/RechargeHeal";
+                case TexId.skill_healing_purple:
+                    return "SkillsScreen/RechargeHeal(Purple)";
+                case TexId.skill_repair_unit:
+                    return "SkillsScreen/Single Target Heal";
+
+                case TexId.skill_empty_socket:
+                    return "SkillsScreen/empty_skill_socket";
+
+
                 case TexId.graphic_victory:
                     return "VictoryGraphics/VICTORY";
                 case TexId.confetti_1:

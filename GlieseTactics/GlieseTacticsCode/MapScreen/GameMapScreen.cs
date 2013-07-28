@@ -469,11 +469,16 @@ namespace Gliese581g
                 {
                     m_player1Display.AddAnimation(new Animation(new TimeSpan(0, 0, 1), m_fixedRectangles["player1_display_shown"]));
                     m_player2Display.AddAnimation(new Animation(new TimeSpan(0, 0, 1), m_fixedRectangles["player2_display_hidden"]));
+                    m_player1Display.ShowingSkills = true;
+                    m_player2Display.ShowingSkills = false;
+
                 }
                 else if (Game.CurrentPlayer == Game.Players[1])
                 {
                     m_player1Display.AddAnimation(new Animation(new TimeSpan(0, 0, 1), m_fixedRectangles["player1_display_hidden"]));
                     m_player2Display.AddAnimation(new Animation(new TimeSpan(0, 0, 1), m_fixedRectangles["player2_display_shown"]));
+                    m_player1Display.ShowingSkills = false;
+                    m_player2Display.ShowingSkills = true;
                 }
             }
         }

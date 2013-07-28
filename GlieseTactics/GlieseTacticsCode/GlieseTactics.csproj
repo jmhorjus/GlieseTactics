@@ -125,6 +125,7 @@
     <Compile Include="GameState\Commander.cs" />
     <Compile Include="Infrastructure\GUI\CheckBox.cs" />
     <Compile Include="Infrastructure\Animation.cs" />
+    <Compile Include="Infrastructure\GUI\MenuButtonPannel.cs" />
     <Compile Include="Infrastructure\ImageResize.cs" />
     <Compile Include="Infrastructure\ContentStores\SfxStore.cs" />
     <Compile Include="Infrastructure\ConfigManager.cs" />

@@ -22,10 +22,40 @@ namespace Gliese581g
         /// <summary>
         ///  Members related to the skills frame
         /// </summary>
-        bool m_showingSkills;
+        MenuButtonPannel m_skillsButtonPanel;
+        public bool ShowingSkills
+        {
+            get { return m_skillsButtonPanel.Visible; }
+            set
+            {
+                m_skillsButtonPanel.Visible = value;
+                m_skillsButtonPanel.Enabled = value;
+            }
+        }
+
+        protected void UpdateSkillsPanelPosition()
+        {
+            if (m_skillsButtonPanel == null)
+                return;
+            Rectangle dispRect = DisplayRect;
+            m_skillsButtonPanel.DisplayRect = new Rectangle(
+                dispRect.X + dispRect.Width, dispRect.Y,
+                (int)(dispRect.Width * 1.5f), dispRect.Height);
+        }
+
+        public override Rectangle DisplayRect
+        {   // We override the DisplayRect set function to also call UpdateSkillsPanelPosition().
+            set
+            {
+                base.DisplayRect = value;
+                UpdateSkillsPanelPosition();
+            }
+        }
 
 
-
+        /// <summary>
+        /// Constructor
+        /// </summary>
         public Commander Commander
         {
             get { return m_player; }
@@ -47,12 +77,19 @@ namespace Gliese581g
         }
 
 
-
         public CommanderDisplaySocket(Texture2D emptyPortrait, Rectangle dispRect, SpriteFont font)
             : base(emptyPortrait, dispRect, Color.White, 1f, 0f, Vector2.Zero, 1f)
         {
             m_emptyPortrait = emptyPortrait;
             m_font = font;
+            
+            m_skillsButtonPanel = new MenuButtonPannel(
+                TextureStore.Get(TexId.player_stats_frame_skill_panel),
+                TextureStore.Get(TexId.skill_empty_socket),
+                Rectangle.Empty);
+
+            UpdateSkillsPanelPosition();
+            m_skillsButtonPanel.Visible = false;
         }
 
 
@@ -155,6 +192,10 @@ namespace Gliese581g
         /// The draw function. 
         public override void Draw(SpriteBatch spriteBatch, GameTime time)
         {
+            //The skill button panel is on the botom
+            m_skillsButtonPanel.Draw(spriteBatch, time);
+
+
             base.Draw(spriteBatch, time);
             updateFontScale();
 
@@ -209,8 +250,16 @@ namespace Gliese581g
             m_fontScale.X = Math.Min(
                 NAME_DISPLAY_SIZE.X * frameRectangle.Width / nameSize.X,
                 m_fontScale.Y /*Don't stretch it unneccessarily on x any more than you already did on y*/);
+        }
 
 
+        public override bool Update(MouseState mouseState, Matrix transformMatrix, GameTime time, bool mouseAlreadyIntercepted)
+        {
+            bool retVal = base.Update(mouseState, transformMatrix, time, mouseAlreadyIntercepted);
+            
+            retVal |= m_skillsButtonPanel.Update(mouseState, transformMatrix, time, mouseAlreadyIntercepted);
+
+            return retVal;
         }
        
     }
