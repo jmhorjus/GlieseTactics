@@ -64,10 +64,10 @@ namespace Gliese581g
             player_winner = new CommanderDisplaySocket(
                 TextureStore.Get(TexId.portrait_empty),
                 m_fixedRectangles["winner_display"],
-                m_defaultFont);
+                m_defaultFont, this);
             player_loser = new CommanderDisplaySocket(TextureStore.Get(TexId.portrait_empty),
                 m_fixedRectangles["loser_display"],
-                m_defaultFont);
+                m_defaultFont, this);
             player_winner.Enabled = false; // Player display panels not enabled for clicking/dragging.
             player_loser.Enabled = false;
             m_mainScreenLayer.DrawnObjects.Add(player_winner);

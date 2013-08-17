@@ -19,6 +19,7 @@ namespace Gliese581g
         Vector2 m_fontScale;
 
 
+
         /// <summary>
         ///  Members related to the skills frame
         /// </summary>
@@ -53,6 +54,13 @@ namespace Gliese581g
         }
 
 
+        GameScreen ParentScreen
+        {  // Can set the skill panel's parent screen through the display socket.
+            get { return m_skillsButtonPanel.ParentScreen; }
+            set { m_skillsButtonPanel.ParentScreen = value; }
+        }
+
+
         /// <summary>
         /// Constructor
         /// </summary>
@@ -77,7 +85,7 @@ namespace Gliese581g
         }
 
 
-        public CommanderDisplaySocket(Texture2D emptyPortrait, Rectangle dispRect, SpriteFont font)
+        public CommanderDisplaySocket(Texture2D emptyPortrait, Rectangle dispRect, SpriteFont font, GameScreen parentScreen)
             : base(emptyPortrait, dispRect, Color.White, 1f, 0f, Vector2.Zero, 1f)
         {
             m_emptyPortrait = emptyPortrait;
@@ -86,7 +94,7 @@ namespace Gliese581g
             m_skillsButtonPanel = new MenuButtonPannel(
                 TextureStore.Get(TexId.player_stats_frame_skill_panel),
                 TextureStore.Get(TexId.skill_empty_socket),
-                Rectangle.Empty);
+                Rectangle.Empty, parentScreen);
 
             UpdateSkillsPanelPosition();
             m_skillsButtonPanel.Visible = false;

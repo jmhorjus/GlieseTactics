@@ -14,12 +14,17 @@ namespace Gliese581g
     public class MenuButton : ClickableSprite
     {
         protected GameScreen m_parentScreen;
+        public GameScreen ParentScreen { get { return m_parentScreen; } set { m_parentScreen = value; } }
+
         protected Texture2D m_lightTexture;
         protected Texture2D m_darkTexture;
         protected SoundEffect m_mouseOverSound;
         protected SoundEffect m_onClickSound;
         protected Event m_clickEvent;
         protected bool m_disableInputOnClick;
+
+        
+
 
 
         public MenuButton(
@@ -88,15 +93,16 @@ namespace Gliese581g
 
         public override void OnLeftClick(Vector2 mousePosInTexture)
         {
+            SfxStore.Play(m_onClickSound);
+            if (m_clickEvent == null)
+                return;
+
             if (m_disableInputOnClick)
                 m_parentScreen.DisableKeysAndMouse();
-            SfxStore.Play(m_onClickSound);
+            
+            m_clickEvent.Reset();
+            m_parentScreen.AddEvent(m_clickEvent);
 
-            if (m_clickEvent != null)
-            {
-                m_clickEvent.Reset();
-                m_parentScreen.AddEvent(m_clickEvent);
-            }
         }
 
 

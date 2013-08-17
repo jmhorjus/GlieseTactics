@@ -117,6 +117,7 @@
     <Compile Include="GameSetupScreen\CommanderTrashBin.cs" />
     <Compile Include="GameSetupScreen\CommanderDisplaySocket.cs" />
     <Compile Include="GameState\Armor.cs" />
+    <Compile Include="GameState\SkillSet.cs" />
     <Compile Include="GameState\DrawnTextEffect.cs" />
     <Compile Include="GameState\Game.cs" />
     <Compile Include="GameState\IDrawnEffect.cs" />

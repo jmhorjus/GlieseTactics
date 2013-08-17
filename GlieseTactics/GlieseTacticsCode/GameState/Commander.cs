@@ -16,7 +16,7 @@ namespace Gliese581g
     [Serializable]
     public class Commander
     {
-        // Static functions / utilities. 
+        /// *********Static functions / utilities. ************
         public void SaveXmlFile(string xmlFilePath)
         {
             FileStream fs = GetStream(xmlFilePath);
@@ -107,13 +107,20 @@ namespace Gliese581g
                 throw ex;
             }
         }
+
+        /// ********* End Static functions / utilities. ************
+
         
+
+        /// Class member variables
+        //CommanderClass m_class;
+        private int m_experience;
         
+        public int Level { get { return 1 + m_experience / 1000; } }
         
-        //
+        SkillSet m_skills;
 
 
-        // Class member variables
 
         private bool m_surrender;
         public bool Surrender

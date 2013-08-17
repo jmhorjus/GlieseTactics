@@ -20,9 +20,9 @@ namespace Gliese581g
         }
 
         TextLabel m_InspirationLabel;
-        TextLabel m_OperationsLabel;
-        TextLabel m_PilotingLabel;
-        TextLabel m_OrdnanceLabel;
+        TextLabel m_EngineerLabel;
+        TextLabel m_KnightLabel;
+        TextLabel m_MageLabel;
 
         public override void InitScreen(ScreenRectangle portionOfScreen, GraphicsDevice graphicsDevice)
         {

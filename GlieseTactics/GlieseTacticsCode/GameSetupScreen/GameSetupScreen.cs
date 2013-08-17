@@ -221,9 +221,9 @@ namespace Gliese581g
                
 
             m_playerSocket_player1 = new CommanderDisplaySocket(TextureStore.Get(TexId.portrait_empty),
-                m_fixedRectangles["player_1"], m_defaultFont);
+                m_fixedRectangles["player_1"], m_defaultFont, this);
             m_playerSocket_player2 = new CommanderDisplaySocket(TextureStore.Get(TexId.portrait_empty),
-               m_fixedRectangles["player_2"], m_defaultFont);
+               m_fixedRectangles["player_2"], m_defaultFont, this);
 
             m_mainScreenLayer.DrawnObjects.Add(m_playerSocket_player1);
             m_mainScreenLayer.DrawnObjects.Add(m_playerSocket_player2);
@@ -337,7 +337,7 @@ namespace Gliese581g
         {
             CommanderDisplaySocket socket;
             socket = new CommanderDisplaySocket(TextureStore.Get(TexId.portrait_newplayer),
-                m_fixedRectangles["player_sidebar_off_bottom"], m_defaultFont);
+                m_fixedRectangles["player_sidebar_off_bottom"], m_defaultFont, this);
             socket.SetClickWhenEmptyEvent(new NewPlayerEvent(socket), this);
             m_playerSidebarList.Add(socket);
             m_mainScreenLayer.DrawnObjects.Add(socket);

@@ -17,6 +17,17 @@ namespace Gliese581g
 
         Texture2D m_baseTexture;
         Texture2D m_buttonFillerTexture;
+        
+        GameScreen m_parentScreen;
+        public GameScreen ParentScreen { get { return m_parentScreen; }
+            set 
+            {
+                m_parentScreen = value;
+                foreach (MenuButton mb in m_buttons)
+                    mb.ParentScreen = value;
+            }
+        }
+
 
         List<MenuButton> m_buttons;
         List<Vector2> m_buttonTopLeft;
@@ -50,12 +61,13 @@ namespace Gliese581g
         }
 
 
-        public MenuButtonPannel(Texture2D baseTexture, Texture2D buttonFillerTexture, Rectangle displayRect)
+        public MenuButtonPannel(Texture2D baseTexture, Texture2D buttonFillerTexture, Rectangle displayRect, GameScreen parentScreen)
             : base(baseTexture, displayRect, Color.White, 1f, 0f, Vector2.Zero, 0f)
         {
             m_baseTexture = baseTexture;
             m_buttonFillerTexture = buttonFillerTexture;
             m_buttons = new List<MenuButton>();
+            m_parentScreen = parentScreen;
 
             Initialize();
         }
@@ -100,7 +112,7 @@ namespace Gliese581g
                 m_buttonSize[ii] -= m_buttonTopLeft[ii];
 
                 m_buttons.Add(new MenuButton(m_buttonFillerTexture, m_buttonFillerTexture, Rectangle.Empty, 
-                    SfxStore.Get(SfxId.menu_mouseover), SfxStore.Get(SfxId.menu_click), null, true, null));
+                    SfxStore.Get(SfxId.menu_mouseover), SfxStore.Get(SfxId.menu_click), null, true, m_parentScreen));
             }
 
             // This function places them in the right locations/scales. 

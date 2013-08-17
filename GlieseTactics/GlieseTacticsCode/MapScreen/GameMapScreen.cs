@@ -170,10 +170,10 @@ namespace Gliese581g
             m_player1Display = new CommanderDisplaySocket(
                 TextureStore.Get(TexId.portrait_empty),
                 gameAlreadyStarted ? m_fixedRectangles["player1_display_shown"] : m_fixedRectangles["player1_display_onload"],
-                m_defaultFont);
+                m_defaultFont, this);
             m_player2Display = new CommanderDisplaySocket(TextureStore.Get(TexId.portrait_empty),
                 gameAlreadyStarted ? m_fixedRectangles["player2_display_shown"] : m_fixedRectangles["player2_display_onload"],
-                m_defaultFont);
+                m_defaultFont, this);
             m_player1Display.Enabled = false; // Player display panels not enabled for clicking/dragging.
             m_player2Display.Enabled = false;
             m_mainScreenLayer.DrawnObjects.Add(m_player1Display);
