@@ -248,16 +248,21 @@ namespace Gliese581g
             return retVal;
         }
         
-        /// The Inverse of the above function.
-        /// If we had this function we wouldn't need to call IsMouseOver for every single hex. 
-        private Point mapCoordinatesFromScreenPosition(Vector2 screenPos)
+        // Should a certain unit be displayed on the map (based on owner, turn stage, fog, etc).
+        public bool ShowUnit(Unit unit)
         {
-            throw new NotImplementedException();
-            //return new Point(
-            //    (int)(screenPos.X * HEX_SIZE + screenPos.Y % 2 * (HEX_SIZE / 2f)),
-            //    (int)(screenPos.Y * (4f / (HEX_SIZE * 3f))));
-        }
+            if (this.Game.CurrentTurnStage == Game.TurnStage.NotYetStarted ||
+                this.Game.CurrentTurnStage == Game.TurnStage.PlacementBegin ||
+                this.Game.CurrentTurnStage == Game.TurnStage.PlacementChooseUnit ||
+                this.Game.CurrentTurnStage == Game.TurnStage.PlacementChooseDestination)
+            {
+                if (unit.Owner != this.Game.CurrentPlayer)
+                    return false;
+            }
 
+            return true;
+        }
+        
         private bool IsValidDestination(Point pos)
         {
             Hex hex = GetHex(pos);

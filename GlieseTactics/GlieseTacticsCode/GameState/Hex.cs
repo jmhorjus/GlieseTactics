@@ -143,7 +143,7 @@ namespace Gliese581g
             spriteBatch.Draw(Texture, m_displayRectangle, null, Tint, 0f, Vector2.Zero, SpriteEffects.None, 0f);
             //base.Draw(spriteBatch, time);
 
-            if (Unit != null)
+            if (Unit != null && m_map.ShowUnit(Unit))
                 Unit.Draw(spriteBatch, time);
 
             // Draw any effects (explosions, etc) - they are removed from the list when finished
