@@ -271,12 +271,13 @@ namespace Gliese581g
         ///------------------------------------------------------
         /// Functions for setting up both random and saved maps. 
         /// 
-        public bool IsValidStartHex(int x, int playerIndex)
+        public bool IsValidStartHex(int x_position, int playerIndex)
         {
+            int startRows = m_hexArray.GetLength(0) / 3;
             if (playerIndex == 0)
-                return x <= m_hexArray.GetLength(0) / 4;
+                return x_position < startRows;
             else
-                return x >= (m_hexArray.GetLength(0) * 3) / 4;
+                return x_position >= m_hexArray.GetLength(0) - startRows;
         }
 
         /// Initialize a random map based on the current size of the hex array.  
@@ -288,30 +289,22 @@ namespace Gliese581g
             {
                 for (int y = 0; y < Columns; y++)
                 {
-                    if (IsValidStartHex(x, 0))
-                    {
-                        m_hexArray[x, y] = new Hex(this, m_defaultHexTexture, new Point(x, y), true, 0);
-                        continue;
-                    }
-                    else if (IsValidStartHex(x, 1))
-                    {
-                        m_hexArray[x, y] = new Hex(this, m_defaultHexTexture, new Point(x, y), true, 1);
-                        continue;
-                    }
+                    bool blocking = random.Next(0, 5) == 0;
+                    int playerStartingArea = -1;
 
-                    
-                    switch (random.Next(0, 5)) //green a lot or not (0,adjust)
-                    {
-                        case 0:
-                            m_hexArray[x, y] = new Hex(this, m_blockingHexTexture, new Point(x, y), false, -1);
-                            break;
-                        default:
-                            m_hexArray[x, y] = new Hex(this, m_defaultHexTexture, new Point(x, y), true, -1);
-                            break;
-                    }
+                    // Starting areas.
+                    if (IsValidStartHex(x, 0))
+                        playerStartingArea = 0;
+                    else if (IsValidStartHex(x, 1))
+                        playerStartingArea = 1;
+
+                    m_hexArray[x, y] = new Hex(this, 
+                        blocking ? m_blockingHexTexture : m_defaultHexTexture, 
+                        new Point(x, y), 
+                        blocking ? false : true, 
+                        playerStartingArea);
                 }
             }
-            PlaceArmiesRandomlyOnMap();
         }
 
         /// function that places the player's unit's randomly on the map. 
@@ -322,36 +315,47 @@ namespace Gliese581g
             {
                 foreach (Unit unit in Game.Players[ii].MyUnits)
                 {
-                    if (unit.IsCommander)
+                    bool placementSuccessful = false;
+                    int tries = 0;
+                    while (!placementSuccessful)
                     {
-                        int tries = 0;
-                        while (!unit.PlaceOnMap(
-                            this,
-                            new Point(
-                               ii == 0 ? rand.Next(0, (Rows * 1) / 5) : rand.Next((Rows * 4) / 5, Rows),
-                               rand.Next(0, Columns)), // commanders don't start near the front
-                            ii == 0 ? Direction.Right : Direction.Left))
+                        Point point = Point.Zero;
+                        point.X = rand.Next(0, Rows);
+                        point.Y = rand.Next(0, Columns);
+                        if (!IsValidStartHex(point.X, ii) ||
+                            !(placementSuccessful = unit.PlaceOnMap(this, point, ii == 0 ? Direction.Right : Direction.Left)))
                         {
                             tries++;
-                            if (tries > 500) break;
-                        }
-                    }
-                    else
-                    {
-                        int tries = 0;
-                        while (!unit.PlaceOnMap(
-                            this,
-                            new Point(
-                                ii == 0 ? rand.Next(0, (Rows * 1) / 4) : rand.Next((Rows * 3) / 4, Rows),
-                                rand.Next(0, Columns)),
-                            ii == 0 ? Direction.Right : Direction.Left))
-                        {
-                            tries++;
-                            if (tries > 500) break;
-                        }
-                    }
-                }
-            }
+                            if (tries > 1000)
+                            {
+                                // Try to find *any* place that's valid
+                                foreach (Hex hex in m_hexArray)
+                                {
+                                    if (IsValidStartHex(hex.MapPosition.X, ii) && hex.Unit == null)
+                                    {
+                                        // Clear terrain if neccessary.
+                                        if (!hex.LandMovementAllowed)
+                                        {
+                                            hex.LandMovementAllowed = true;
+                                            hex.Texture = m_defaultHexTexture;
+                                        }
+                                        if (unit.PlaceOnMap(hex, ii == 0 ? Direction.Right : Direction.Left))
+                                        {
+                                            placementSuccessful = true;
+                                            break;
+                                        }
+                                    }
+                                }
+                                if (!placementSuccessful)
+                                {
+                                    placementSuccessful = true; // For now, just let them be purged. (move to reinforcements later)
+                                    //throw new Exception("could find a place for this unit!");
+                                }
+                            }                             
+                        } // try to place
+                    } // while not placed
+                } // each unit
+            } // each player
             PurgeUnplacedUnitsFromGame();
             return;
         }
@@ -359,16 +363,26 @@ namespace Gliese581g
 
         void PurgeUnplacedUnitsFromGame()
         {
+            // How many units to they have?
+            int unitsBeforePurge = Game.Players[0].MyUnits.Count + Game.Players[1].MyUnits.Count;
+
             // Clear the unit lists of both players completely. Any units not on the map immediately become unreferanced. 
             Game.Players[0].MyUnits = new List<Unit>();
             Game.Players[1].MyUnits = new List<Unit>();
 
+            // Now remake the lists using only units on the map. 
             for (int x = 0; x < Rows; x++)
                 for (int y = 0; y < Columns; y++)
                     if (m_hexArray[x, y] != null && m_hexArray[x,y].Unit != null)
                     {   //Add the unit to its own owners list. 
                         m_hexArray[x, y].Unit.Owner.MyUnits.Add(m_hexArray[x, y].Unit);
                     }
+
+            if (unitsBeforePurge != Game.Players[0].MyUnits.Count + Game.Players[1].MyUnits.Count)
+            {
+                ;
+                //throw new Exception("Some unplaced units were purged!");
+            }
         }
 
 

@@ -69,7 +69,7 @@ namespace Gliese581g
         {
             Unit tempUnit = m_unit;
             m_unit = null;
-            if (tempUnit != null && tempUnit.CurrentHex != null)
+            if (tempUnit != null && tempUnit.CurrentHex == this)
                 tempUnit.ClearCurrentHex();
         }
         

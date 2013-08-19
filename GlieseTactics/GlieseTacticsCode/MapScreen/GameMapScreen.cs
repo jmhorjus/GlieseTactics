@@ -63,11 +63,11 @@ namespace Gliese581g
             switch(mapSize)
             {
                 case Game.MapSize.Small:
-                    newDimensions = new Point(12, 8); break;
+                    newDimensions = new Point(10, 8); break;
                 case Game.MapSize.Medium:
-                    newDimensions = new Point(14, 10); break;
+                    newDimensions = new Point(12, 10); break;
                 case Game.MapSize.Large:
-                    newDimensions = new Point(16, 12); break;
+                    newDimensions = new Point(14, 12); break;
                 default:
                     newDimensions = Point.Zero; break;
             }
@@ -79,7 +79,7 @@ namespace Gliese581g
             m_backgroundColor = environment.BackgroundTint;
 
             m_map = new Map(
-                mapType == Game.MapType.Random ? newDimensions.X : 18,
+                mapType == Game.MapType.Random ? newDimensions.X : 18, // 18x18 - max current dimensions for custom map.
                 mapType == Game.MapType.Random ? newDimensions.Y : 18, 
                 m_mapCamera,
                 m_mapEnvironment.DefaultHexTexture, 
@@ -89,7 +89,10 @@ namespace Gliese581g
             Game = game;
 
             if (mapType == Game.MapType.Random)
-            { m_map.InitRandomMap(); }
+            { 
+                m_map.InitRandomMap();
+                m_map.PlaceArmiesRandomlyOnMap();
+            }
             else
             {
                 if (mapSize == Game.MapSize.Small)

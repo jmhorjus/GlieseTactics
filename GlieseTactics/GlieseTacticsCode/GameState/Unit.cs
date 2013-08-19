@@ -243,7 +243,7 @@ namespace Gliese581g
         {
             Hex tempHex = m_currentHex;
             m_currentHex = null;
-            if (tempHex != null && tempHex.Unit != null)
+            if (tempHex != null && tempHex.Unit == this)
                 tempHex.ClearUnit();
         }
 
@@ -405,14 +405,16 @@ namespace Gliese581g
         }
         public bool PlaceOnMap(Hex destination, Direction facingDirection)
         {
-            if (destination == null && !destination.IsValidDestination)
+            if (destination == null || !destination.IsValidDestination)
                 return false;
 
             DrawOrigin = new Vector2(Texture.Height / 2, Texture.Width / 2);
 
-            destination.PlaceUnit(this);
+            // Gotta clear before placing.
             if(m_currentHex != null)
                 m_currentHex.ClearUnit();
+
+            destination.PlaceUnit(this);
             m_currentHex = destination;
 
             Visible = true;
