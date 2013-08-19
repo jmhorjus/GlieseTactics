@@ -419,7 +419,7 @@ namespace Gliese581g
 
             Visible = true;
             Enabled = true;
-            DisplayRect = destination.DisplayRect;
+            LocationRect = destination.DisplayRect;
             FacingDirection = facingDirection;
             
             return true;
@@ -455,7 +455,7 @@ namespace Gliese581g
             // Draw the Commander Star
             if (IsCommander)
             {
-                Rectangle StarRect = DisplayRect;
+                Rectangle StarRect = LocationRect;
                 spriteBatch.Draw(TextureStore.Get(TexId.commander_star),
                     new Rectangle(StarRect.Center.X - StarRect.Width / 6,
                         StarRect.Top + (StarRect.Height * 2) / 3,

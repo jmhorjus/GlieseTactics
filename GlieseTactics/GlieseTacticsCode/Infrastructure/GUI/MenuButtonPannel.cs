@@ -33,12 +33,14 @@ namespace Gliese581g
         List<Vector2> m_buttonTopLeft;
         List<Vector2> m_buttonSize;
 
-        public override Rectangle DisplayRect
+        public override Rectangle LocationRect
         {   // We override the DisplayRect set function to also call UpdateButtonPositions().
-            set 
+            set
             {
-                base.DisplayRect = value;
-                UpdateButtonPositions();
+                Vector2 scale = Scale;
+                base.LocationRect = value;
+                if (scale != Scale)
+                    UpdateButtonPositions();
             }
         }
         public override bool Visible
@@ -61,8 +63,8 @@ namespace Gliese581g
         }
 
 
-        public MenuButtonPannel(Texture2D baseTexture, Texture2D buttonFillerTexture, Rectangle displayRect, GameScreen parentScreen)
-            : base(baseTexture, displayRect, Color.White, 1f, 0f, Vector2.Zero, 0f)
+        public MenuButtonPannel(Texture2D baseTexture, Texture2D buttonFillerTexture, Rectangle displayRect, GameScreen parentScreen, ClickableSprite anchorSprite = null)
+            : base(baseTexture, displayRect, Color.White, 1f, 0f, Vector2.Zero, 0f, anchorSprite)
         {
             m_baseTexture = baseTexture;
             m_buttonFillerTexture = buttonFillerTexture;
@@ -112,7 +114,7 @@ namespace Gliese581g
                 m_buttonSize[ii] -= m_buttonTopLeft[ii];
 
                 m_buttons.Add(new MenuButton(m_buttonFillerTexture, m_buttonFillerTexture, Rectangle.Empty, 
-                    SfxStore.Get(SfxId.menu_mouseover), SfxStore.Get(SfxId.menu_click), null, true, m_parentScreen));
+                    SfxStore.Get(SfxId.menu_mouseover), SfxStore.Get(SfxId.menu_click), null, true, m_parentScreen, this));
             }
 
             // This function places them in the right locations/scales. 
@@ -126,14 +128,13 @@ namespace Gliese581g
             // the button's internal rectangle.  
             if (m_buttons == null)
                 return;
-            Rectangle panel = DisplayRect;
             for (int ii = 0; ii < m_buttons.Count; ii++)
             {
-                m_buttons[ii].DisplayRect = new Rectangle(
-                    (int)(panel.X + panel.Width * m_buttonTopLeft[ii].X),
-                    (int)(panel.Y + panel.Height * m_buttonTopLeft[ii].Y),
-                    (int)(panel.Width * m_buttonSize[ii].X),
-                    (int)(panel.Height * m_buttonSize[ii].Y));
+                m_buttons[ii].LocationRect = new Rectangle(
+                    (int)(Width * m_buttonTopLeft[ii].X),  // TODO: include draworigin later
+                    (int)(Height * m_buttonTopLeft[ii].Y),
+                    (int)(Width * m_buttonSize[ii].X),
+                    (int)(Height * m_buttonSize[ii].Y));
             }
         }
 

@@ -60,7 +60,7 @@ namespace Gliese581g
                 Tint = Color.White;
 
             base.Draw(spriteBatch, time);
-            spriteBatch.Draw(m_textureRadioButton, DisplayRect, null, Tint, 0f, Vector2.Zero, SpriteEffects.None, 0f);
+            spriteBatch.Draw(m_textureRadioButton, LocationRect, null, Tint, 0f, Vector2.Zero, SpriteEffects.None, 0f);
         }
 
     } 

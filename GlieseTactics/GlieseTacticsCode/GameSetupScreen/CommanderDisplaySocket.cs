@@ -31,6 +31,13 @@ namespace Gliese581g
             {
                 m_skillsButtonPanel.Visible = value;
                 m_skillsButtonPanel.Enabled = value;
+
+                // Add an animation to the skill panel, anchored to the display socket
+                Rectangle offsetRect = CalcSkillsPanelRect();
+                Point pos = LocationRect.Location;
+                m_skillsButtonPanel.AddAnimation(
+                    new Animation(new TimeSpan(0, 0, 0, 1),
+                    offsetRect));
             }
         }
 
@@ -38,17 +45,37 @@ namespace Gliese581g
         {
             if (m_skillsButtonPanel == null)
                 return;
-            Rectangle dispRect = DisplayRect;
-            m_skillsButtonPanel.DisplayRect = new Rectangle(
-                dispRect.X + dispRect.Width, dispRect.Y,
+            if (m_skillsButtonPanel.HasAnyAnimation)
+                return;
+
+            m_skillsButtonPanel.LocationRect = CalcSkillsPanelRect();
+        }
+        private Rectangle CalcSkillsPanelRect()
+        { return ShowingSkills ? GetSkillsPanelShownRect() : GetSkillsPanelHiddenRect(); }
+        private Rectangle GetSkillsPanelShownRect()
+        {
+            Rectangle dispRect = LocationRect;
+            return new Rectangle(
+                dispRect.Width, 0,
                 (int)(dispRect.Width * 1.5f), dispRect.Height);
         }
+        private Rectangle GetSkillsPanelHiddenRect()
+        { 
+            Rectangle dispRect = LocationRect;
+            int panelWidth = (int)(dispRect.Width * 1.5f);
+            return new Rectangle(
+                dispRect.Width - panelWidth, 0,
+                panelWidth, dispRect.Height);
+        }
 
-        public override Rectangle DisplayRect
+
+
+
+        public override Rectangle LocationRect
         {   // We override the DisplayRect set function to also call UpdateSkillsPanelPosition().
             set
             {
-                base.DisplayRect = value;
+                base.LocationRect = value;
                 UpdateSkillsPanelPosition();
             }
         }
@@ -94,7 +121,7 @@ namespace Gliese581g
             m_skillsButtonPanel = new MenuButtonPannel(
                 TextureStore.Get(TexId.player_stats_frame_skill_panel),
                 TextureStore.Get(TexId.skill_empty_socket),
-                Rectangle.Empty, parentScreen);
+                Rectangle.Empty, parentScreen, this);
 
             UpdateSkillsPanelPosition();
             m_skillsButtonPanel.Visible = false;
@@ -171,16 +198,16 @@ namespace Gliese581g
             if (s_dragSourceSocket == this && s_dragDestSocket != null)
             {
                 Commander temp = s_dragDestSocket.Commander;
-                Rectangle tempDestRect = s_dragDestSocket.DisplayRect;
-                Rectangle tempSourceRect = s_dragSourceSocket.DisplayRect;
+                Rectangle tempDestRect = s_dragDestSocket.LocationRect;
+                Rectangle tempSourceRect = s_dragSourceSocket.LocationRect;
 
                 s_dragDestSocket.Commander = s_dragSourceSocket.Commander;
                 s_dragDestSocket.Tint = Color.White;
                 s_dragSourceSocket.Commander = temp;
 
                 //Not only swap players but also locations - then animate back to their original places with the new players.
-                s_dragDestSocket.DisplayRect = tempSourceRect;
-                s_dragSourceSocket.DisplayRect = tempDestRect;
+                s_dragDestSocket.LocationRect = tempSourceRect;
+                s_dragSourceSocket.LocationRect = tempDestRect;
                 s_dragDestSocket.AddAnimation(new Animation(new TimeSpan(0,0,0,0,400), tempDestRect));
                 s_dragSourceSocket.AddAnimation(new Animation(new TimeSpan(0,0,0,0,400), tempSourceRect));
             }
@@ -207,7 +234,7 @@ namespace Gliese581g
             base.Draw(spriteBatch, time);
             updateFontScale();
 
-            Rectangle frameRectangle = DisplayRect;
+            Rectangle frameRectangle = LocationRect;
             frameRectangle.Inflate( 
                 (int)(frameRectangle.Width  * FRAME_INFLATE_RATIO.X), 
                 (int)(frameRectangle.Height * FRAME_INFLATE_RATIO.Y));
@@ -248,7 +275,7 @@ namespace Gliese581g
             }
 
             Vector2 nameSize = m_font.MeasureString(m_player.Name);
-            Rectangle frameRectangle = DisplayRect;
+            Rectangle frameRectangle = LocationRect;
             frameRectangle.Inflate(
                 (int)(frameRectangle.Width * FRAME_INFLATE_RATIO.X),
                 (int)(frameRectangle.Height * FRAME_INFLATE_RATIO.Y));

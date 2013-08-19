@@ -35,8 +35,9 @@ namespace Gliese581g
             SoundEffect onClickSound,  
             Event clickEvent,
             bool disableInputOnClick,
-            GameScreen parentScreen) :
-            base(darkTexture, pos, Color.White, 1f, Vector2.One, 0f, Vector2.Zero, .5f)
+            GameScreen parentScreen, 
+            ClickableSprite anchorSprite = null) :
+            base(darkTexture, pos, Color.White, 1f, Vector2.One, 0f, Vector2.Zero, .5f, anchorSprite)
         { 
             m_parentScreen = parentScreen;
             m_lightTexture = lightTexture;
@@ -58,8 +59,9 @@ namespace Gliese581g
             SoundEffect onClickSound,
             Event clickEvent,
             bool disableInputOnClick,
-            GameScreen parentScreen) :
-            base(darkTexture, displayRect, Color.White, 1f, 0f, Vector2.Zero, .5f)
+            GameScreen parentScreen,
+            ClickableSprite anchorSprite = null) :
+            base(darkTexture, displayRect, Color.White, 1f, 0f, Vector2.Zero, .5f, anchorSprite)
         {
             m_parentScreen = parentScreen;
             m_lightTexture = lightTexture;

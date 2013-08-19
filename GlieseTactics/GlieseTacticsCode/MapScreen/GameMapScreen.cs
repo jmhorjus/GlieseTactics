@@ -591,7 +591,7 @@ namespace Gliese581g
                 (int)(SizeX * 0.18f), (int)(SizeY * 0.3f));
 
             m_fixedRectangles["player2_display_shown"] = new Rectangle(
-                (int)(SizeX * 0.8f), (int)(SizeY * 0.05f),
+                (int)(SizeX * 0.675f), (int)(SizeY * 0.05f),
                 (int)(SizeX * 0.12f), (int)(SizeY * 0.2f));
             m_fixedRectangles["player2_display_hidden"] = new Rectangle(
                 (int)(SizeX * 1.10f), (int)(SizeY * 0.05f),

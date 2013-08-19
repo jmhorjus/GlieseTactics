@@ -25,9 +25,9 @@ namespace Gliese581g
             {
                 if (m_stretchToRect)
                 {
-                    Rectangle currentRectangle = DisplayRect;
+                    Rectangle currentRectangle = LocationRect;
                     m_texture = value;
-                    DisplayRect = currentRectangle;
+                    LocationRect = currentRectangle;
                 }
                 else
                 { m_texture = value; }
@@ -36,18 +36,34 @@ namespace Gliese581g
 
         bool m_stretchToRect;
 
-        public Vector2 Position;
+        // If set, the position of this sprite is an offset from the position of the anchor.
+        protected ClickableSprite m_anchorSprite;
+
+        // Eather position or offset, depending on anchorSprite.
+        private Vector2 m_positionOrOffset;
+        public Vector2 Position 
+        { 
+            get { return (m_anchorSprite == null) ? m_positionOrOffset : m_anchorSprite.Position + m_positionOrOffset; } 
+            set { m_positionOrOffset = (m_anchorSprite == null) ? value : value - m_anchorSprite.Position; } 
+        }
+        public Vector2 AnchorOffset
+        {
+            get { return (m_anchorSprite == null) ? Vector2.Zero : m_positionOrOffset; }
+            set { if (m_anchorSprite == null) m_positionOrOffset = value; } 
+        }
         public Vector2 Scale;
 
         public int Width  { get { return (int)(m_texture.Width * Scale.X); } }
         public int Height { get { return (int)(m_texture.Height * Scale.Y); } }
-        public virtual Rectangle DisplayRect
+        
+        /// May be a static location or an offset from its anchor.
+        public virtual Rectangle LocationRect
         {
             get 
             {
                 return new Rectangle(
-                    (int)(Position.X - (DrawOrigin.X * Scale.X)),
-                    (int)(Position.Y - (DrawOrigin.Y * Scale.Y)),
+                    (int)(m_positionOrOffset.X - (DrawOrigin.X * Scale.X)),
+                    (int)(m_positionOrOffset.Y - (DrawOrigin.Y * Scale.Y)),
                     this.Width, this.Height);
             }
             set 
@@ -55,10 +71,23 @@ namespace Gliese581g
                 Scale.X = (float)value.Width / m_texture.Width;
                 Scale.Y = (float)value.Height / m_texture.Height;
 
-                Position.X = value.X + (DrawOrigin.X * Scale.X);
-                Position.Y = value.Y + (DrawOrigin.Y * Scale.Y);
+                m_positionOrOffset.X = value.X + (DrawOrigin.X * Scale.X);
+                m_positionOrOffset.Y = value.Y + (DrawOrigin.Y * Scale.Y);
             }
         }
+        public virtual Rectangle DisplayRect
+        { 
+            get
+            {
+                Rectangle retVal = LocationRect;
+
+                if(m_anchorSprite != null)
+                   retVal.Offset(new Point((int)m_anchorSprite.Position.X, (int)m_anchorSprite.Position.Y));
+
+                return retVal;
+            }
+        }
+
         
         public Color Tint;
         public float Alpha;
@@ -115,6 +144,8 @@ namespace Gliese581g
         {
             m_queuedAnimations.Add(animation);
         }
+        public bool HasAnyAnimation
+        { get { return m_queuedAnimations.Count > 0; } }
 
 
         /// The constructor - everything must be passed in.  
@@ -127,7 +158,8 @@ namespace Gliese581g
             Vector2 scale,
             float rotationAngle,
             Vector2 drawOrigin,
-            float layerDepth)
+            float layerDepth,
+            ClickableSprite anchorSprite = null)
         {
             m_texture = texture;
             Position = pos;
@@ -137,6 +169,8 @@ namespace Gliese581g
             RotationAngle = rotationAngle;
             DrawOrigin = drawOrigin;
             LayerDepth = layerDepth;
+
+            m_anchorSprite = anchorSprite;
 
             DisableClickDrag();
         }
@@ -150,16 +184,19 @@ namespace Gliese581g
             float alpha,
             float rotationAngle,
             Vector2 drawOrigin,
-            float layerDepth)
+            float layerDepth,
+            ClickableSprite anchorSprite = null)
         {
             m_texture = texture;
+            DrawOrigin = drawOrigin;
+            m_anchorSprite = anchorSprite;
             m_stretchToRect = true;
-            DisplayRect = dispRect;
             Tint = tint;
             Alpha = alpha;
             RotationAngle = rotationAngle;
-            DrawOrigin = drawOrigin;
             LayerDepth = layerDepth;
+
+            LocationRect = dispRect;
 
             DisableClickDrag();
         }
