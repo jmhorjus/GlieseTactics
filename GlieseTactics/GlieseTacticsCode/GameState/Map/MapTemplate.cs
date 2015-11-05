@@ -22,7 +22,7 @@ namespace Gliese581g
         protected HexEffectStats AccumulateStats(HexEffectStats stats1, HexEffectStats stats2)
         {
             if (m_returnMaxStats)
-                return HexEffectStats.Best(stats1, stats2);
+                return HexEffectStats.BestByCatagory(stats1, stats2);
             else
                 return (stats1 + stats2);
         }

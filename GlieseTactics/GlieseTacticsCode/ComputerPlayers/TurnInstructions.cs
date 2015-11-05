@@ -17,5 +17,22 @@ namespace Gliese581g.ComputerPlayers
     {
         public bool Surrender = false;
         public Queue<ClickableSprite> ThingsToClickOn = new Queue<ClickableSprite>();
+
+        public bool IsFinished() { return ThingsToClickOn.Count == 0; }
+
+        public TurnInstructions() { ; }
+
+        public TurnInstructions(HexEffectStats moveData)
+        {
+            Surrender = false;
+            ThingsToClickOn = new Queue<ClickableSprite>();
+
+            ThingsToClickOn.Enqueue(moveData.AttackingUnit);
+            ThingsToClickOn.Enqueue(moveData.AttackOriginHex);
+            ThingsToClickOn.Enqueue(moveData.AttackTargetHex);
+
+            // Add the end-turn button as an instruction to end the turn? 
+            // For now no; let Map.Update handle it.
+        }
     }
 }

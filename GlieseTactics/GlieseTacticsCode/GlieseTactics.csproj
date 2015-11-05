@@ -114,6 +114,7 @@
     <Compile Include="ArmySetupScreen\UnitTileBox.cs" />
     <Compile Include="ArmySetupScreen\UnitTile.cs" />
     <Compile Include="ComputerPlayers\ComputerPlayer.cs" />
+    <Compile Include="ComputerPlayers\EasyComputer.cs" />
     <Compile Include="ComputerPlayers\TurnInstructions.cs" />
     <Compile Include="EscMenu\EscMenuScreen.cs" />
     <Compile Include="GameSetupScreen\CommanderTrashBin.cs" />

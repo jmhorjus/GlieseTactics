@@ -237,10 +237,20 @@ namespace Gliese581g
             {
                 if (time.TotalGameTime.TotalSeconds > m_lastComputerClickTime + ConfigManager.GlobalManager.ComputerPlayerSpeed)
                 {
-                    // We need to click the next click! 
-                    ClickableSprite nextThingToClick = Game.PendingInstructions.ThingsToClickOn.Dequeue();
-                    nextThingToClick.OnLeftClick(Vector2.One);
-                    m_lastComputerClickTime = time.TotalGameTime.TotalSeconds;
+                    
+                    if (Game.PendingInstructions.IsFinished())
+                    {
+                        // If the queue is empty, then we'll need to end the turn.
+                        Game.EndTurn();
+                    }                
+                    else
+                    {
+                        // We need to click the next click! 
+                        ClickableSprite nextThingToClick = Game.PendingInstructions.ThingsToClickOn.Dequeue();
+                        nextThingToClick.OnLeftClick(Vector2.One);
+                        m_lastComputerClickTime = time.TotalGameTime.TotalSeconds;
+                    }
+                    
                 }
                 return false;
             }

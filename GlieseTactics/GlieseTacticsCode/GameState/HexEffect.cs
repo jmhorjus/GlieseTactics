@@ -4,18 +4,37 @@ using System.Linq;
 using System.Text;
 using Microsoft.Xna.Framework;
 
+using Gliese581g.ComputerPlayers;
+
 namespace Gliese581g
 {
-
+    
+    
     /// <summary>
     /// The HexEffectStats class - stats about what an effect does when applied by a template.
+    /// 
+    /// In order to implement AI decision-making this stats object needs to also be able to keep track of 
+    /// the move that caused it somehow.  i.e. the attacking unit, move hex, and target hex...how can they be
+    /// found and recorded?
     /// </summary>
     public class HexEffectStats
     {
+        // Units, locations involved in calculation of these stats.
+        // Only needed during AI deliberation.
+        public Unit AttackingUnit = null;
+        public Hex AttackOriginHex = null;
+        public Hex AttackTargetHex = null;
+
+        // Stats about damage done, kills, etc.  
+        // Used for AI dicisions and player GUI feedback.
         public int Damage = 0;
+        public int CommanderDamage = 0;
         public int Kills = 0;
+        public int CommanderKills = 0;
         public int FriendlyDamage = 0;
+        public int FriendlyCommanderDamage = 0;
         public int FriendlyKills = 0;
+        public int FriendlyCommanderKills = 0;
 
         public int TotalDamage { get { return Damage + FriendlyDamage; } }
         public int TotalKills { get { return Kills + FriendlyKills; } }
@@ -27,35 +46,50 @@ namespace Gliese581g
         }
         public void Clear() { Damage = 0; Kills = 0; FriendlyDamage = 0; FriendlyKills = 0; }
 
+        // Used to accumulate stats (for instance in area-effect attacks). 
         public static HexEffectStats operator +(HexEffectStats stats1, HexEffectStats stats2)
         {
             HexEffectStats statsResult = new HexEffectStats();
             statsResult.Damage = stats1.Damage + stats2.Damage;
             statsResult.Kills =  stats1.Kills + stats2.Kills;
+            statsResult.CommanderDamage = stats1.CommanderDamage + stats2.CommanderDamage;
+            statsResult.CommanderKills = stats1.CommanderKills + stats2.CommanderKills;
             statsResult.FriendlyDamage = stats1.FriendlyDamage + stats2.FriendlyDamage;
             statsResult.FriendlyKills = stats1.FriendlyKills + stats2.FriendlyKills;
+            statsResult.FriendlyCommanderDamage = stats1.FriendlyCommanderDamage + stats2.FriendlyCommanderDamage;
+            statsResult.FriendlyCommanderKills = stats1.FriendlyCommanderKills + stats2.FriendlyCommanderKills   ;
             return statsResult;
         }
-        public static HexEffectStats Best(HexEffectStats stats1, HexEffectStats stats2)
+
+        // Finds the best outcome for each catagory.  
+        public static HexEffectStats BestByCatagory(HexEffectStats stats1, HexEffectStats stats2)
         {
             HexEffectStats statsResult = new HexEffectStats();
             statsResult.Damage = Math.Max(stats1.Damage, stats2.Damage);
             statsResult.Kills = Math.Max(stats1.Kills, stats2.Kills);
+            statsResult.CommanderDamage = Math.Max(stats1.CommanderDamage, stats2.CommanderDamage);
+            statsResult.CommanderKills = Math.Max(stats1.CommanderKills, stats2.CommanderKills);
+
             statsResult.FriendlyDamage = Math.Min(stats1.FriendlyDamage, stats2.FriendlyDamage);
             statsResult.FriendlyKills = Math.Min(stats1.FriendlyKills, stats2.FriendlyKills);
+            statsResult.FriendlyCommanderDamage = Math.Min(stats1.FriendlyCommanderDamage, stats2.FriendlyCommanderDamage);
+            statsResult.FriendlyCommanderKills = Math.Min(stats1.FriendlyCommanderKills, stats2.FriendlyCommanderKills);
             return statsResult; 
         }
+
+        // Return the move defined as best by the given priorities.
+        public static HexEffectStats BestSingleMove(HexEffectStats stats1, HexEffectStats stats2, 
+            HexEffectPriorities priorities)
+        {
+            int weight1 = priorities.GetEffectValue(stats1);
+            int weight2 = priorities.GetEffectValue(stats2);
+
+            if (weight1 > weight2)
+                return stats1;
+            else
+                return stats2;
+        }
     }
-
-
-    /// <summary>
-    /// The HexEffect interface - defines the ApplyToHex function. (All HexEffects can be applied to a hex.)
-    /// </summary>
-    public abstract class HexEffect
-    {
-        public abstract HexEffectStats ApplyToHex(Hex hex, Direction templateDirection, Hex effectSourceHex);
-    }
-
 
 
     /// <summary>
@@ -80,24 +114,46 @@ namespace Gliese581g
         public static HexEffectStats CalculateDamageStats(Unit attacker, Hex attackSourceHex, Unit defender)
         {
             HexEffectStats retVal = new HexEffectStats();
+
+            // Record the units/hexes involved in this calculation.
+            retVal.AttackingUnit = attacker;
+            retVal.AttackOriginHex = attackSourceHex;
+            retVal.AttackTargetHex = defender.CurrentHex;
+
             if (defender != null)
             {
                 int damage = defender.Armor.AdjustDamage(
                     attackSourceHex.MapPosition, 
                     defender.MapLocation, 
                     attacker.AttackEffect.BaseDamage);
-                
+
                 if (attacker.Owner == defender.Owner)
+                {
                     retVal.FriendlyDamage = damage;
+                    if (defender.IsCommander)
+                        retVal.FriendlyCommanderDamage = damage;
+                }
                 else
+                {
                     retVal.Damage = damage;
+                    if (defender.IsCommander)
+                        retVal.CommanderDamage = damage;
+                }
 
                 if (defender.CurrentHP <= damage)
                 {
                     if (attacker.Owner == defender.Owner)
+                    {
                         retVal.FriendlyKills = 1;
+                        if (defender.IsCommander)
+                            retVal.FriendlyCommanderKills = 1;
+                    }
                     else
+                    {
                         retVal.Kills = 1;
+                        if (defender.IsCommander)
+                            retVal.CommanderKills = 1;
+                    }
                 }
             }
             return retVal;
@@ -144,8 +200,40 @@ namespace Gliese581g
     }
 
 
+
     /// <summary>
-    /// An effect that double-highlights the hex on the map (for highlighting 
+    /// The HexEffect interface - defines the ApplyToHex function. (All HexEffects can be applied to a hex.)
+    /// </summary>
+    public abstract class HexEffect
+    {
+        public abstract HexEffectStats ApplyToHex(Hex hex, Direction templateDirection, Hex effectSourceHex);
+    }
+
+
+    /// <summary>
+    /// Used by AI to inspect possibile outcomes of moves involving the application of map templates. 
+    /// </summary>
+    public class ExpectedDamageHexEffect : HexEffect
+    {
+        Map m_map;
+        Unit m_owningUnit;
+
+        public ExpectedDamageHexEffect(Map map, Unit owningUnit)
+        {
+            m_map = map;
+            m_owningUnit = owningUnit;
+        }
+
+        public override HexEffectStats ApplyToHex(Hex hex, Direction templateDirection, Hex effectSourceHex)
+        {
+            return UnitDamageEffect.CalculateDamageStats(m_owningUnit, effectSourceHex, hex.Unit);
+        }
+    }
+
+
+    /// <summary>
+    /// An effect that double-highlights the hex on the map (i.e. for highlighting 
+    /// attak areas when a target area is already highlighted). 
     /// </summary>
     public class DoubleHighlightEffect : HexEffect
     {
@@ -161,6 +249,7 @@ namespace Gliese581g
         public override HexEffectStats ApplyToHex(Hex hex, Direction templateDirection, Hex effectSourceHex)
         {
             m_map.DoubleHighlightHex(hex);
+            // Does calculations as though it were a unit-damage effect - so expected damage can be displayed in GUI. 
             return UnitDamageEffect.CalculateDamageStats(m_owningUnit, effectSourceHex, hex.Unit);
         }
 
@@ -178,7 +267,15 @@ namespace Gliese581g
         HexEffect m_subTemplateEffect;
         bool m_allDirections;
         bool m_redefineEffectSourceHex;
+
+        // TODO: Implement a slick, general case solution to specifying the 
+        // recursive template stats accumulation/combination method.  Maybe
+        // have them pass in a function pointer (Delegate) to a function that 
+        // takes two stats and returns one. 
         bool m_returnMaxStats;
+        bool m_returnBestMove;
+        HexEffectPriorities m_bestMovePriorities;
+        
 
 
         public RecursiveTemplateEffect(
@@ -187,7 +284,8 @@ namespace Gliese581g
             bool allDirections,
             bool redefineEffectSourceHex,
             HexEffect subTemplateEffect,
-            bool returnMaxStats = true)
+            bool returnMaxStats = true,
+            HexEffectPriorities bestMovePriorities = null)
         {
             m_map = map;
             m_subTemplate = subTemplate;
@@ -195,6 +293,13 @@ namespace Gliese581g
             m_allDirections = allDirections;
             m_redefineEffectSourceHex = redefineEffectSourceHex;
             m_returnMaxStats = returnMaxStats;
+
+            if (bestMovePriorities != null)
+            {
+                m_returnBestMove = true;
+                m_returnMaxStats = false;
+                m_bestMovePriorities = bestMovePriorities;
+            }
         }
 
         public override HexEffectStats ApplyToHex(Hex hex, Direction templateDirection, Hex effectOriginHex)
@@ -212,24 +317,23 @@ namespace Gliese581g
                     m_subTemplateEffect,
                     m_redefineEffectSourceHex ? hex : effectOriginHex);
 
-                if (!m_returnMaxStats)
-                    retVal += stats;
+                if (m_returnMaxStats)
+                    retVal = HexEffectStats.BestByCatagory(stats, retVal);
+                else if (m_returnBestMove)
+                    retVal = HexEffectStats.BestSingleMove(stats, retVal, m_bestMovePriorities);
                 else
-                    retVal = HexEffectStats.Best(stats, retVal);
+                    retVal += stats;
 
+                // If we're not actually doing all the directions, break out here.
                 if (!m_allDirections)
                     break;
+
                 currentDirection++;
             }
             return retVal;
         }
 
-
-
-
     }
-
-
 
 
 }
