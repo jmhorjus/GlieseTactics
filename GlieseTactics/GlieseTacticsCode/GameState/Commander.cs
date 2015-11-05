@@ -8,7 +8,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Media;
 
-
+using Gliese581g.ComputerPlayers;
 
 namespace Gliese581g        
 {
@@ -104,7 +104,7 @@ namespace Gliese581g
             }
             catch (Exception ex)
             {
-                throw ex;
+                //throw ex;
             }
         }
 
@@ -121,7 +121,25 @@ namespace Gliese581g
         SkillSet m_skills;
 
 
+        // Is this commander a human or AI player?
+        // [XmlIgnore]
+        private ComputerPlayer m_computerPlayer = null;
 
+        public Boolean IsHuman { get { return m_computerPlayer == null; } }
+        public ComputerPlayer ComputerPlayer
+        {
+            get { return m_computerPlayer; }
+            set { m_computerPlayer = value; }
+        }
+        public TurnInstructions GetNextMove(Map gameState)
+        {
+            if (m_computerPlayer != null)
+                return m_computerPlayer.GetNextMove(gameState); 
+            return null; // This commander is human.
+        }
+
+
+        // Used to signal surrender during battle. 
         private bool m_surrender;
         public bool Surrender
         {

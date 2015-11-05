@@ -161,9 +161,13 @@ namespace Gliese581g
 
 
         /// <summary>
-        /// The update function is only for updating!
+        /// The main map's update function updates all game state based on input.  
+        /// It also needs to be able to call the AI to determine actions on a computer player's turn.
+        ///     This means calling Hex.LeftClick() on various hexes directly, as determined by the turn 
+        ///     instructions returned by the AI function.   
         /// </summary>
         protected MouseState m_lastMouseState = new MouseState();
+        protected double m_lastComputerClickTime = 0.0f;
         public Direction ChooseHeadingDirection = new Direction(Direction.ValueType.Right);
         public bool Update(MouseState mouseState, Matrix transformMatrix, GameTime time, bool mouseAlreadyIntercepted)
         {
@@ -176,7 +180,7 @@ namespace Gliese581g
             switch (Game.CurrentTurnStage)
             {
                 case Game.TurnStage.BeginTurn:
-                    Game.BeginTurn();
+                    Game.BeginTurn(this);
                     break;
                 case Game.TurnStage.ChooseHeading:
                     // Calculate the direction
@@ -217,18 +221,33 @@ namespace Gliese581g
 
                     break;
 
-                case Gliese581g.Game.TurnStage.PlacementBegin:
+                case Game.TurnStage.PlacementBegin:
                     HighlightStartingArea(Game.CurrentPlayerIndex);
                     Game.BeginPlacement();
                     break;
             }
 
 
+            /// Here we check whether we are waiting for mouse input or running the 
+            /// current turn based on saved instructions (and the UseInstructionsTimer).  
+
+            if (!Enabled) // If the Map is disabled, pause turn execution.
+                return false;
+            if (Game.HasInstructions)
+            {
+                if (time.TotalGameTime.TotalSeconds > m_lastComputerClickTime + ConfigManager.GlobalManager.ComputerPlayerSpeed)
+                {
+                    // We need to click the next click! 
+                    ClickableSprite nextThingToClick = Game.PendingInstructions.ThingsToClickOn.Dequeue();
+                    nextThingToClick.OnLeftClick(Vector2.One);
+                    m_lastComputerClickTime = time.TotalGameTime.TotalSeconds;
+                }
+                return false;
+            }
             /// Now we check the mouse - actions after this point in the function
             /// depend on mouse input.
-            if (!Enabled || mouseAlreadyIntercepted)
+            if (mouseAlreadyIntercepted)
                 return false;
-
             
             // Call update on each hex in the map.
             bool retVal = false;

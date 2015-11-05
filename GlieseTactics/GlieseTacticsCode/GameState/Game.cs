@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
+using Gliese581g.ComputerPlayers;
+
+
 namespace Gliese581g
 {
     public class Game
@@ -29,8 +32,6 @@ namespace Gliese581g
             Large,
             NotSet
         }
-
-
 
         public enum VictoryType
         {
@@ -62,7 +63,6 @@ namespace Gliese581g
         public List<Commander> Players;
 
         private bool m_surrender;
-
         public bool Surrender
         {
             get { return m_surrender; }
@@ -94,6 +94,12 @@ namespace Gliese581g
             }
         }
 
+        // In the case of AI or network/scripted game of some kind, there may be pending instructions for the current turn.
+        private TurnInstructions m_pendingInstructions = null;
+        public bool HasInstructions { get { return m_pendingInstructions != null; } }
+        public TurnInstructions PendingInstructions { get { return m_pendingInstructions; } }
+
+
         public Game(List<Commander> players, VictoryType victoryCondition)
         {
             Players = players;
@@ -114,7 +120,7 @@ namespace Gliese581g
         } 
 
 
-        public void BeginTurn()
+        public void BeginTurn(Map gameMap /*needed by AI to generate new turn's instructions*/)
         {
             if (m_currentTurnStage == TurnStage.BeginTurn)
             {
@@ -135,9 +141,20 @@ namespace Gliese581g
                 if (!canMove)
                     m_currentTurnStage = TurnStage.EndTurn;
                 else
+                {
                     m_currentTurnStage = TurnStage.ChooseUnit;
+
+                    // If the current player is an AI, he now needs to consider the game board and
+                    // formulate instructions for the coming turn. 
+                    // These instructions can then be set in the Map and executed during subsequent updates.
+                    if (!m_currentPlayer.IsHuman)
+                    {
+                        m_pendingInstructions = m_currentPlayer.GetNextMove(gameMap);
+                    }
+                }
             }
         }
+
 
 
         public Commander NextPlayer
@@ -159,6 +176,9 @@ namespace Gliese581g
         {
             m_currentPlayer = NextPlayer;
             m_currentTurnStage = TurnStage.BeginTurn;
+
+            // Always clear instructions at the end of the turn.
+            m_pendingInstructions = null;
         }
 
         public void CheckForGameOver()

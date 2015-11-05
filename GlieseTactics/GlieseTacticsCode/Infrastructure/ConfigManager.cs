@@ -80,6 +80,13 @@ namespace Gliese581g
             set { m_mapScrollSpeed = value; }
         }
 
+        /// Computer Player Speed - seconds between their "clicks".
+        float m_computerPlayerSpeed = 2.5f;
+        public float ComputerPlayerSpeed
+        {
+            get { return m_computerPlayerSpeed; }
+            set { m_computerPlayerSpeed = value; }
+        }
 
         string m_playerProfileDirectory;
         public string PlayerProfileDirectory

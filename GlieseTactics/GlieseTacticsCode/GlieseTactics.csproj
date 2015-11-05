@@ -113,6 +113,8 @@
     <Compile Include="ArmySetupScreen\UnitTileSocket.cs" />
     <Compile Include="ArmySetupScreen\UnitTileBox.cs" />
     <Compile Include="ArmySetupScreen\UnitTile.cs" />
+    <Compile Include="ComputerPlayers\ComputerPlayer.cs" />
+    <Compile Include="ComputerPlayers\TurnInstructions.cs" />
     <Compile Include="EscMenu\EscMenuScreen.cs" />
     <Compile Include="GameSetupScreen\CommanderTrashBin.cs" />
     <Compile Include="GameSetupScreen\CommanderDisplaySocket.cs" />

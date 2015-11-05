@@ -115,8 +115,6 @@ namespace Gliese581g
         { }
 
 
-
-
         // Support the draw interface (we're using the composite design pattern)
         public override void Draw(SpriteBatch spriteBatch, GameTime time)
         {
@@ -143,6 +141,7 @@ namespace Gliese581g
             spriteBatch.Draw(Texture, m_displayRectangle, null, Tint, 0f, Vector2.Zero, SpriteEffects.None, 0f);
             //base.Draw(spriteBatch, time);
 
+            // If there's a unit in this hex, draw it.  
             if (Unit != null && m_map.ShowUnit(Unit))
                 Unit.Draw(spriteBatch, time);
 
@@ -158,7 +157,6 @@ namespace Gliese581g
             }
 
         }
-
 
 
 
@@ -179,6 +177,7 @@ namespace Gliese581g
 
         /// <summary>
         /// Override clickablesprite's TestMouseOver method.
+        /// Needed because of the hex's non-standard shape.
         /// </summary>
         public override bool TestMouseOver(Point pos)
         {
@@ -196,7 +195,6 @@ namespace Gliese581g
                 (posWithinHex.Y > -.25f + (posWithinHex.X / 2f));    // Bottom Right Edge
 
         }
-
 
 
         /// <summary>
@@ -249,7 +247,7 @@ namespace Gliese581g
         
         
         /// <summary>
-        /// Left clicking a hex is used to select units, movement, and targets and confirm choices.
+        /// Left clicking a hex is used to select units, movement, and targets and to confirm choices.
         /// </summary>
         public override void OnLeftClick(Vector2 mousePosInTexture)
         {
@@ -261,7 +259,7 @@ namespace Gliese581g
                 // Left clicking should select a unit and allow you to move it (if its yours)
                 case Game.TurnStage.ChooseUnit:
                     m_map.SelectedHex = this;
-                    if (Unit != null)
+                    if (this.Unit != null)
                     {
                         this.Unit.MoveTemplate.OnApply(
                             m_map,

@@ -46,14 +46,12 @@ namespace Gliese581g
         }
 
 
-
         // Needs to be replaced with a TerrainType class eventually.
-        // (also none of this needs to be static or public!)
         MapEnvironment m_mapEnvironment;
 
         ScreenLayer m_mapScreenLayer;
         
-        int m_lastMouseScrollValue = 1; //Previous Mouse Scroll Wheel Value (Neil) //TODO:clean up
+        int m_lastMouseScrollValue = 1; //Previous Mouse Scroll Wheel Value //TODO:clean up
 
         Map m_map;
         public void SetNewMap(Game.MapSize mapSize, MapEnvironment environment, Game.MapType mapType)
@@ -78,15 +76,17 @@ namespace Gliese581g
             m_backgroundTexture = environment.BackgroundTexture;
             m_backgroundColor = environment.BackgroundTint;
 
+            // Create the map, which in the umbrella object containing all units, hexes, and game state.
             m_map = new Map(
                 mapType == Game.MapType.Random ? newDimensions.X : 18, // 18x18 - max current dimensions for custom map.
                 mapType == Game.MapType.Random ? newDimensions.Y : 18, 
                 m_mapCamera,
                 m_mapEnvironment.DefaultHexTexture, 
                 m_mapEnvironment.BlockingHexTexture);
+            // Add the ap to the drawn objects list - ensuring that it will be updated and drawn.
             m_mapScreenLayer.DrawnObjects.Add(m_map);
 
-            Game = game;
+            this.Game = game;
 
             if (mapType == Game.MapType.Random)
             { 
@@ -110,7 +110,8 @@ namespace Gliese581g
             set 
             {
                 if (m_map == null)
-                    m_map = new Map(1, 1, null, null, null); //a bit of a hack. (the map needs to just not be null since it's the container for the game)
+                    //a bit of a hack. (the map needs to just not be null since it's the container for the game)
+                    m_map = new Map(1, 1, null, null, null); 
                 m_map.Game = value;
                 if (value == null)
                     return;
@@ -252,6 +253,29 @@ namespace Gliese581g
         }
 
 
+
+        /* 
+         * 1.) We have a great way to track time built in.  Therefore we define an interval at which, if the current player is a 
+         * computer, we will perform it's next action.  We'll have "last AI action time" and "AI action interval"(configurable), which
+         * will tell us when we need to perform the AI's next turn step.  
+         * 2.) Then we need the "TurnInstructions" class.  This thing contains all the information you need to fully execute a turn.
+         * So a turn is defined as moving through the same "TurnStage" sequence as a player would:
+         *     BeginTurn
+         *     a.)(ChooseUnit) pick a unit to move 
+         *     b.)(ChooseMoveDestination) pick a destination he for that units move
+         *     c.)(ChooseAttackTarget) pick an action to perform with that unit 
+         *     
+         * 
+         * 
+            BeginTurn,
+            ChooseUnit,
+            ChooseMoveDestination,
+            ChooseHeading,
+            ChooseAttackType,
+            ChooseAttackTarget,
+            EndTurn,
+
+        */
 
         public override void Update(GameTime gameTime, MouseState mouseState, KeyboardState keyboardState)
         {
@@ -460,6 +484,7 @@ namespace Gliese581g
             }
 
 		}
+        
         /// <summary>
         /// called from Update
         /// </summary>
