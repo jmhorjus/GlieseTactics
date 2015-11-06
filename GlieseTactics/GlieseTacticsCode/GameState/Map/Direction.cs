@@ -93,10 +93,6 @@ namespace Gliese581g
             return base.GetHashCode();
         }
 
-
-
-
-
         // some convenient fixed direction definitions.  
         public static readonly Direction Right = new Direction(ValueType.Right);
         public static readonly Direction DownRight = new Direction(ValueType.DownRight);
@@ -104,6 +100,44 @@ namespace Gliese581g
         public static readonly Direction Left = new Direction(ValueType.Left);
         public static readonly Direction UpLeft = new Direction(ValueType.UpLeft);
         public static readonly Direction UpRight = new Direction(ValueType.UpRight);
+
+
+        static public Direction GetDirectionFromHex(Hex centerHex, Point transformedPoint)
+        {
+            Direction retVal = null;
+            // Calculate the direction
+            Point center = centerHex.DisplayRect.Center;
+            int direction = 0;
+            direction += (transformedPoint.X > center.X) ? 1 : 0;
+            direction += (transformedPoint.Y > center.Y + ((transformedPoint.X - center.X) / 2)) ? 2 : 0;
+            direction += (transformedPoint.Y > center.Y - ((transformedPoint.X - center.X) / 2)) ? 4 : 0;
+            switch (direction)
+            {
+                case 5:
+                    retVal = Direction.Right;
+                    break;
+                case 1:
+                    retVal = Direction.UpRight;
+                    break;
+                case 0:
+                    retVal = Direction.UpLeft;
+                    break;
+                case 2:
+                    retVal = Direction.Left;
+                    break;
+                case 6:
+                    retVal = Direction.DownLeft;
+                    break;
+                case 7:
+                    retVal = Direction.DownRight;
+                    break;
+                default:
+                    throw new Exception("This should never happen.");
+            }
+
+            return retVal;
+        }
+
     }
     
 

@@ -355,9 +355,6 @@ namespace Gliese581g
                     ActiveMouseCursor = m_moveCursor;
                     break;
                 case Game.TurnStage.ChooseHeading:
-                //    m_moveCursor.Rotation = Unit.DirectionRotationAngles[(int)m_map.ChooseHeadingDirection] - (float)Math.PI/2 ;
-                //    break;
-                //case Game.TurnStage.ChooseAttackTarget:
                     if(m_map.SelectedHex.LastMouseOver)
                         ActiveMouseCursor = m_rechargeCursor;
                     else 

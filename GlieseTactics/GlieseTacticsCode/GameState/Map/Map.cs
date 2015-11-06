@@ -168,7 +168,6 @@ namespace Gliese581g
         /// </summary>
         protected MouseState m_lastMouseState = new MouseState();
         protected double m_lastComputerClickTime = 0.0f;
-        public Direction ChooseHeadingDirection = new Direction(Direction.ValueType.Right);
         public bool Update(MouseState mouseState, Matrix transformMatrix, GameTime time, bool mouseAlreadyIntercepted)
         {
             /// Actions which depend on the turn stage but are not related to a specific hex.
@@ -197,6 +196,7 @@ namespace Gliese581g
             
             if (Game.HasInstructions && Game.CurrentTurnStage != Game.TurnStage.GameOver)
             {
+
                 if (time.TotalGameTime.TotalSeconds <= m_lastComputerClickTime + ConfigManager.GlobalManager.ComputerPlayerSpeed)
                 {
                     //It's not time for the next click yet. Do a "peek" and put the "mouse" over the next target.
@@ -240,50 +240,20 @@ namespace Gliese581g
             if (mouseAlreadyIntercepted)
                 return false;
 
+            // If we're in the "ChooseHeading" (aka targetting) turn stage, adjust the selected unit's heading.
             if (Game.CurrentTurnStage == Game.TurnStage.ChooseHeading)
             {
-                // Calculate the direction
-                Point center = m_selectedHex.DisplayRect.Center;
-                int direction = 0;
-                direction += (transformedPoint.X > center.X) ? 1 : 0;
-                direction += (transformedPoint.Y > center.Y + ((transformedPoint.X - center.X) / 2)) ? 2 : 0;
-                direction += (transformedPoint.Y > center.Y - ((transformedPoint.X - center.X) / 2)) ? 4 : 0;
-                switch (direction)
-                {
-                    case 5:
-                        ChooseHeadingDirection = Direction.Right;
-                        break;
-                    case 1:
-                        ChooseHeadingDirection = Direction.UpRight;
-                        break;
-                    case 0:
-                        ChooseHeadingDirection = Direction.UpLeft;
-                        break;
-                    case 2:
-                        ChooseHeadingDirection = Direction.Left;
-                        break;
-                    case 6:
-                        ChooseHeadingDirection = Direction.DownLeft;
-                        break;
-                    case 7:
-                        ChooseHeadingDirection = Direction.DownRight;
-                        break;
-                    //default:
-                    //throw new Exception("this should never happen.");
-                }
+                Direction ChooseHeadingDirection = Direction.GetDirectionFromHex(m_selectedHex, transformedPoint);
                 if (m_selectedHex.Unit.FacingDirection != ChooseHeadingDirection)
                 {
                     m_selectedHex.Unit.FacingDirection = ChooseHeadingDirection;
-
                     m_selectedHex.HighlightAttackRange();
                 }
             }
 
-
-            //if (Game.HasInstructions)
-            //{
-            //    return false; // now that the direction check is done, return.
-            //}
+            
+            // If we're in AI mode, don't use the real mouse state (so the player can't mess when it's not their turn.
+            MouseState updateMouseState = Game.HasInstructions ? m_lastMouseState : mouseState;
 
             // Call update on each hex in the map.
             bool retVal = false;
@@ -292,13 +262,13 @@ namespace Gliese581g
                 for (int x = 0; x < Rows; x++)
                 {
                     if (m_hexArray[x, y] != null)
-                        retVal = m_hexArray[x, y].Update(mouseState, transformedMousePos, time) || retVal;
+                        retVal = m_hexArray[x, y].Update(updateMouseState, transformedMousePos, time) || retVal;
                 }
             }
 
 
             // Keep track of last mouse state.  
-            m_lastMouseState = mouseState;
+            m_lastMouseState = updateMouseState;
 
             return retVal;
         }
