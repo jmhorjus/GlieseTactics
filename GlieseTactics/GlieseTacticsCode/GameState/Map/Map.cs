@@ -203,12 +203,15 @@ namespace Gliese581g
                     if (!Game.PendingInstructions.IsFinished())
                     { // There's something there to point at.
                         ClickableSprite nextThing = Game.PendingInstructions.ThingsToClickOn.Peek();
-                        transformedPoint = nextThing.DisplayRect.Center;
-                        transformedMousePos = new Vector2(transformedPoint.X,transformedPoint.Y);
+                        if (nextThing != null)
+                        {
+                            transformedPoint = nextThing.DisplayRect.Center;
+                            transformedMousePos = new Vector2(transformedPoint.X, transformedPoint.Y);
 
-                        //debug
-                        if (!nextThing.TestMouseOver(transformedPoint))
-                            throw new Exception("WHAT THE CRAP");
+                            //debug
+                            if (!nextThing.TestMouseOver(transformedPoint))
+                                throw new Exception("WHAT THE CRAP");
+                        }
                     }
                 }
                 else
@@ -222,7 +225,10 @@ namespace Gliese581g
                     {
                         // We need to click the next click! 
                         ClickableSprite nextThingToClick = Game.PendingInstructions.ThingsToClickOn.Dequeue();
-                        nextThingToClick.OnLeftClick(Vector2.One);
+                        if (nextThingToClick != null)
+                            nextThingToClick.OnLeftClick(Vector2.One);
+                        else
+                            ;//debug
                         m_lastComputerClickTime = time.TotalGameTime.TotalSeconds;
                     }
                 }
