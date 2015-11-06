@@ -195,7 +195,7 @@ namespace Gliese581g
             if (!Enabled) // If the Map is disabled, pause turn execution.
                 return false;
             
-            if (Game.HasInstructions)
+            if (Game.HasInstructions && Game.CurrentTurnStage != Game.TurnStage.GameOver)
             {
                 if (time.TotalGameTime.TotalSeconds <= m_lastComputerClickTime + ConfigManager.GlobalManager.ComputerPlayerSpeed)
                 {
