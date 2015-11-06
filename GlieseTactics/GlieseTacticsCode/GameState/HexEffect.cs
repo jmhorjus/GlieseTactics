@@ -50,6 +50,12 @@ namespace Gliese581g
         public static HexEffectStats operator +(HexEffectStats stats1, HexEffectStats stats2)
         {
             HexEffectStats statsResult = new HexEffectStats();
+
+            // Prefer whichever one is not null, otherwise stats1.  
+            statsResult.AttackingUnit = (stats1.AttackingUnit != null) ? stats1.AttackingUnit:stats2.AttackingUnit;
+            statsResult.AttackOriginHex = (stats1.AttackOriginHex != null) ? stats1.AttackOriginHex : stats2.AttackOriginHex;
+            statsResult.AttackTargetHex = (stats1.AttackTargetHex != null) ? stats1.AttackTargetHex : stats2.AttackTargetHex;
+
             statsResult.Damage = stats1.Damage + stats2.Damage;
             statsResult.Kills =  stats1.Kills + stats2.Kills;
             statsResult.CommanderDamage = stats1.CommanderDamage + stats2.CommanderDamage;
@@ -115,13 +121,14 @@ namespace Gliese581g
         {
             HexEffectStats retVal = new HexEffectStats();
 
-            // Record the units/hexes involved in this calculation.
-            retVal.AttackingUnit = attacker;
-            retVal.AttackOriginHex = attackSourceHex;
-            retVal.AttackTargetHex = defender.CurrentHex;
-
             if (defender != null)
             {
+                // Record the units/hexes involved in this calculation.
+                retVal.AttackingUnit = attacker;
+                retVal.AttackOriginHex = attackSourceHex;
+                retVal.AttackTargetHex = defender.CurrentHex;
+
+
                 int damage = defender.Armor.AdjustDamage(
                     attackSourceHex.MapPosition, 
                     defender.MapLocation, 
@@ -199,7 +206,9 @@ namespace Gliese581g
         }
     }
 
-
+    
+    // TODO: Try something like this. 
+    // public delegate HexEffectStats CombineStatsType(HexEffectStats stats1, HexEffectStats stats2, HexEffectPriorities priorities = null);
 
     /// <summary>
     /// The HexEffect interface - defines the ApplyToHex function. (All HexEffects can be applied to a hex.)
@@ -207,8 +216,12 @@ namespace Gliese581g
     public abstract class HexEffect
     {
         public abstract HexEffectStats ApplyToHex(Hex hex, Direction templateDirection, Hex effectSourceHex);
+
+        // TODO: Try something like this.
+        //public CombineStatsType StatsCombiner = HexEffectStats.BestSingleMove;
     }
 
+    
 
     /// <summary>
     /// Used by AI to inspect possibile outcomes of moves involving the application of map templates. 
@@ -302,7 +315,9 @@ namespace Gliese581g
             }
         }
 
-        public override HexEffectStats ApplyToHex(Hex hex, Direction templateDirection, Hex effectOriginHex)
+        public override HexEffectStats ApplyToHex(
+            Hex hex, Direction templateDirection, 
+            Hex effectOriginHex)
         {
             Direction currentDirection = templateDirection;
             HexEffectStats retVal = new HexEffectStats();
@@ -315,7 +330,8 @@ namespace Gliese581g
                     m_map,
                     loc,
                     m_subTemplateEffect,
-                    m_redefineEffectSourceHex ? hex : effectOriginHex);
+                    m_redefineEffectSourceHex ? hex : effectOriginHex, 
+                    m_bestMovePriorities);
 
                 if (m_returnMaxStats)
                     retVal = HexEffectStats.BestByCatagory(stats, retVal);

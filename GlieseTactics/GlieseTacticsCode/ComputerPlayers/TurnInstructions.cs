@@ -27,7 +27,8 @@ namespace Gliese581g.ComputerPlayers
             Surrender = false;
             ThingsToClickOn = new Queue<ClickableSprite>();
 
-            ThingsToClickOn.Enqueue(moveData.AttackingUnit);
+            if (moveData.AttackingUnit != null) // Gotta click on hexes not units!
+                ThingsToClickOn.Enqueue(moveData.AttackingUnit.CurrentHex);
             ThingsToClickOn.Enqueue(moveData.AttackOriginHex);
             ThingsToClickOn.Enqueue(moveData.AttackTargetHex);
 

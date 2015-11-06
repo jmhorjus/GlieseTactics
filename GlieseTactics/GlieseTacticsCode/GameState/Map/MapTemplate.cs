@@ -4,28 +4,42 @@ using System.Linq;
 using System.Text;
 using Microsoft.Xna.Framework;
 
+using Gliese581g.ComputerPlayers;
+
 namespace Gliese581g
 {
 
     public abstract class MapTemplate
     {
         protected static Hex nullOutputDestination = null;
-        public abstract HexEffectStats OnApply(Map map, MapLocation location, HexEffect effect, Hex effectSourceHex, out Hex onlyOneHex);
+        
+        public abstract HexEffectStats OnApply(
+            Map map, MapLocation location, HexEffect effect, 
+            Hex effectSourceHex, HexEffectPriorities priorities, 
+            out Hex onlyOneHex);
 
         //public abstract HexEffectStats OnApply(Map map, MapLocation location, HexEffect effect, Hex effectOriginHex);
-        public virtual HexEffectStats OnApply(Map map, MapLocation location, HexEffect effect, Hex effectSourceHex)
+        public virtual HexEffectStats OnApply(
+            Map map, MapLocation location, 
+            HexEffect effect, Hex effectSourceHex, 
+            HexEffectPriorities priorities)
         {
-            return OnApply(map, location, effect, effectSourceHex, out nullOutputDestination);
+            return OnApply(map, location, effect, effectSourceHex, priorities, out nullOutputDestination);
         }
         
         protected bool m_returnMaxStats = false;
-        protected HexEffectStats AccumulateStats(HexEffectStats stats1, HexEffectStats stats2)
+        
+        protected HexEffectStats AccumulateStats(HexEffectStats stats1, HexEffectStats stats2, HexEffectPriorities priorities)
         {
+            if (priorities != null)
+                return HexEffectStats.BestSingleMove(stats1, stats2, priorities);
+            
             if (m_returnMaxStats)
                 return HexEffectStats.BestByCatagory(stats1, stats2);
-            else
-                return (stats1 + stats2);
+            
+            return (stats1 + stats2);
         }
+
     }
 
 
@@ -47,7 +61,13 @@ namespace Gliese581g
         }
 
 
-        public override HexEffectStats OnApply(Map map, MapLocation location, HexEffect effect, Hex effectSourceHex, out Hex onlyOneHex)
+        public override HexEffectStats OnApply(
+            Map map, 
+            MapLocation location, 
+            HexEffect effect, 
+            Hex effectSourceHex, 
+            HexEffectPriorities priorities,
+            out Hex onlyOneHex)
         {
             HexEffectStats retVal = new HexEffectStats();
             onlyOneHex = null;
@@ -75,7 +95,7 @@ namespace Gliese581g
                     onlyOneHex = hex;
                     
                 // Apply the effect.
-                retVal = AccumulateStats(retVal, effect.ApplyToHex(hex, location.Direction, sourceHex));
+                retVal = AccumulateStats(retVal, effect.ApplyToHex(hex, location.Direction, sourceHex), priorities);
                 isFirstHex = false;
 
                 if (doneAfterThisHex)
@@ -121,7 +141,13 @@ namespace Gliese581g
 
 
         // The public OnApply
-        public override HexEffectStats OnApply(Map map, MapLocation location, HexEffect effect, Hex effectSourceHex, out Hex onlyOneHex)
+        public override HexEffectStats OnApply(
+            Map map, 
+            MapLocation location, 
+            HexEffect effect,
+            Hex effectSourceHex, 
+            HexEffectPriorities priorities, 
+            out Hex onlyOneHex)
         {
             HexEffectStats retVal = new HexEffectStats();
             // Ranged template never only one hex
@@ -135,6 +161,7 @@ namespace Gliese581g
                 location.Position, location.Position,
                 m_range, m_range,
                 (m_unitWhoseAlliesDontBlockMovement != null) ? m_unitWhoseAlliesDontBlockMovement.Owner : null,
+                priorities,
                 ref retVal);
             return retVal;
         }
@@ -149,6 +176,7 @@ namespace Gliese581g
             int totalRange,
             int rangeRemaining,
             Commander friendlyPlayer, // the units of this player are friendly and can be moved through.
+            HexEffectPriorities priorities, // used by AI; can be null.
             ref HexEffectStats stats
             )
         {
@@ -166,11 +194,13 @@ namespace Gliese581g
                 {
                     map.MarkHex(this, hex);
 
-                    stats = AccumulateStats (stats, 
+                    stats = AccumulateStats (
+                        stats, 
                         effect.ApplyToHex(
                             hex,
                             new Direction(0), // direction is arbitrary in this context!
-                            effectSourceHex != null ? effectSourceHex : map.GetHex(startingPos))); 
+                            effectSourceHex != null ? effectSourceHex : map.GetHex(startingPos)), 
+                        priorities); 
                     
                     hex.CurrentMoveCost = totalRange - rangeRemaining;
                 }
@@ -186,17 +216,17 @@ namespace Gliese581g
             {
                 // Recurse in each of the six directions.  
                 RecursiveApply(map, effect, effectSourceHex, startingPos, new Point(pos.X + 1, pos.Y), totalRange, rangeRemaining - 1,
-                    friendlyPlayer, ref stats);
+                    friendlyPlayer, priorities, ref stats);
                 RecursiveApply(map, effect, effectSourceHex, startingPos, new Point(pos.X - 1, pos.Y), totalRange, rangeRemaining - 1,
-                    friendlyPlayer, ref stats);
+                    friendlyPlayer, priorities, ref stats);
                 RecursiveApply(map, effect, effectSourceHex, startingPos, new Point(pos.X + (pos.Y % 2), pos.Y + 1), totalRange, rangeRemaining - 1,
-                    friendlyPlayer, ref stats);
+                    friendlyPlayer, priorities, ref stats);
                 RecursiveApply(map, effect, effectSourceHex, startingPos, new Point(pos.X - 1 + (pos.Y % 2), pos.Y + 1), totalRange, rangeRemaining - 1,
-                    friendlyPlayer, ref stats);
+                    friendlyPlayer, priorities, ref stats);
                 RecursiveApply(map, effect, effectSourceHex, startingPos, new Point(pos.X - 1 + (pos.Y % 2), pos.Y - 1), totalRange, rangeRemaining - 1,
-                    friendlyPlayer, ref stats);
+                    friendlyPlayer, priorities, ref stats);
                 RecursiveApply(map, effect, effectSourceHex, startingPos, new Point(pos.X + (pos.Y % 2), pos.Y - 1), totalRange, rangeRemaining - 1,
-                    friendlyPlayer, ref stats);
+                    friendlyPlayer, priorities, ref stats);
             }
             return;
         }

@@ -8,7 +8,7 @@ namespace Gliese581g.ComputerPlayers
     [Serializable]
     public class ComputerPlayer
     {
-        public TurnInstructions GetNextMove(Map currentGameState)
+        public virtual TurnInstructions GetNextMove(Map currentGameState)
         {
             return new TurnInstructions();
         }

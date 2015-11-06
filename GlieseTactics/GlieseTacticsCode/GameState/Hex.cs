@@ -230,7 +230,7 @@ namespace Gliese581g
                         m_map,
                         new MapLocation(m_map.SelectedHex.m_mapPosition, m_map.SelectedHex.Unit.FacingDirection),
                         new HighlightEffect(m_map),
-                        null);
+                        null, null);
                     
                     m_map.Game.CurrentTurnStage = Game.TurnStage.ChooseMoveDestination;
 
@@ -265,7 +265,7 @@ namespace Gliese581g
                             m_map,
                             new MapLocation(this.m_mapPosition, this.Unit.FacingDirection),
                             new HighlightEffect(m_map),
-                            null);
+                            null, null);
 
                         if (Unit.Owner == m_map.Game.CurrentPlayer)
                         {
@@ -314,7 +314,7 @@ namespace Gliese581g
                         m_map,
                         new MapLocation(this.m_mapPosition, tempUnit.FacingDirection),
                         new HighlightEffect(m_map), 
-                        null); 
+                        null, null); 
                     m_map.Game.CurrentTurnStage = Game.TurnStage.ChooseHeading;
                     Unit.PlaySfxMove();
                 
@@ -460,7 +460,7 @@ namespace Gliese581g
                     new RecursiveTemplateEffect(m_map, Unit.TargetTemplate, true, true,
                         new RecursiveTemplateEffect(m_map, Unit.AttackTemplate, false, false,
                             new DoubleHighlightEffect(m_map, Unit))), 
-                            Unit.CurrentHex);
+                            Unit.CurrentHex, null/*could change to show player what the AI would do*/);
                 
                 m_currentlyOriginOfDoubleHighlightArea = true;
                 m_map.ExpectedAttackStats = stats;
@@ -503,7 +503,7 @@ namespace Gliese581g
                 m_map,
                 new MapLocation(m_mapPosition, Unit.FacingDirection),
                 new HighlightEffect(m_map), 
-                null,
+                null, null,
                 out onlyOneHex);
 
             if (onlyOneHex != null)
@@ -512,7 +512,8 @@ namespace Gliese581g
                     m_map,
                     new MapLocation(onlyOneHex.MapPosition, Unit.FacingDirection),
                     new HighlightEffect(m_map, onlyOneHex), 
-                    Unit.CurrentHex);
+                    Unit.CurrentHex, 
+                    null);
             }
         }
 
@@ -527,7 +528,8 @@ namespace Gliese581g
                 m_map,
                 new MapLocation(attackOrigin.m_mapPosition, attackingUnit.FacingDirection),
                 effect,
-                attackingUnit.CurrentHex);
+                attackingUnit.CurrentHex, 
+                null);
         }
 
     }

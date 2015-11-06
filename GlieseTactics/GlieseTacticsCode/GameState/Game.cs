@@ -108,6 +108,9 @@ namespace Gliese581g
             m_currentTurn = 0;
             m_currentPlayer = Players[0];
             m_currentTurnStage = TurnStage.PlacementBegin;
+
+            //DEBUG TODO: HACK IN A COMPUTER PLAYER FOR TESTING
+            Players[1].ComputerPlayer = new EasyComputer();
         }
 
 
