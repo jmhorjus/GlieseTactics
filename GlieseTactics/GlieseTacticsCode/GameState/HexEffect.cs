@@ -128,11 +128,15 @@ namespace Gliese581g
                 retVal.AttackOriginHex = attackSourceHex;
                 retVal.AttackTargetHex = defender.CurrentHex;
 
-
                 int damage = defender.Armor.AdjustDamage(
                     attackSourceHex.MapPosition, 
                     defender.MapLocation, 
                     attacker.AttackEffect.BaseDamage);
+
+                // Limit the damage done to the units remaining HP.
+                // Helps AI decision making, but also effects damage 
+                // displayed in the GUI.
+                damage = Math.Min(damage, defender.CurrentHP);
 
                 if (attacker.Owner == defender.Owner)
                 {
@@ -338,7 +342,13 @@ namespace Gliese581g
                 else if (m_returnBestMove)
                     retVal = HexEffectStats.BestSingleMove(stats, retVal, m_bestMovePriorities);
                 else
+                {
                     retVal += stats;
+                    // HACK. Because this case applies to attack templates whose effects are summed
+                    // rather than being compared by value or maximized catagorically, the AI will want to 
+                    // target the actual HEX the effect is being applied to, rather than any of the units damaged.
+                    retVal.AttackTargetHex = hex; 
+                }
 
                 // If we're not actually doing all the directions, break out here.
                 if (!m_allDirections)

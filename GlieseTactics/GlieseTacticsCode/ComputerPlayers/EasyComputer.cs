@@ -26,10 +26,10 @@ namespace Gliese581g.ComputerPlayers
                     new RecursiveTemplateEffect(currentMap, unit.TargetTemplate, true, true,
                         new RecursiveTemplateEffect(currentMap, unit.AttackTemplate, false, false,
                             new ExpectedDamageHexEffect(currentMap, unit),
-                        false, m_priorities),
-                    false, m_priorities),
+                        false, null), // The attack template is added up, not maximized or "get best"ed.  
+                    false, m_priorities), // Target options "get best of".
                 unit.CurrentHex, 
-                m_priorities);
+                m_priorities); // Move options "get best of". 
 
                 // The stats returned should be the "best move" available to this unit based 
                 // on the priorities given.  Zero consideration whatsoever to defensive positioning.
