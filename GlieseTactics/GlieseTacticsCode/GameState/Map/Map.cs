@@ -202,8 +202,13 @@ namespace Gliese581g
                     //It's not time for the next click yet. Do a "peek" and put the "mouse" over the next target.
                     if (!Game.PendingInstructions.IsFinished())
                     { // There's something there to point at.
-                        transformedPoint = Game.PendingInstructions.ThingsToClickOn.Peek().DisplayRect.Center;
+                        ClickableSprite nextThing = Game.PendingInstructions.ThingsToClickOn.Peek();
+                        transformedPoint = nextThing.DisplayRect.Center;
                         transformedMousePos = new Vector2(transformedPoint.X,transformedPoint.Y);
+
+                        //debug
+                        if (!nextThing.TestMouseOver(transformedPoint))
+                            throw new Exception("WHAT THE CRAP");
                     }
                 }
                 else
