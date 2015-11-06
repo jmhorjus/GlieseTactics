@@ -18,7 +18,7 @@ namespace Gliese581g.ComputerPlayers
 
             foreach (Unit unit in me.MyUnits)
             {
-                if (unit.CurrentRechargeTime > 0)
+                if (!unit.AliveAndReady())
                     continue;
 
                 // Apply three nexted templates: move, attack, damage.

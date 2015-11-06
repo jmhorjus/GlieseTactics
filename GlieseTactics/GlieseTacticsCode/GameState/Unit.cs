@@ -276,7 +276,10 @@ namespace Gliese581g
         public int MaxRechargeTime;
         public int CurrentRechargeTime;
 
-
+        public bool AliveAndReady()
+        {
+            return (CurrentHP > 0) && (CurrentRechargeTime <= 0);
+        }
 
         //Sounds
         [NonSerialized]

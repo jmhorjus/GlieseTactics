@@ -171,10 +171,6 @@ namespace Gliese581g
         public Direction ChooseHeadingDirection = new Direction(Direction.ValueType.Right);
         public bool Update(MouseState mouseState, Matrix transformMatrix, GameTime time, bool mouseAlreadyIntercepted)
         {
-            Vector2 mousePos = new Vector2(mouseState.X, mouseState.Y);
-            Vector2 transformedMousePos = Vector2.Transform(mousePos, Matrix.Invert(transformMatrix));
-            Point transformedPoint = new Point((int)transformedMousePos.X, (int)transformedMousePos.Y);
-
             /// Actions which depend on the turn stage but are not related to a specific hex.
             /// These happen even if the map is not intercepting the mouse. 
             switch (Game.CurrentTurnStage)
@@ -182,45 +178,6 @@ namespace Gliese581g
                 case Game.TurnStage.BeginTurn:
                     Game.BeginTurn(this);
                     break;
-                case Game.TurnStage.ChooseHeading:
-                    // Calculate the direction
-                    Point center = m_selectedHex.DisplayRect.Center;
-                    int direction = 0;
-                    direction += (transformedPoint.X > center.X) ? 1 : 0;
-                    direction += (transformedPoint.Y > center.Y + ((transformedPoint.X - center.X) / 2)) ? 2 : 0;
-                    direction += (transformedPoint.Y > center.Y - ((transformedPoint.X - center.X) / 2)) ? 4 : 0;
-                    switch (direction)
-                    {
-                        case 5:
-                            ChooseHeadingDirection = Direction.Right;
-                            break;
-                        case 1:
-                            ChooseHeadingDirection = Direction.UpRight;
-                            break;
-                        case 0:
-                            ChooseHeadingDirection = Direction.UpLeft;
-                            break;
-                        case 2:
-                            ChooseHeadingDirection = Direction.Left;
-                            break;
-                        case 6:
-                            ChooseHeadingDirection = Direction.DownLeft;
-                            break;
-                        case 7:
-                            ChooseHeadingDirection = Direction.DownRight;
-                            break;
-                        //default:
-                        //throw new Exception("this should never happen.");
-                    }
-                    if (m_selectedHex.Unit.FacingDirection != ChooseHeadingDirection)
-                    {
-                        m_selectedHex.Unit.FacingDirection = ChooseHeadingDirection;
-
-                        m_selectedHex.HighlightAttackRange();
-                    }
-
-                    break;
-
                 case Game.TurnStage.PlacementBegin:
                     HighlightStartingArea(Game.CurrentPlayerIndex);
                     Game.BeginPlacement();
@@ -230,19 +187,32 @@ namespace Gliese581g
 
             /// Here we check whether we are waiting for mouse input or running the 
             /// current turn based on saved instructions (and the UseInstructionsTimer).  
+            Vector2 mousePos = new Vector2(mouseState.X, mouseState.Y);
+            Vector2 transformedMousePos = Vector2.Transform(mousePos, Matrix.Invert(transformMatrix));
+            Point transformedPoint = new Point((int)transformedMousePos.X, (int)transformedMousePos.Y);
+
 
             if (!Enabled) // If the Map is disabled, pause turn execution.
                 return false;
+            
             if (Game.HasInstructions)
             {
-                if (time.TotalGameTime.TotalSeconds > m_lastComputerClickTime + ConfigManager.GlobalManager.ComputerPlayerSpeed)
+                if (time.TotalGameTime.TotalSeconds <= m_lastComputerClickTime + ConfigManager.GlobalManager.ComputerPlayerSpeed)
                 {
-                    
+                    //It's not time for the next click yet. Do a "peek" and put the "mouse" over the next target.
+                    if (!Game.PendingInstructions.IsFinished())
+                    { // There's something there to point at.
+                        transformedPoint = Game.PendingInstructions.ThingsToClickOn.Peek().DisplayRect.Center;
+                        transformedMousePos = new Vector2(transformedPoint.X,transformedPoint.Y);
+                    }
+                }
+                else
+                {
                     if (Game.PendingInstructions.IsFinished())
                     {
                         // If the queue is empty, then we'll need to end the turn.
                         Game.EndTurn();
-                    }                
+                    }
                     else
                     {
                         // We need to click the next click! 
@@ -250,15 +220,60 @@ namespace Gliese581g
                         nextThingToClick.OnLeftClick(Vector2.One);
                         m_lastComputerClickTime = time.TotalGameTime.TotalSeconds;
                     }
-                    
                 }
-                return false;
             }
+
             /// Now we check the mouse - actions after this point in the function
             /// depend on mouse input.
+
             if (mouseAlreadyIntercepted)
                 return false;
-            
+
+            if (Game.CurrentTurnStage == Game.TurnStage.ChooseHeading)
+            {
+                // Calculate the direction
+                Point center = m_selectedHex.DisplayRect.Center;
+                int direction = 0;
+                direction += (transformedPoint.X > center.X) ? 1 : 0;
+                direction += (transformedPoint.Y > center.Y + ((transformedPoint.X - center.X) / 2)) ? 2 : 0;
+                direction += (transformedPoint.Y > center.Y - ((transformedPoint.X - center.X) / 2)) ? 4 : 0;
+                switch (direction)
+                {
+                    case 5:
+                        ChooseHeadingDirection = Direction.Right;
+                        break;
+                    case 1:
+                        ChooseHeadingDirection = Direction.UpRight;
+                        break;
+                    case 0:
+                        ChooseHeadingDirection = Direction.UpLeft;
+                        break;
+                    case 2:
+                        ChooseHeadingDirection = Direction.Left;
+                        break;
+                    case 6:
+                        ChooseHeadingDirection = Direction.DownLeft;
+                        break;
+                    case 7:
+                        ChooseHeadingDirection = Direction.DownRight;
+                        break;
+                    //default:
+                    //throw new Exception("this should never happen.");
+                }
+                if (m_selectedHex.Unit.FacingDirection != ChooseHeadingDirection)
+                {
+                    m_selectedHex.Unit.FacingDirection = ChooseHeadingDirection;
+
+                    m_selectedHex.HighlightAttackRange();
+                }
+            }
+
+
+            //if (Game.HasInstructions)
+            //{
+            //    return false; // now that the direction check is done, return.
+            //}
+
             // Call update on each hex in the map.
             bool retVal = false;
             for (int y = 0; y < Columns; y++)
