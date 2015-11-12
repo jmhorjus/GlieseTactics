@@ -40,6 +40,10 @@ namespace Gliese581g.ComputerPlayers
                     bestMoveStats = HexEffectStats.BestSingleMove(bestMoveStats, stats, m_priorities);
             }
 
+            //Debug info 
+            int totalMoves = bestMoveStats.GetTotalMovesContained();
+
+
             // We should have the "best move" picked out now.  
             // Translate/return it as a TurnInstructions object.
             return new TurnInstructions(bestMoveStats);

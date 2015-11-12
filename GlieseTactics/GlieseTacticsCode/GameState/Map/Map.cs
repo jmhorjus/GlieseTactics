@@ -227,8 +227,6 @@ namespace Gliese581g
                         ClickableSprite nextThingToClick = Game.PendingInstructions.ThingsToClickOn.Dequeue();
                         if (nextThingToClick != null)
                             nextThingToClick.OnLeftClick(Vector2.One);
-                        else
-                            ;//debug
                         m_lastComputerClickTime = time.TotalGameTime.TotalSeconds;
                     }
                 }

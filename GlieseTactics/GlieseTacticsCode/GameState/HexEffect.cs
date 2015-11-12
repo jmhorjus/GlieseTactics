@@ -19,6 +19,9 @@ namespace Gliese581g
     /// </summary>
     public class HexEffectStats
     {
+        public List<HexEffectStats> m_lesserStatsList = new List<HexEffectStats>();
+        public List<HexEffectStats> m_equalStatsList = new List<HexEffectStats>();
+
         // Units, locations involved in calculation of these stats.
         // Only needed during AI deliberation.
         public Unit AttackingUnit = null;
@@ -47,6 +50,7 @@ namespace Gliese581g
         public void Clear() { Damage = 0; Kills = 0; FriendlyDamage = 0; FriendlyKills = 0; }
 
         // Used to accumulate stats (for instance in area-effect attacks). 
+        // In this case no "lesser stats" pointer is kept, since both have been combined.
         public static HexEffectStats operator +(HexEffectStats stats1, HexEffectStats stats2)
         {
             HexEffectStats statsResult = new HexEffectStats();
@@ -63,11 +67,16 @@ namespace Gliese581g
             statsResult.FriendlyDamage = stats1.FriendlyDamage + stats2.FriendlyDamage;
             statsResult.FriendlyKills = stats1.FriendlyKills + stats2.FriendlyKills;
             statsResult.FriendlyCommanderDamage = stats1.FriendlyCommanderDamage + stats2.FriendlyCommanderDamage;
-            statsResult.FriendlyCommanderKills = stats1.FriendlyCommanderKills + stats2.FriendlyCommanderKills   ;
+            statsResult.FriendlyCommanderKills = stats1.FriendlyCommanderKills + stats2.FriendlyCommanderKills;
+
+            // Combine the two "lesser" and "equal" lists? Likely not neccessary.
+
             return statsResult;
         }
 
         // Finds the best outcome for each catagory.  
+        // We're violating the two stats identities by combining them this way, so no
+        // additions to the lesser/equal lists are made. 
         public static HexEffectStats BestByCatagory(HexEffectStats stats1, HexEffectStats stats2)
         {
             HexEffectStats statsResult = new HexEffectStats();
@@ -84,6 +93,7 @@ namespace Gliese581g
         }
 
         // Return the move defined as best by the given priorities.
+        // The lesser ranked move is kept as a member of the greater ranked move.
         public static HexEffectStats BestSingleMove(HexEffectStats stats1, HexEffectStats stats2, 
             HexEffectPriorities priorities)
         {
@@ -91,11 +101,44 @@ namespace Gliese581g
             int weight2 = priorities.GetEffectValue(stats2);
 
             if (weight1 > weight2)
+            {
+                stats1.m_lesserStatsList.Add(stats2);
                 return stats1;
-            else
+            }
+            if (weight2 > weight1)
+            {
+                stats2.m_lesserStatsList.Add(stats1);
                 return stats2;
+            }
+            // they are equal - combine their lists into one.
+            stats2.m_equalStatsList.Concat(stats1.m_equalStatsList);
+            stats1.m_equalStatsList.Clear();
+
+            stats2.m_lesserStatsList.Concat(stats1.m_lesserStatsList);
+            stats1.m_lesserStatsList.Clear();
+            
+            stats2.m_equalStatsList.Add(stats1);
+            return stats2;
+        }
+        // Get the total number of lesser options, recursively. 
+        public int GetTotalMovesContained()
+        {
+            int retVal = 1;
+
+            foreach (HexEffectStats stats in m_equalStatsList)
+            {
+                retVal += stats.GetTotalMovesContained();
+            }
+
+            foreach (HexEffectStats stats in m_lesserStatsList)
+            {
+                retVal += stats.GetTotalMovesContained();
+            }
+
+            return retVal;
         }
     }
+
 
 
     /// <summary>
