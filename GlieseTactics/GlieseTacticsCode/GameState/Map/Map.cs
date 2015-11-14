@@ -27,7 +27,6 @@ namespace Gliese581g
         public bool Visible = true;
 
 
-
         //The Array to store each tiles of image and position.
         public Hex GetHex(Point mapCoordinates)
         {
@@ -67,7 +66,6 @@ namespace Gliese581g
                 ClearHighlightedHexes();
             }
         }
-
 
         // Stats for displaying in the GUI.
         public HexEffectStats ExpectedAttackStats = new HexEffectStats();
@@ -132,6 +130,7 @@ namespace Gliese581g
         }
 
 
+        /// Primary constructor for a new game.
         public Map(int Rows, int Columns, Camera camera, Texture2D greenTexture, Texture2D blueTexture)
         {
             m_camera = camera;
@@ -142,6 +141,21 @@ namespace Gliese581g
             m_hexArray = new Hex[Rows, Columns];
         }
 
+        /// Deep-copy function for keeping records of game-states with as little overhead as possible.
+        public Map(Map source)
+        {
+            this.m_blockingHexTexture = null;
+            this.m_camera = null;
+            this.m_defaultHexTexture = null;
+            this.m_doubleHighlightedHexes = null;
+            this.m_hexArray = new Hex[source.Rows,source.Columns];
+            for (int y = 0; y < m_hexArray.GetLength(1); y++)
+                for (int x = 0; x < m_hexArray.GetLength(0); x++)
+                    this.m_hexArray[x, y].CopyFrom(source.m_hexArray[x, y]);
+ 
+
+
+        }
 
         /// <summary>
         /// The draw function is only for drawing!

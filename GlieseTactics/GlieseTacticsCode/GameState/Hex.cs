@@ -114,6 +114,23 @@ namespace Gliese581g
             : base(null, Rectangle.Empty, Color.White, 1f, 0f, Vector2.Zero, 0f)
         { }
 
+        // Used in deep-copy of game-state. Copy all game-state related attributes of the target hex.
+        public void CopyFrom(Hex source)
+        {
+            this.m_map = source.m_map; //neccessary?
+            this.m_mapPosition = source.m_mapPosition;
+            if (source.m_unit != null)
+            {
+                this.m_unit = Unit.UnitFactory.MakeUnit(source.m_unit.TypeOfUnit);
+                this.m_unit.CopyFrom(source.m_unit);
+                if (!this.m_unit.PlaceOnMap(this))
+                    throw new Exception("unit location error");
+            }
+
+            this.PlayerStartingArea = source.PlayerStartingArea;
+            this.CurrentMoveCost = source.CurrentMoveCost;
+            this.LandMovementAllowed = source.LandMovementAllowed;            
+        }
 
         // Support the draw interface (we're using the composite design pattern)
         public override void Draw(SpriteBatch spriteBatch, GameTime time)

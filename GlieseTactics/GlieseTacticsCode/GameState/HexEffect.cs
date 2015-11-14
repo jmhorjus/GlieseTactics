@@ -42,6 +42,17 @@ namespace Gliese581g
         public int TotalDamage { get { return Damage + FriendlyDamage; } }
         public int TotalKills { get { return Kills + FriendlyKills; } }
 
+        private bool m_hasCalculatedUtility = false;
+        private int m_calculatedUtility = 0;
+        public bool HasCalculatedUtility
+        { get { return m_hasCalculatedUtility; } }
+        public int CalculatedUtility
+        {
+            get { return m_calculatedUtility; } 
+            set { m_hasCalculatedUtility = true; m_calculatedUtility = value; } 
+        }
+
+
         public bool IsZero() 
         { 
             return Damage == 0 && Kills == 0 && 

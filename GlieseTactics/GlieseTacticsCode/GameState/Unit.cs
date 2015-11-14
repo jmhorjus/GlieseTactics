@@ -391,6 +391,19 @@ namespace Gliese581g
             SfxFire.Add(sfxFire);
         }
 
+        // Used in deep-copy of game state.
+        // Copies all changable attribudes from source 
+        public void CopyFrom(Unit source)
+        {
+            if (this.TypeOfUnit != source.TypeOfUnit)
+                throw new Exception("Unit type confusion");
+
+            this.CurrentHP = source.CurrentHP;
+            this.CurrentRechargeTime = source.CurrentRechargeTime;
+            this.FacingDirection = source.FacingDirection;
+            this.m_owner = source.m_owner;
+            //this.m_currentHex //actually skip currenthex, since we don't want it to be the same.
+        }
 
 
         /// <summary>
