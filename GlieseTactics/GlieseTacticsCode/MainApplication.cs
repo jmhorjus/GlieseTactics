@@ -71,8 +71,8 @@ namespace Gliese581g
         {
             /// Check the configuration for the currently set resolution?
             GraphicsDeviceManager = new GraphicsDeviceManager(this);
-            GraphicsDeviceManager.PreferredBackBufferWidth = 1000; 
-            GraphicsDeviceManager.PreferredBackBufferHeight = 562;
+            GraphicsDeviceManager.PreferredBackBufferWidth = (int)(1000*1.36); 
+            GraphicsDeviceManager.PreferredBackBufferHeight = (int)(562*1.23);
             GraphicsDeviceManager.IsFullScreen = false;
             
             m_allGameScreens = new Dictionary<game_screen_key,GameScreen>();

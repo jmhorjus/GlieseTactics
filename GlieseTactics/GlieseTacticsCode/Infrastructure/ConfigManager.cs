@@ -81,7 +81,7 @@ namespace Gliese581g
         }
 
         /// Computer Player Speed - seconds between their "clicks".
-        float m_computerPlayerSpeed = 2.5f;
+        float m_computerPlayerSpeed = 3.0f;
         public float ComputerPlayerSpeed
         {
             get { return m_computerPlayerSpeed; }
