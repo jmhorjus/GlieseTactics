@@ -151,6 +151,7 @@ namespace Gliese581g
             
             this.m_hexArray = new Hex[source.Rows,source.Columns];
             for (int yy = 0; yy < m_hexArray.GetLength(1); yy++)
+            {
                 for (int xx = 0; xx < m_hexArray.GetLength(0); xx++)
                 {
                     this.m_hexArray[xx, yy] = new Hex(source.m_hexArray[xx, yy]);
@@ -164,6 +165,7 @@ namespace Gliese581g
                         newOwner.MyUnits.Add(newUnit);
                     }
                 }
+            }
         }
 
         /// <summary>
@@ -177,10 +179,15 @@ namespace Gliese581g
             if (this == THE_REAL_MAP)
                 throw new Exception("DON'T TOUCH THE REAL MAP!");
 
+            // These are the original instructions from another (identical) map.
+            // They will need to be translated to the current map.
+            Point unitStartHexPosition = ((Hex)instructions.ThingsToClickOn.Dequeue()).MapPosition;
+            Point moveToHexPosition = ((Hex)instructions.ThingsToClickOn.Dequeue()).MapPosition;
+            Point attackTargetPosition = ((Hex)instructions.ThingsToClickOn.Dequeue()).MapPosition;
 
-            Hex unitStartHex = (Hex)instructions.ThingsToClickOn.Dequeue();
-            Hex moveToHex = (Hex)instructions.ThingsToClickOn.Dequeue();
-            Hex attackTarget = (Hex)instructions.ThingsToClickOn.Dequeue();
+            Hex unitStartHex = this.GetHex(unitStartHexPosition);
+            Hex moveToHex = this.GetHex(moveToHexPosition);
+            Hex attackTarget = this.GetHex(attackTargetPosition);
 
             //Move the unit to it's intended destination.
             this.Game.CurrentTurnStage = Game.TurnStage.ChooseMoveDestination; 
