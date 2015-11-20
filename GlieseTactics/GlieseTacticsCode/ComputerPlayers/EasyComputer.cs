@@ -41,7 +41,7 @@ namespace Gliese581g.ComputerPlayers
             }
 
             //Debug info 
-            int totalMoves = bestMoveStats.GetTotalMovesContained();
+            //int totalMoves = bestMoveStats.GetTotalMovesContained();
 
 
             // We should have the "best move" picked out now.  

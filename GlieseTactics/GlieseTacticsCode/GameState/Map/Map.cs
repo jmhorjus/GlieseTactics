@@ -9,6 +9,9 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
 
+using Gliese581g.ComputerPlayers;
+
+
 namespace Gliese581g
 {
 
@@ -39,16 +42,14 @@ namespace Gliese581g
             return m_hexArray[mapCoordinates.X, mapCoordinates.Y]; 
         }
 
-        
         Camera m_camera;
 
         Texture2D m_blockingHexTexture;
         Texture2D m_defaultHexTexture;
 
-
         public Hex SelectedUnitOriginHex = null;
         public Direction SelectedUnitOriginDirection;
-       // public List<HexEffect>
+        // public List<HexEffect>
         
         Hex m_selectedHex = null;
         public Hex SelectedHex
@@ -141,20 +142,91 @@ namespace Gliese581g
             m_hexArray = new Hex[Rows, Columns];
         }
 
-        /// Deep-copy function for keeping records of game-states with as little overhead as possible.
+        /// Deep-copy constructor used for keeping records of game-states with as little overhead as possible.
         public Map(Map source)
         {
-            this.m_blockingHexTexture = null;
-            this.m_camera = null;
-            this.m_defaultHexTexture = null;
-            this.m_doubleHighlightedHexes = null;
+            // The game state includes the hex array (map, units), and Game (players, etc).   
+            // Do the game first - we need players who can own the units before we can create units.
+            this.Game = new Game(source.Game);
+            
             this.m_hexArray = new Hex[source.Rows,source.Columns];
-            for (int y = 0; y < m_hexArray.GetLength(1); y++)
-                for (int x = 0; x < m_hexArray.GetLength(0); x++)
-                    this.m_hexArray[x, y].CopyFrom(source.m_hexArray[x, y]);
- 
+            for (int yy = 0; yy < m_hexArray.GetLength(1); yy++)
+                for (int xx = 0; xx < m_hexArray.GetLength(0); xx++)
+                {
+                    this.m_hexArray[xx, yy] = new Hex(source.m_hexArray[xx, yy]);
+                    if (this.m_hexArray[xx, yy].Unit != null)
+                    {
+                        Unit newUnit = this.m_hexArray[xx, yy].Unit;
+                        int ownerIndex = source.m_hexArray[xx, yy].Unit.Owner.MyPlayerIndex;
+                        Commander newOwner = this.Game.Players[ownerIndex];
+                        // Inform the new unit and the new unit owner about each other.
+                        newUnit.Owner = newOwner;
+                        newOwner.MyUnits.Add(newUnit);
+                    }
+                }
+        }
+
+        /// <summary>
+        /// A function to quickly advance gamestate independant of any GUI interaciton.
+        /// Used during AI decision making.  Returns True if the instructions were valid 
+        /// and the state has been successfully updated.
+        /// </summary>
+        public static Map THE_REAL_MAP = null;
+        public bool quickMove(TurnInstructions instructions)
+        {
+            if (this == THE_REAL_MAP)
+                throw new Exception("DON'T TOUCH THE REAL MAP!");
 
 
+            Hex unitStartHex = (Hex)instructions.ThingsToClickOn.Dequeue();
+            Hex moveToHex = (Hex)instructions.ThingsToClickOn.Dequeue();
+            Hex attackTarget = (Hex)instructions.ThingsToClickOn.Dequeue();
+
+            //Move the unit to it's intended destination.
+            this.Game.CurrentTurnStage = Game.TurnStage.ChooseMoveDestination; 
+            Unit activeUnit = unitStartHex.Unit;
+            activeUnit.PlaceOnMap(moveToHex);
+            
+            //Apply the attack template with the real effect or recharge.
+            //(This function responsible for defining and enforcing game rules.)
+            if (attackTarget != moveToHex)
+            { //This isn't a recharge command; attack!
+                this.Game.CurrentTurnStage = Game.TurnStage.ChooseHeading;    
+                //1.) Change the heading of the active unit to the direction from
+                //  "moveToHex" to "attackTarget" (i.e. the direction the attacker 
+                //  should be facing, or the opposite  of the direction of impact)
+                Direction direction = Direction.GetDirectionFromHex(moveToHex, attackTarget);
+                activeUnit.FacingDirection = direction;
+
+                //2.) Apply the damage, using templates.
+                // TODO: should we double-check this is a valid target?
+                //       for now assume the AI is not trying to cheat. :)
+                activeUnit.AttackTemplate.OnApply(
+                    this,
+                    new MapLocation(attackTarget.MapPosition,  direction), 
+                    activeUnit.AttackEffect, // effect
+                    activeUnit.CurrentHex, // source hex 
+                    null);// Don't worry about priorities.
+
+                //3.) Put the attacking unit on recharge.
+                activeUnit.CurrentRechargeTime = activeUnit.MaxRechargeTime;
+
+                // See if the game is over.
+                this.Game.CheckForGameOver();
+            }
+            else
+            {
+                // Recharge the unit in it's new location...what direction should it be facing though???
+                // TODO: Need to consider how to do recharging moves! The direction is not implied, like with 
+                // most attacks. Actually the direction doesn't *need* to be implied for attacks either.  
+                activeUnit.PerformRecharge();
+            }
+
+            //4.) Do end-of-turn upkeep (as well as start-of-turn things?)
+            this.Game.EndTurn();
+            Game.BeginTurn(this);
+
+            return true;
         }
 
         /// <summary>

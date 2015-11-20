@@ -281,6 +281,15 @@ namespace Gliese581g
             return (CurrentHP > 0) && (CurrentRechargeTime <= 0);
         }
 
+        // Set the cooldown and healing associated with a recharge.
+        public void PerformRecharge()
+        {
+            // The clicked hex is the units own hex: command it to recharge instead of firing.
+            this.CurrentRechargeTime = (this.CurrentRechargeTime + 1) / 2;
+            // Recharging also heals a damaged unit slightly (20% of max).
+            this.CurrentHP = Math.Min(this.MaxHP, this.CurrentHP + (this.MaxHP / 5));        
+        }
+
         //Sounds
         [NonSerialized]
         List<SoundEffect> SfxSelected = new List<SoundEffect>();

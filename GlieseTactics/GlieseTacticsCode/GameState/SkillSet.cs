@@ -109,6 +109,11 @@ namespace Gliese581g
     {
         Dictionary<SkillId, int> m_skillLevels;
 
+        // Default constructor.
+        public SkillSet() { }
+        // Deep-copy constructor.
+        public SkillSet(SkillSet source) { }
+
         /// <summary>
         /// Return true if all skills in this skillset meet their prerequitates.  
         /// </summary>

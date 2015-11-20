@@ -5,17 +5,19 @@ using System.Text;
 
 namespace Gliese581g.ComputerPlayers
 {
+
     class GameStatePriorities
     {
-        Dictionary<UnitType, int> LiveUnitValueByType;
-        Dictionary<int, int> UnitValueIgnoredByRechargeTime;
+        Dictionary<UnitType, int> LiveUnitValueByType = new Dictionary<UnitType,int>();
+        Dictionary<int, int> UnitValueIgnoredByRechargeTime = new Dictionary<int,int>();
         
         int valuePerUnitHP = 1;
         int valuePerCommanderHP = 3;
+        int valuePerNotLosing = 10000000; // Losing is bad.
 
         public GameStatePriorities()
         {
-            LiveUnitValueByType[UnitType.Commander] = 100000000; //Commander is Everything
+            LiveUnitValueByType[UnitType.Commander] = 70; // Commander Value for recharge adjustment.
             LiveUnitValueByType[UnitType.Artillery] = 50;
             LiveUnitValueByType[UnitType.Infantry] = 25;
             LiveUnitValueByType[UnitType.Mech] = 60;
@@ -32,6 +34,37 @@ namespace Gliese581g.ComputerPlayers
             UnitValueIgnoredByRechargeTime[4] = 50;
             UnitValueIgnoredByRechargeTime[5] = 50; // Cap ignored value at 50%...seems like a good ide.
             UnitValueIgnoredByRechargeTime[6] = 50;
+        }
+
+        public int CalculateUtility(Map gameState, int currentPlayerIndex)
+        {
+            int retVal = 0;
+
+            for (int ii = 0; ii < gameState.Game.Players.Count; ii++)
+            {
+                // is this the current player? 
+                int valueMultiplier = (ii == currentPlayerIndex) ? 1 : -1;
+
+                foreach (Unit unit in gameState.Game.Players[ii].MyUnits)
+                {
+                    if (unit.CurrentHP > 0) // All living units count.
+                    {
+                        // Start with the unit's intrinsic value.
+                        int unitValue = LiveUnitValueByType[unit.TypeOfUnit];
+                        
+                        // Add in the unit's HP (also whether our commander is alive).
+                        if (unit.TypeOfUnit == UnitType.Commander)
+                            unitValue += (unit.CurrentHP * valuePerCommanderHP) + valuePerNotLosing;
+                        else
+                            unitValue += unit.CurrentHP * valuePerUnitHP;
+
+                        // Multiply in which player the unit belongs to - negative value if not current player.
+                        retVal += unitValue * valueMultiplier;
+                    }
+                }
+            }
+
+            return retVal;
         }
     }
 
@@ -50,15 +83,40 @@ namespace Gliese581g.ComputerPlayers
     /// </summary>
     class HardComputer : ComputerPlayer
     {
-        // Use the default for now.
+        // Use the default for now (not really needed in this class)
         HexEffectPriorities m_priorities = new HexEffectPriorities();
 
+        // The default GameStatePriorities.
+        GameStatePriorities m_gameStatePriorities = new GameStatePriorities();
+
+        // This function should execute the recursive mini-max/negamax function.  
         public override TurnInstructions GetNextMove(Map currentMap)
         {
-            HexEffectStats bestMoveStats = null;
+            return NegaMax(currentMap
+                ,2/*for now try using a depth of two - one tun per player*/
+                ,currentMap.Game.CurrentPlayerIndex /*either zero or one*/
+                );
+        }
 
-            Commander me = currentMap.Game.CurrentPlayer;
+        // Recursive function - returns the best move after searching to a given depth. 
+        // Need to experient with time/emory limitations.
+        // (limit depth, or limit beam width, possibly enforce max nodes expanded on both)...
+        protected TurnInstructions NegaMax(Map currentMap, int depth, int currentPlayerIndex)
+        {
+            // If we've reached our depth or have reached a terminal node, just return this gamestate's utility.
+            if (depth == 0 || currentMap.Game.CurrentTurnStage == Game.TurnStage.GameOver)
+            {
+                TurnInstructions nextMove = new TurnInstructions(); // Empty turn instructions - no actual move.
+                nextMove.UtilityValue = m_gameStatePriorities.CalculateUtility(currentMap, currentPlayerIndex);
+                return nextMove;
+            }
 
+            // Look through all possible moves for the best.  
+            HexEffectStats allMoveStats = null;
+            TurnInstructions bestMoveSoFar = null;
+
+            // Find all possible moves, using the unit's properties and templates.
+            Commander me = currentMap.Game.Players[currentPlayerIndex];
             foreach (Unit unit in me.MyUnits)
             {
                 if (!unit.AliveAndReady())
@@ -74,22 +132,48 @@ namespace Gliese581g.ComputerPlayers
                 unit.CurrentHex, 
                 m_priorities); // Move options "get best of". 
 
-                // The stats returned should be the "best move" available to this unit based 
-                // on the priorities given.  Zero consideration whatsoever to defensive positioning.
-                // Just "do the most damage/kill the most units with this one move."
-                if (bestMoveStats == null || bestMoveStats.AttackingUnit == null)
-                    bestMoveStats = stats;
-                else 
-                    bestMoveStats = HexEffectStats.BestSingleMove(bestMoveStats, stats, m_priorities);
+                // "stats" should now contains all possible attacking moves by the given unit. 
+                // Add them into the list of possible moves.
+                if (allMoveStats == null || allMoveStats.AttackingUnit == null)
+                    allMoveStats = stats;
+                else
+                    allMoveStats = HexEffectStats.BestSingleMove(allMoveStats, stats, m_priorities);
+
+                //TODO: Now get recharge moves for this unit and add them to allMoveStats as well.
+                //////
             }
 
-            //Debug info 
-            int totalMoves = bestMoveStats.GetTotalMovesContained();
+            // Get the list of all valid moves.  
+            List<HexEffectStats> allMoves = new List<HexEffectStats>();
+            int numberOfMoves = allMoveStats.GetTotalMovesContained(ref allMoves);
 
+            // Calculate the resulting game state if we make each move in the list.  
+            foreach (HexEffectStats move in allMoves)
+            {
+                // We're going to recurse now.  
+                // 1.) Sart by making a deep copy of the current game state.
+                Map newGameState = new Map(currentMap);
+
+                // 2.) Fully perform this move on the new gamestate.
+                newGameState.quickMove(new TurnInstructions(move));
+
+                // 3.) Recurse using the new gamestate and opposite player while decrementing depth.
+                TurnInstructions newTurnInstruction = NegaMax(newGameState, depth - 1, currentPlayerIndex == 0 ? 1 : 0);
+                // Negate the returned utility value 
+                newTurnInstruction.UtilityValue *= -1;
+                
+                // 4.) Compare the result to our best move calculated so far.
+                if (bestMoveSoFar == null || bestMoveSoFar.UtilityValue < newTurnInstruction.UtilityValue)
+                {
+                    // Attach the move at this depth to the utility from the lower depth.
+                    bestMoveSoFar = new TurnInstructions(move);
+                    bestMoveSoFar.UtilityValue = newTurnInstruction.UtilityValue;
+                }
+            }
 
             // We should have the "best move" picked out now.  
             // Translate/return it as a TurnInstructions object.
-            return new TurnInstructions(bestMoveStats);
+            return bestMoveSoFar;
         }
 
 

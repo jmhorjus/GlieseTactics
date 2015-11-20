@@ -189,13 +189,17 @@ namespace Gliese581g
 
         public List<Unit> MyUnits = new List<Unit>();
         //Other stats can be added later.
+        public int MyPlayerIndex;
 
 
-
-
+        /// <summary>
+        /// Null constructor for serialization.
+        /// </summary>
         public Commander()
         { }
 
+        ///
+        /// Usual constructor.  
         public Commander(string name, byte[] portraitRawData, int unitColorAsArgb, string portraitPath)
         {
             Name = name;
@@ -205,7 +209,21 @@ namespace Gliese581g
             m_profileFileName = portraitPath + "\\" + Name + ".xml";            
         }
 
+        /// Deep-copy constructor, used during branching of game states dring AI decision making.
+        public Commander(Commander source)
+        {
+            // Don't copy the units - they will be created during copy of the hexes they occupy.
+            // (how will they know which commander they should belong to?)
 
+            // Copy everything else that is needed for game-state calculation though.
+            MyPlayerIndex = source.MyPlayerIndex;
+            // Even stuff that's not implemented. :)
+            m_experience = source.m_experience;
+            m_skills = new SkillSet(source.m_skills);
+
+        }
+
+        /// Add a new unit to the *ownership* of this Commander.
         public void AddUnit(Unit newUnit)
         {
             MyUnits.Add(newUnit);

@@ -67,6 +67,11 @@ namespace Gliese581g
                 List<Commander> players = new List<Commander>();
                 players.Add(setupScreen.Player1);
                 players.Add(setupScreen.Player2);
+
+                // Let the players know what their player index values are.
+                players[0].MyPlayerIndex = 0;
+                players[1].MyPlayerIndex = 1;
+
                 mapScreen.Game = new Game(players, setupScreen.VictoryType);
 
                 mapScreen.Game.InitArmies(setupScreen.ArmySize);

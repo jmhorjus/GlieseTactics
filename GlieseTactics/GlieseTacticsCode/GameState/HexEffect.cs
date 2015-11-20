@@ -132,23 +132,32 @@ namespace Gliese581g
             return stats2;
         }
         // Get the total number of lesser options, recursively. 
-        public int GetTotalMovesContained()
+        public int GetTotalMovesContained(ref List<HexEffectStats> outputList)
         {
             int retVal = 1;
+            if (outputList != null)
+            {
+                // Disquality moves that don't have all their components.
+                if (this.AttackingUnit != null && 
+                    this.AttackOriginHex != null && 
+                    this.AttackTargetHex != null)
+                    outputList.Add(this);
+            }
 
             foreach (HexEffectStats stats in m_equalStatsList)
             {
-                retVal += stats.GetTotalMovesContained();
+                retVal += stats.GetTotalMovesContained(ref outputList);
             }
 
             foreach (HexEffectStats stats in m_lesserStatsList)
             {
-                retVal += stats.GetTotalMovesContained();
+                retVal += stats.GetTotalMovesContained(ref outputList);
             }
 
             return retVal;
         }
     }
+
 
 
 

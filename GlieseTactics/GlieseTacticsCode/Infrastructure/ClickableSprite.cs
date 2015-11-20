@@ -196,7 +196,8 @@ namespace Gliese581g
             RotationAngle = rotationAngle;
             LayerDepth = layerDepth;
 
-            LocationRect = dispRect;
+            if (m_texture != null)
+                LocationRect = dispRect;
 
             DisableClickDrag();
         }

@@ -65,60 +65,12 @@ namespace Gliese581g
 
         public int AdjustDamage(Point damageSource, MapLocation targetLocation, int damage)
         {
-            ImpactAngle impactAngle;
-            // Determine the most prominent direction by finding distance in the 3 directions.  
-            int a = (targetLocation.Position.X-(targetLocation.Position.Y/2)) -
-                (damageSource.X - (damageSource.Y / 2));
-            int b = (targetLocation.Position.X+((targetLocation.Position.Y+1)/2)) -
-                (damageSource.X + ((damageSource.Y + 1) / 2));
-            int ab = 0;
-            if ((a > 0) == (b > 0)){
-                if (Math.Abs(a) < Math.Abs(b))
-                    ab = a;
-                else
-                    ab = b;
-                a -= ab;
-                b -= ab;
-            }
-            // at least 1 zero now. There are 6 possible directions and 6 possible ties (12 cases total).  
-            if (Math.Abs(a) >= Math.Max(Math.Abs(b), Math.Abs(ab))  ) { //the a direction dominates or ties (six cases)
-                if (a > 0)  // three cases
-                    if(a > Math.Max(-b,ab) )
-                        impactAngle = ImpactAngle.PosA; //+a;
-                    else if (-b > ab)
-                        impactAngle = ImpactAngle.NegB_PosA; // +a ties -b;
-                    else 
-                        impactAngle = ImpactAngle.PosA_PosAB; // +a ties +ab;
-                else   // other 3 cases
-                    if(-a > Math.Max(b,-ab) )
-                        impactAngle = ImpactAngle.NegA; // -a;
-                    else if (b > -ab)
-                        impactAngle = ImpactAngle.PosB_NegA; // -a ties +b;
-                    else 
-                        impactAngle = ImpactAngle.NegA_NegAB; // -a ties -ab;
-            }
-            else if (  Math.Abs(b) >= Math.Max(Math.Abs(a), Math.Abs(ab))  ) { //the b direction dominates or ties ab (four cases)
-                if ( b > 0 ) //two cases
-                    if ( b > ab )
-                        impactAngle = ImpactAngle.PosB; // +b;
-                    else 
-                        impactAngle = ImpactAngle.PosAB_PosB; // +b ties +ab;
-                else
-                    if ( -b > -ab )
-                        impactAngle = ImpactAngle.NegB; // -b;
-                    else 
-                        impactAngle = ImpactAngle.NegAB_NegB; // -b ties -ab;
-            }
-            else //abs(ab) is the dominant axis (two cases) {
-                if ( ab > 0)
-                    impactAngle = ImpactAngle.PosAB; //+ab // right
-                else 
-                    impactAngle = ImpactAngle.NegAB; //-ab // left
+            ImpactAngle impactAngle = Direction.GetImpactAngle(targetLocation.Position, damageSource);
 
             // Now that we have a direction, we combine it with the direction the target is facing to find one of four impact zones.  
             // First get the direction offset: "*2" because of the relationship between direction and ImpactAngle. 
             int directionOffset = Math.Abs(((int)targetLocation.Direction * 2) - (int)impactAngle);
-            // -6 because it's reletive to a half circle.  +1 so that we round in favor of the defender.
+            // -6 because armor zone is reletive to a half circle(front to back). +1 so that we round in favor of the defender.
             ArmorZone zone = (ArmorZone) ((Math.Abs((directionOffset - 6))+1) / 2);  // integers round down to the less armored zone.
 
             if (zone >= ArmorZone.NumberOfZones)

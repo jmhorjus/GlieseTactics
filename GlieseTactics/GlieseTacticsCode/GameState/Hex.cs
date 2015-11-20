@@ -115,21 +115,27 @@ namespace Gliese581g
         { }
 
         // Used in deep-copy of game-state. Copy all game-state related attributes of the target hex.
-        public void CopyFrom(Hex source)
+        public Hex(Hex source) 
+            : base(null, Rectangle.Empty, Color.White, 1f, 0f, Vector2.Zero, 0f)
         {
             this.m_map = source.m_map; //neccessary?
             this.m_mapPosition = source.m_mapPosition;
-            if (source.m_unit != null)
-            {
-                this.m_unit = Unit.UnitFactory.MakeUnit(source.m_unit.TypeOfUnit);
-                this.m_unit.CopyFrom(source.m_unit);
-                if (!this.m_unit.PlaceOnMap(this))
-                    throw new Exception("unit location error");
-            }
 
             this.PlayerStartingArea = source.PlayerStartingArea;
             this.CurrentMoveCost = source.CurrentMoveCost;
-            this.LandMovementAllowed = source.LandMovementAllowed;            
+            this.LandMovementAllowed = source.LandMovementAllowed;
+            
+            if (source.m_unit != null)
+            {
+                Unit newUnit = Unit.UnitFactory.MakeUnit(source.m_unit.TypeOfUnit);
+                newUnit.CopyFrom(source.m_unit);
+                if (!newUnit.PlaceOnMap(this))
+                    throw new Exception("unit location error");
+
+                // This function cannot give the unit to its owner unfortunately - the
+                // new owner is not the same object as the old owner, but is the new player
+                // with the same player index (remember it's a deep copy).
+            }
         }
 
         // Support the draw interface (we're using the composite design pattern)
@@ -381,13 +387,13 @@ namespace Gliese581g
                     }
                     else if (this.IsSelected)
                     {
-                        // The clicked hex is the units own hex: command it to recharge instead of firing.
-                        Unit.CurrentRechargeTime = (Unit.CurrentRechargeTime +1) / 2;
-                        // Recharging also heals a damaged unit slightly (20% of max).
-                        int previousHP = Unit.CurrentHP;
-                        Unit.CurrentHP = Math.Min(Unit.MaxHP, Unit.CurrentHP + (Unit.MaxHP / 5));
-                        CreateDrawnTextEffect("+" + (Unit.CurrentHP - previousHP).ToString(), Color.DarkGreen);
 
+                        // The clicked hex is the units own hex: command it to recharge instead of firing.
+                        int previousHP = Unit.CurrentHP;
+                        Unit.PerformRecharge();
+                        // Display a green number indicating how much was healed.
+                        CreateDrawnTextEffect("+" + (Unit.CurrentHP - previousHP).ToString(), Color.DarkGreen);
+                        // Play the recharge sound effect.
                         if (ConfigManager.GlobalManager.UnitVoicesEnabled)
                             SfxStore.Play(SfxId.unit_recharge);
                         else

@@ -102,6 +102,10 @@ namespace Gliese581g
                 else
                     m_map.InitMapFromFile("Content/Maps/large_blood_bath.map"); 
             }
+
+            // For debugging, we set this map as THE_REAL_MAP so we can 
+            // make sure rogue algorithms don't try to modify it.
+            Map.THE_REAL_MAP = m_map;
         }
 
         public Game Game

@@ -9,6 +9,7 @@ using Microsoft.Xna.Framework.Audio;
 
 namespace Gliese581g
 {
+    // Intended for use in army setup.  
     class UnitTileBox
     {
         // The unit tiles are ordered into stacks by type.  

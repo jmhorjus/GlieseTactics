@@ -16,12 +16,16 @@ namespace Gliese581g.ComputerPlayers
     public class TurnInstructions
     {
         public bool Surrender = false;
+        
         public Queue<ClickableSprite> ThingsToClickOn = new Queue<ClickableSprite>();
-
         public bool IsFinished() { return ThingsToClickOn.Count == 0; }
 
-        public TurnInstructions() { ; }
+        // Utility value used in minimax calculation.
+        public int UtilityValue = 0; 
 
+        // Default empty constructor.
+        public TurnInstructions() { ; }
+        // Usual constructor taking a HexEffectStats.
         public TurnInstructions(HexEffectStats moveData)
         {
             Surrender = false;
@@ -35,5 +39,9 @@ namespace Gliese581g.ComputerPlayers
             // Add the end-turn button as an instruction to end the turn? 
             // For now no; let Map.Update handle it.
         }
+
+
+
+
     }
 }

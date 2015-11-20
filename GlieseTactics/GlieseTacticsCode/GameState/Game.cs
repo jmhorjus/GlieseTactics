@@ -99,7 +99,7 @@ namespace Gliese581g
         public bool HasInstructions { get { return m_pendingInstructions != null; } }
         public TurnInstructions PendingInstructions { get { return m_pendingInstructions; } }
 
-
+        /// The standard constructor.
         public Game(List<Commander> players, VictoryType victoryCondition)
         {
             Players = players;
@@ -111,6 +111,26 @@ namespace Gliese581g
 
             //DEBUG TODO: HACK IN A COMPUTER PLAYER FOR TESTING
             Players[1].ComputerPlayer = new EasyComputer();
+            Players[0].ComputerPlayer = new HardComputer();
+        }
+
+        /// A deep-copy constructor for use when copying game-states during AI dicision making. 
+        public Game(Game source)
+        {
+            // Copy the commanders.
+            this.Players = new List<Commander>();
+            for (int ii = 0; ii < source.Players.Count; ii++ )
+            {
+                this.Players.Add(new Commander(source.Players[ii]));
+            }
+            this.m_currentPlayer = this.Players[source.CurrentPlayerIndex];
+
+            // Copy other turn/state variables.  
+            this.VictoryCondition = source.VictoryCondition;
+            this.m_currentTurn = source.m_currentTurn;
+            this.m_currentTurnStage = source.m_currentTurnStage;
+
+            // Other things, like pending instructions, should not be needed during AI calculations.
         }
 
 
