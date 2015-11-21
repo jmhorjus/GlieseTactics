@@ -27,6 +27,7 @@ namespace Gliese581g
         public Unit AttackingUnit = null;
         public Hex AttackOriginHex = null;
         public Hex AttackTargetHex = null;
+        public Direction RechargeFacing = null;
 
         // Stats about damage done, kills, etc.  
         // Used for AI dicisions and player GUI feedback.
@@ -108,6 +109,11 @@ namespace Gliese581g
         public static HexEffectStats BestSingleMove(HexEffectStats stats1, HexEffectStats stats2, 
             HexEffectPriorities priorities)
         {
+            if (stats1 == null)
+                return stats2;
+            if (stats2 == null)
+                return stats1;
+
             int weight1 = priorities.GetEffectValue(stats1);
             int weight2 = priorities.GetEffectValue(stats2);
 
@@ -291,7 +297,7 @@ namespace Gliese581g
     
 
     /// <summary>
-    /// Used by AI to inspect possibile outcomes of moves involving the application of map templates. 
+    /// Used by AI to inspect possibile outcomes of moves involving the application of damage templates. 
     /// </summary>
     public class ExpectedDamageHexEffect : HexEffect
     {
@@ -307,6 +313,56 @@ namespace Gliese581g
         public override HexEffectStats ApplyToHex(Hex hex, Direction templateDirection, Hex effectSourceHex)
         {
             return UnitDamageEffect.CalculateDamageStats(m_owningUnit, effectSourceHex, hex.Unit);
+        }
+    }
+
+    /// <summary>
+    /// Used by AI to inspect possibile outcomes of moves involving recharging a unit. 
+    /// </summary>
+    public class ExpectedRechargeHexEffect : HexEffect
+    {
+        Map m_map;
+        Unit m_owningUnit;
+
+        public ExpectedRechargeHexEffect(Map map, Unit owningUnit)
+        {
+            m_map = map;
+            m_owningUnit = owningUnit;
+        }
+
+        public override HexEffectStats ApplyToHex(Hex hex, Direction templateDirection, Hex effectSourceHex)
+        {
+            HexEffectStats retVal = null;
+
+            //(m_owningUnit is the only relevant unit.);
+            if (m_owningUnit != null)
+            {
+                // Amount of HP that can be recovered.
+                int recoveredHP = Math.Min(m_owningUnit.MaxHP / 5, m_owningUnit.MaxHP - m_owningUnit.CurrentHP);
+
+                for (int dir = 0; dir < 6; dir++)
+                {
+                    HexEffectStats effectForThisDurection = new HexEffectStats();
+
+                    // Record the units/hexes involved in this calculation.
+                    effectForThisDurection.AttackingUnit = m_owningUnit;
+                    effectForThisDurection.AttackOriginHex = hex;
+                    effectForThisDurection.AttackTargetHex = hex;
+                    effectForThisDurection.RechargeFacing = new Direction(dir);
+                    // Record HP gained.
+                    if (m_owningUnit.IsCommander)
+                        effectForThisDurection.CommanderDamage = recoveredHP;
+                    else
+                        effectForThisDurection.Damage = recoveredHP;
+
+                    // Group the stats objects. They'll have equal value.
+                    if (retVal == null)
+                        retVal = effectForThisDurection;
+                    else
+                        retVal.m_equalStatsList.Add(effectForThisDurection);
+                }
+            }
+            return retVal; 
         }
     }
 

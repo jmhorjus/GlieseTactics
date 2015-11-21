@@ -12,7 +12,7 @@ namespace Gliese581g.ComputerPlayers
         Dictionary<int, int> UnitValueIgnoredByRechargeTime = new Dictionary<int,int>();
         
         int valuePerUnitHP = 1;
-        int valuePerCommanderHP = 3;
+        int valuePerCommanderHP = 4;
         int valuePerNotLosing = 10000000; // Losing is bad.
 
         public GameStatePriorities()
@@ -123,7 +123,7 @@ namespace Gliese581g.ComputerPlayers
                     continue;
 
                 // Apply three nexted templates: move, attack, damage.
-                HexEffectStats stats = unit.MoveTemplate.OnApply(currentMap, unit.MapLocation,
+                HexEffectStats attackStats = unit.MoveTemplate.OnApply(currentMap, unit.MapLocation,
                     new RecursiveTemplateEffect(currentMap, unit.TargetTemplate, true, true,
                         new RecursiveTemplateEffect(currentMap, unit.AttackTemplate, false, false,
                             new ExpectedDamageHexEffect(currentMap, unit),
@@ -134,13 +134,15 @@ namespace Gliese581g.ComputerPlayers
 
                 // "stats" should now contains all possible attacking moves by the given unit. 
                 // Add them into the list of possible moves.
-                if (allMoveStats == null || allMoveStats.AttackingUnit == null)
-                    allMoveStats = stats;
-                else
-                    allMoveStats = HexEffectStats.BestSingleMove(allMoveStats, stats, m_priorities);
+                allMoveStats = HexEffectStats.BestSingleMove(allMoveStats, attackStats, m_priorities);
 
                 //TODO: Now get recharge moves for this unit and add them to allMoveStats as well.
-                //////
+                // For this we only need the move template applied with all directions considered at the end.  
+                HexEffectStats rechargeStats = unit.MoveTemplate.OnApply(currentMap, unit.MapLocation,
+                    new ExpectedRechargeHexEffect(currentMap, unit),
+                    unit.CurrentHex, m_priorities);
+  
+                allMoveStats = HexEffectStats.BestSingleMove(allMoveStats, rechargeStats, m_priorities);
             }
 
             // Get the list of all valid moves.  
@@ -159,7 +161,10 @@ namespace Gliese581g.ComputerPlayers
 
                 // 3.) Recurse using the new gamestate and opposite player while decrementing depth.
                 TurnInstructions newTurnInstruction = NegaMax(newGameState, depth - 1, currentPlayerIndex == 0 ? 1 : 0);
-                // Negate the returned utility value 
+                if (newTurnInstruction == null)
+                    continue; // There was no valid move - forced pass turn. 
+                              // Might need to do something for this case.
+                // Negate the returned utility value to complete negamax.  
                 newTurnInstruction.UtilityValue *= -1;
                 
                 // 4.) Compare the result to our best move calculated so far.

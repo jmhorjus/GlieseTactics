@@ -18,6 +18,8 @@ namespace Gliese581g.ComputerPlayers
         public bool Surrender = false;
         
         public Queue<ClickableSprite> ThingsToClickOn = new Queue<ClickableSprite>();
+        public Direction RechargeFacing;
+
         public bool IsFinished() { return ThingsToClickOn.Count == 0; }
 
         // Utility value used in minimax calculation.
@@ -36,6 +38,7 @@ namespace Gliese581g.ComputerPlayers
             ThingsToClickOn.Enqueue(moveData.AttackOriginHex);
             ThingsToClickOn.Enqueue(moveData.AttackTargetHex);
 
+            RechargeFacing = moveData.RechargeFacing;
             // Add the end-turn button as an instruction to end the turn? 
             // For now no; let Map.Update handle it.
         }

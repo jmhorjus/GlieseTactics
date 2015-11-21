@@ -127,8 +127,10 @@ namespace Gliese581g
             
             if (source.m_unit != null)
             {
-                Unit newUnit = Unit.UnitFactory.MakeUnit(source.m_unit.TypeOfUnit);
+
+                Unit newUnit = Unit.UnitFactory.MakeUnit(UnitType.EmptyUnit);
                 newUnit.CopyFrom(source.m_unit);
+                
                 if (!newUnit.PlaceOnMap(this))
                     throw new Exception("unit location error");
 

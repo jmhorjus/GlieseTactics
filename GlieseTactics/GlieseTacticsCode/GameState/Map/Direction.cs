@@ -55,6 +55,8 @@ namespace Gliese581g
         public Direction() { } // for serialization
         public Direction(ValueType direction)
         { m_value = (int)direction; }
+        public Direction(int direction)
+        { m_value = direction; }
         public Direction(ImpactAngle angle, bool roundClockwise = false)
         {
             // Divide by two to get the right direction.  
@@ -78,6 +80,11 @@ namespace Gliese581g
 
         public static bool operator ==(Direction dir1, Direction dir2)
         {
+            if ((Object)dir1 == null && (Object)dir2 == null)
+                return true;
+            if ((Object)dir1 == null || (Object)dir2 == null)
+                return false;
+
             return dir1.m_value == dir2.m_value;
         }
         public static bool operator !=(Direction dir1, Direction dir2)
@@ -183,7 +190,6 @@ namespace Gliese581g
             return impactAngle;
         }
 
-
         /// <summary>
         /// Get the direction from a certain hex to a certain "point" anywhere in space (i.e. often the mouse cursor).
         /// </summary>
@@ -221,6 +227,29 @@ namespace Gliese581g
             }
 
             return retVal;
+        }
+
+        public static Vector2 NudgeVectorInDirection(Vector2 vector, Direction direction)
+        {
+            if (direction == null)
+                return vector;
+
+            switch (direction.m_value)
+            {
+                case (int)ValueType.Right:
+                    return vector + new Vector2(0, -2);
+                case (int)ValueType.DownRight:
+                    return vector + new Vector2(-2, -2);
+                case (int)ValueType.DownLeft:
+                    return vector + new Vector2(-2, 2);
+                case (int)ValueType.Left:
+                    return vector + new Vector2(0, 2);
+                case (int)ValueType.UpLeft:
+                    return vector + new Vector2(2, 2);
+                case (int)ValueType.UpRight:
+                    return vector + new Vector2(2, -2);
+            }
+            return vector;
         }
 
     }

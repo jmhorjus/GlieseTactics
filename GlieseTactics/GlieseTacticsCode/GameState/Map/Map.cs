@@ -227,6 +227,7 @@ namespace Gliese581g
                 // TODO: Need to consider how to do recharging moves! The direction is not implied, like with 
                 // most attacks. Actually the direction doesn't *need* to be implied for attacks either.  
                 activeUnit.PerformRecharge();
+                activeUnit.FacingDirection = instructions.RechargeFacing;
             }
 
             //4.) Do end-of-turn upkeep (as well as start-of-turn things?)
@@ -300,10 +301,13 @@ namespace Gliese581g
                         {
                             transformedPoint = nextThing.DisplayRect.Center;
                             transformedMousePos = new Vector2(transformedPoint.X, transformedPoint.Y);
+                            // Nudge the mouse a bit in the direction the instructions say we should be facing.  
+                            transformedMousePos = Direction.NudgeVectorInDirection(
+                                transformedMousePos, Game.PendingInstructions.RechargeFacing);
 
                             //debug
                             if (!nextThing.TestMouseOver(transformedPoint))
-                                throw new Exception("WHAT THE CRAP");
+                                throw new Exception("MOUSE POSITION ERROR");
                         }
                     }
                 }

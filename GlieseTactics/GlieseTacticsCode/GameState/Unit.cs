@@ -10,6 +10,7 @@ namespace Gliese581g
 {
     public enum UnitType
     {
+        EmptyUnit = 0,
         Commander = 1,
         Infantry = 2,
         Scout = 3,
@@ -30,6 +31,8 @@ namespace Gliese581g
             {
                 switch (type)
                 {
+                    case UnitType.EmptyUnit:
+                        return MakeEmptyUnit();
                     case UnitType.Commander:
                         return MakeCommander("");
                     case UnitType.Infantry:
@@ -47,6 +50,11 @@ namespace Gliese581g
                     default:
                         throw new Exception("invalid unit type");
                 }
+            }
+
+            public static Unit MakeEmptyUnit()
+            {
+                return new Unit();
             }
 
             static int infantry_id = 0;
@@ -315,12 +323,15 @@ namespace Gliese581g
 
         public static TimeSpan PlayRandomSoundFromListIfVoiceEnabled(List<SoundEffect> list)
         {
-            if (!ConfigManager.GlobalManager.UnitVoicesEnabled || list.Count <= 0)
+            if (list.Count <= 0)
+                return TimeSpan.Zero;
+
+            if (!ConfigManager.GlobalManager.UnitVoicesEnabled)
             {
                 SfxStore.Play(SfxId.thump);
-
                 return SfxStore.Get(SfxId.thump).Duration;
             }
+
             SoundEffect soundToPlay = list[new Random().Next(list.Count)];
             SfxStore.Play(soundToPlay);
             return soundToPlay.Duration;
@@ -401,15 +412,27 @@ namespace Gliese581g
         }
 
         // Used in deep-copy of game state.
-        // Copies all changable attribudes from source 
+        // Copies all non-gui realted attribudes from source 
         public void CopyFrom(Unit source)
         {
-            if (this.TypeOfUnit != source.TypeOfUnit)
-                throw new Exception("Unit type confusion");
+            this.IsCommander = source.IsCommander;
+            this.TypeOfUnit = source.TypeOfUnit;
+            this.Armor = source.Armor;
+            this.AttackEffect = source.AttackEffect;
+            this.AttackTemplate = source.AttackTemplate;
+            this.CanTargetEmptyHex = source.CanTargetEmptyHex;
+            this.MaxHP = source.MaxHP;
+            this.MaxRechargeTime = source.MaxRechargeTime;
+            this.MoveTemplate = source.MoveTemplate;
+            this.Name = source.Name;
+            this.TargetTemplate = source.TargetTemplate;
+
 
             this.CurrentHP = source.CurrentHP;
             this.CurrentRechargeTime = source.CurrentRechargeTime;
             this.FacingDirection = source.FacingDirection;
+            
+            // Owner and current hex shouldn't be the same - they have to be handled separately during deep-copy.
             this.m_owner = source.m_owner;
             //this.m_currentHex //actually skip currenthex, since we don't want it to be the same.
         }
@@ -433,7 +456,8 @@ namespace Gliese581g
             if (destination == null || !destination.IsValidDestination)
                 return false;
 
-            DrawOrigin = new Vector2(Texture.Height / 2, Texture.Width / 2);
+            if (Texture != null)
+                DrawOrigin = new Vector2(Texture.Height / 2, Texture.Width / 2);
 
             // Gotta clear before placing.
             if(m_currentHex != null)
@@ -442,9 +466,13 @@ namespace Gliese581g
             destination.PlaceUnit(this);
             m_currentHex = destination;
 
-            Visible = true;
-            Enabled = true;
-            LocationRect = destination.DisplayRect;
+            if (Texture != null)
+            {
+                Visible = true;
+                Enabled = true;
+                LocationRect = destination.DisplayRect;
+            }
+
             FacingDirection = facingDirection;
             
             return true;
