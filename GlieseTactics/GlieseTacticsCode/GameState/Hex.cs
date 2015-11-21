@@ -118,6 +118,9 @@ namespace Gliese581g
         public Hex(Hex source) 
             : base(null, Rectangle.Empty, Color.White, 1f, 0f, Vector2.Zero, 0f)
         {
+            if (source == null)
+                return;
+
             this.m_map = source.m_map; //neccessary?
             this.m_mapPosition = source.m_mapPosition;
 

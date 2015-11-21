@@ -179,6 +179,12 @@ namespace Gliese581g
             if (this == THE_REAL_MAP)
                 throw new Exception("DON'T TOUCH THE REAL MAP!");
 
+            if (instructions.PassTurn)
+            {
+                this.Game.EndTurn();
+                Game.BeginTurn(this);
+            }
+
             // These are the original instructions from another (identical) map.
             // They will need to be translated to the current map.
             Point unitStartHexPosition = ((Hex)instructions.ThingsToClickOn.Dequeue()).MapPosition;
@@ -230,7 +236,7 @@ namespace Gliese581g
                 activeUnit.FacingDirection = instructions.RechargeFacing;
             }
 
-            //4.) Do end-of-turn upkeep (as well as start-of-turn things?)
+            //4.) Do end-of-turn upkeep (as well as start-of-turn things)
             this.Game.EndTurn();
             Game.BeginTurn(this);
 

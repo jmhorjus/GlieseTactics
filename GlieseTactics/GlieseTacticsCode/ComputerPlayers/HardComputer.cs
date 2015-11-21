@@ -147,7 +147,11 @@ namespace Gliese581g.ComputerPlayers
 
             // Get the list of all valid moves.  
             List<HexEffectStats> allMoves = new List<HexEffectStats>();
-            int numberOfMoves = allMoveStats.GetTotalMovesContained(ref allMoves);
+            if (allMoveStats != null)
+                allMoveStats.GetTotalMovesContained(ref allMoves);
+            else
+                allMoves.Add(new HexEffectStats()); // No moves available - must pass turn doing nothing.  
+
 
             // Calculate the resulting game state if we make each move in the list.  
             foreach (HexEffectStats move in allMoves)

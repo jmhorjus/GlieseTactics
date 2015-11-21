@@ -15,6 +15,7 @@ namespace Gliese581g.ComputerPlayers
     /// </summary>
     public class TurnInstructions
     {
+        public bool PassTurn = false;
         public bool Surrender = false;
         
         public Queue<ClickableSprite> ThingsToClickOn = new Queue<ClickableSprite>();
@@ -33,8 +34,13 @@ namespace Gliese581g.ComputerPlayers
             Surrender = false;
             ThingsToClickOn = new Queue<ClickableSprite>();
 
-            if (moveData.AttackingUnit != null) // Gotta click on hexes not units!
-                ThingsToClickOn.Enqueue(moveData.AttackingUnit.CurrentHex);
+            if (moveData.AttackingUnit == null) 
+            {
+                this.PassTurn = true;
+                return;
+            }
+
+            ThingsToClickOn.Enqueue(moveData.AttackingUnit.CurrentHex);
             ThingsToClickOn.Enqueue(moveData.AttackOriginHex);
             ThingsToClickOn.Enqueue(moveData.AttackTargetHex);
 

@@ -168,7 +168,7 @@ namespace Gliese581g
                     true,
                     140, //hp
                     Armor.ArmorFactory.MakeArmor(ArmorType.Medium),
-                    5,//recharge
+                    4,//recharge
                     SfxStore.Get(SfxId.commander_selected_1),
                     SfxStore.Get(SfxId.mech_fire));
                 commander.SfxSelected.Add(SfxStore.Get(SfxId.commander_selected_2));

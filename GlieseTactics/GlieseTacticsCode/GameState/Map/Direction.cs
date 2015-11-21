@@ -237,17 +237,17 @@ namespace Gliese581g
             switch (direction.m_value)
             {
                 case (int)ValueType.Right:
-                    return vector + new Vector2(0, -2);
+                    return vector + new Vector2(0, -7);
                 case (int)ValueType.DownRight:
-                    return vector + new Vector2(-2, -2);
+                    return vector + new Vector2(-7, -7);
                 case (int)ValueType.DownLeft:
-                    return vector + new Vector2(-2, 2);
+                    return vector + new Vector2(-7, 7);
                 case (int)ValueType.Left:
-                    return vector + new Vector2(0, 2);
+                    return vector + new Vector2(0, 7);
                 case (int)ValueType.UpLeft:
-                    return vector + new Vector2(2, 2);
+                    return vector + new Vector2(7, 7);
                 case (int)ValueType.UpRight:
-                    return vector + new Vector2(2, -2);
+                    return vector + new Vector2(7, -7);
             }
             return vector;
         }
