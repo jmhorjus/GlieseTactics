@@ -96,7 +96,8 @@ namespace Gliese581g
             else
             {
                 if (mapSize == Game.MapSize.Small)
-                    m_map.InitMapFromFile("Content/Maps/small_lanes.map");
+                    m_map.InitMapFromFile("Content/Maps/ai_test.map");
+                    //m_map.InitMapFromFile("Content/Maps/small_lanes.map");
                 else if (mapSize == Game.MapSize.Medium)
                     m_map.InitMapFromFile("Content/Maps/medium_firing line.map"); 
                 else

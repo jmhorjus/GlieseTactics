@@ -1065,6 +1065,10 @@
       <Importer>FontDescriptionImporter</Importer>
       <Processor>FontDescriptionProcessor</Processor>
     </Compile>
+    <None Include="Maps\ai_test.map">
+      <Name>ai_test</Name>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="Maps\medium_firing line.map">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <Name>medium_firing line</Name>
