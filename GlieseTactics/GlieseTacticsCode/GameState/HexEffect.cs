@@ -128,10 +128,13 @@ namespace Gliese581g
                 return stats2;
             }
             // they are equal - combine their lists into one.
-            stats2.m_equalStatsList.Concat(stats1.m_equalStatsList);
+
+            foreach (HexEffectStats ss in stats1.m_equalStatsList)
+                stats2.m_equalStatsList.Add(ss);
             stats1.m_equalStatsList.Clear();
 
-            stats2.m_lesserStatsList.Concat(stats1.m_lesserStatsList);
+            foreach (HexEffectStats ss in stats1.m_lesserStatsList)
+                stats2.m_lesserStatsList.Add(ss);
             stats1.m_lesserStatsList.Clear();
             
             stats2.m_equalStatsList.Add(stats1);
@@ -144,10 +147,15 @@ namespace Gliese581g
             if (outputList != null)
             {
                 // Disquality moves that don't have all their components.
-                if (this.AttackingUnit != null && 
-                    this.AttackOriginHex != null && 
+                if (this.AttackingUnit != null &&
+                    this.AttackOriginHex != null &&
                     this.AttackTargetHex != null)
                     outputList.Add(this);
+                else
+                {
+                    int debug = 123;
+                    debug++;
+                }
             }
 
             foreach (HexEffectStats stats in m_equalStatsList)
@@ -342,24 +350,24 @@ namespace Gliese581g
 
                 for (int dir = 0; dir < 6; dir++)
                 {
-                    HexEffectStats effectForThisDurection = new HexEffectStats();
+                    HexEffectStats effectForThisDirection = new HexEffectStats();
 
                     // Record the units/hexes involved in this calculation.
-                    effectForThisDurection.AttackingUnit = m_owningUnit;
-                    effectForThisDurection.AttackOriginHex = hex;
-                    effectForThisDurection.AttackTargetHex = hex;
-                    effectForThisDurection.RechargeFacing = new Direction(dir);
+                    effectForThisDirection.AttackingUnit = m_owningUnit;
+                    effectForThisDirection.AttackOriginHex = hex;
+                    effectForThisDirection.AttackTargetHex = hex;
+                    effectForThisDirection.RechargeFacing = new Direction(dir);
                     // Record HP gained.
                     if (m_owningUnit.IsCommander)
-                        effectForThisDurection.CommanderDamage = recoveredHP;
+                        effectForThisDirection.CommanderDamage = recoveredHP;
                     else
-                        effectForThisDurection.Damage = recoveredHP;
+                        effectForThisDirection.Damage = recoveredHP;
 
                     // Group the stats objects. They'll have equal value.
                     if (retVal == null)
-                        retVal = effectForThisDurection;
+                        retVal = effectForThisDirection;
                     else
-                        retVal.m_equalStatsList.Add(effectForThisDurection);
+                        retVal.m_equalStatsList.Add(effectForThisDirection);
                 }
             }
             return retVal; 

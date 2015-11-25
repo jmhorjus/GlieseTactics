@@ -21,7 +21,10 @@ namespace Gliese581g.ComputerPlayers
         public Queue<ClickableSprite> ThingsToClickOn = new Queue<ClickableSprite>();
         public Direction RechargeFacing;
 
-        public bool IsFinished() { return ThingsToClickOn.Count == 0; }
+        public bool IsFinished() 
+        { 
+            return ThingsToClickOn.Count == 0 || PassTurn == true; 
+        }
 
         // Utility value used in minimax calculation.
         public int UtilityValue = 0; 

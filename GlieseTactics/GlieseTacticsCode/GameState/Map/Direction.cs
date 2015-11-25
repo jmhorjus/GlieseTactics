@@ -89,7 +89,7 @@ namespace Gliese581g
         }
         public static bool operator !=(Direction dir1, Direction dir2)
         {
-            return dir1.m_value != dir2.m_value;
+            return !(dir1 == dir2);
         }
         public static explicit operator int(Direction dir)
         {
@@ -229,28 +229,28 @@ namespace Gliese581g
             return retVal;
         }
 
-        public static Vector2 NudgeVectorInDirection(Vector2 vector, Direction direction)
-        {
-            if (direction == null)
-                return vector;
+        //public static Vector2 NudgeVectorInDirection(Vector2 vector, Direction direction)
+        //{
+        //    if (direction == null)
+        //        return vector;
 
-            switch (direction.m_value)
-            {
-                case (int)ValueType.Right:
-                    return vector + new Vector2(0, -7);
-                case (int)ValueType.DownRight:
-                    return vector + new Vector2(-7, -7);
-                case (int)ValueType.DownLeft:
-                    return vector + new Vector2(-7, 7);
-                case (int)ValueType.Left:
-                    return vector + new Vector2(0, 7);
-                case (int)ValueType.UpLeft:
-                    return vector + new Vector2(7, 7);
-                case (int)ValueType.UpRight:
-                    return vector + new Vector2(7, -7);
-            }
-            return vector;
-        }
+        //    switch (direction.m_value)
+        //    {
+        //        case (int)ValueType.Right:
+        //            return vector + new Vector2(0, -1);
+        //        case (int)ValueType.DownRight:
+        //            return vector + new Vector2(-1, -1);
+        //        case (int)ValueType.DownLeft:
+        //            return vector + new Vector2(-1, 1);
+        //        case (int)ValueType.Left:
+        //            return vector + new Vector2(0, 1);
+        //        case (int)ValueType.UpLeft:
+        //            return vector + new Vector2(1, 1);
+        //        case (int)ValueType.UpRight:
+        //            return vector + new Vector2(1, -1);
+        //    }
+        //    return vector;
+        //}
 
     }
     

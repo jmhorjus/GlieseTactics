@@ -183,6 +183,7 @@ namespace Gliese581g
             {
                 this.Game.EndTurn();
                 Game.BeginTurn(this);
+                return true;
             }
 
             // These are the original instructions from another (identical) map.
@@ -307,9 +308,6 @@ namespace Gliese581g
                         {
                             transformedPoint = nextThing.DisplayRect.Center;
                             transformedMousePos = new Vector2(transformedPoint.X, transformedPoint.Y);
-                            // Nudge the mouse a bit in the direction the instructions say we should be facing.  
-                            transformedMousePos = Direction.NudgeVectorInDirection(
-                                transformedMousePos, Game.PendingInstructions.RechargeFacing);
 
                             //debug
                             if (!nextThing.TestMouseOver(transformedPoint))
@@ -345,6 +343,10 @@ namespace Gliese581g
             if (Game.CurrentTurnStage == Game.TurnStage.ChooseHeading)
             {
                 Direction ChooseHeadingDirection = Direction.GetDirectionFromHex(m_selectedHex, transformedPoint);
+
+                if (Game.HasInstructions && Game.PendingInstructions.RechargeFacing != null)
+                    ChooseHeadingDirection = Game.PendingInstructions.RechargeFacing;
+
                 if (m_selectedHex.Unit.FacingDirection != ChooseHeadingDirection)
                 {
                     m_selectedHex.Unit.FacingDirection = ChooseHeadingDirection;

@@ -29,11 +29,11 @@ namespace Gliese581g.ComputerPlayers
             // (if the minimax goes deep enough, this should not be needed)
             UnitValueIgnoredByRechargeTime[0] = 0;
             UnitValueIgnoredByRechargeTime[1] = -20; //Actively try to kill units the turn before they recharge.
-            UnitValueIgnoredByRechargeTime[2] = 30;
+            UnitValueIgnoredByRechargeTime[2] = 20;
             UnitValueIgnoredByRechargeTime[3] = 40;
-            UnitValueIgnoredByRechargeTime[4] = 50;
-            UnitValueIgnoredByRechargeTime[5] = 50; // Cap ignored value at 50%...seems like a good ide.
-            UnitValueIgnoredByRechargeTime[6] = 50;
+            UnitValueIgnoredByRechargeTime[4] = 60;
+            UnitValueIgnoredByRechargeTime[5] = 60; // Cap ignored value at 50%...seems like a good ide.
+            UnitValueIgnoredByRechargeTime[6] = 60;
         }
 
         public int CalculateUtility(Map gameState, int currentPlayerIndex)
@@ -51,6 +51,7 @@ namespace Gliese581g.ComputerPlayers
                     {
                         // Start with the unit's intrinsic value.
                         int unitValue = LiveUnitValueByType[unit.TypeOfUnit];
+                        unitValue = (unitValue * (100 - UnitValueIgnoredByRechargeTime[unit.CurrentRechargeTime])) / 100;
                         
                         // Add in the unit's HP (also whether our commander is alive).
                         if (unit.TypeOfUnit == UnitType.Commander)
@@ -92,16 +93,28 @@ namespace Gliese581g.ComputerPlayers
         // This function should execute the recursive mini-max/negamax function.  
         public override TurnInstructions GetNextMove(Map currentMap)
         {
-            return NegaMax(currentMap
-                ,2/*for now try using a depth of two - one tun per player*/
-                ,currentMap.Game.CurrentPlayerIndex /*either zero or one*/
-                );
+            TurnInstructions retVal = null;
+            try
+            {
+                retVal = NegaMax(currentMap
+                    , 2/*for now try using a depth of two - one tun per player*/
+                    , int.MinValue + 1 //alpha 
+                    , int.MaxValue - 1 //beta
+                    , currentMap.Game.CurrentPlayerIndex /*either zero or one*/
+                    );
+            }
+            catch(Exception up)
+            {
+                throw up; // :(
+            }
+
+            return retVal;
         }
 
         // Recursive function - returns the best move after searching to a given depth. 
         // Need to experient with time/emory limitations.
         // (limit depth, or limit beam width, possibly enforce max nodes expanded on both)...
-        protected TurnInstructions NegaMax(Map currentMap, int depth, int currentPlayerIndex)
+        protected TurnInstructions NegaMax(Map currentMap, int depth, int alpha, int beta, int currentPlayerIndex)
         {
             // If we've reached our depth or have reached a terminal node, just return this gamestate's utility.
             if (depth == 0 || currentMap.Game.CurrentTurnStage == Game.TurnStage.GameOver)
@@ -164,7 +177,12 @@ namespace Gliese581g.ComputerPlayers
                 newGameState.quickMove(new TurnInstructions(move));
 
                 // 3.) Recurse using the new gamestate and opposite player while decrementing depth.
-                TurnInstructions newTurnInstruction = NegaMax(newGameState, depth - 1, currentPlayerIndex == 0 ? 1 : 0);
+                TurnInstructions newTurnInstruction = NegaMax(
+                    newGameState, 
+                    depth - 1,
+                    -beta, // -beta becomes alpha.
+                    -alpha, // -alpha becomes beta.
+                    currentPlayerIndex == 0 ? 1 : 0);
                 if (newTurnInstruction == null)
                     continue; // There was no valid move - forced pass turn. 
                               // Might need to do something for this case.
@@ -178,6 +196,12 @@ namespace Gliese581g.ComputerPlayers
                     bestMoveSoFar = new TurnInstructions(move);
                     bestMoveSoFar.UtilityValue = newTurnInstruction.UtilityValue;
                 }
+
+                // Do alpha-beta pruning.  
+                if (bestMoveSoFar != null && alpha < bestMoveSoFar.UtilityValue)
+                    alpha = bestMoveSoFar.UtilityValue;
+                if (alpha >= beta)
+                    break;
             }
 
             // We should have the "best move" picked out now.  
