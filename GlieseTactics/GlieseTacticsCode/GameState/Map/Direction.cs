@@ -136,20 +136,9 @@ namespace Gliese581g
         {
             ImpactAngle impactAngle;
             // Determine the most prominent direction by finding distance in the 3 directions.  
-            int a = (startingMapPoint.X - (startingMapPoint.Y / 2)) -
-                (endingMapPoint.X - (endingMapPoint.Y / 2));
-            int b = (startingMapPoint.X + ((startingMapPoint.Y + 1) / 2)) -
-                (endingMapPoint.X + ((endingMapPoint.Y + 1) / 2));
-            int ab = 0;
-            if ((a > 0) == (b > 0))
-            {
-                if (Math.Abs(a) < Math.Abs(b))
-                    ab = a;
-                else
-                    ab = b;
-                a -= ab;
-                b -= ab;
-            }
+            int a = 0, b = 0, ab = 0;
+            GetHexDistances(ref a, ref b, ref ab, startingMapPoint, endingMapPoint);
+
             // at least 1 zero now. There are 6 possible directions and 6 possible ties (12 cases total).  
             if (Math.Abs(a) >= Math.Max(Math.Abs(b), Math.Abs(ab)))
             { //the a direction dominates or ties (six cases)
@@ -229,28 +218,35 @@ namespace Gliese581g
             return retVal;
         }
 
-        //public static Vector2 NudgeVectorInDirection(Vector2 vector, Direction direction)
-        //{
-        //    if (direction == null)
-        //        return vector;
+        // Utility function to get the three "map distances" between two hexes.
+        // a and b are the "upright/downleft" and "downright/upleft" axes and ab is the "left/right" distance.
+        public static void GetHexDistances(ref int a, ref int b, ref int ab, Point start, Point end)
+        {
+            // Determine the most prominent direction by finding distance in the 3 directions.  
+            a = (start.X - (start.Y / 2)) -
+                (end.X - (end.Y / 2));
+            b = (start.X + ((start.Y + 1) / 2)) -
+                (end.X + ((end.Y + 1) / 2));
+            ab = 0;
+            if ((a > 0) == (b > 0))
+            {
+                if (Math.Abs(a) < Math.Abs(b))
+                    ab = a;
+                else
+                    ab = b;
+                a -= ab;
+                b -= ab;
+            }
+        }
 
-        //    switch (direction.m_value)
-        //    {
-        //        case (int)ValueType.Right:
-        //            return vector + new Vector2(0, -1);
-        //        case (int)ValueType.DownRight:
-        //            return vector + new Vector2(-1, -1);
-        //        case (int)ValueType.DownLeft:
-        //            return vector + new Vector2(-1, 1);
-        //        case (int)ValueType.Left:
-        //            return vector + new Vector2(0, 1);
-        //        case (int)ValueType.UpLeft:
-        //            return vector + new Vector2(1, 1);
-        //        case (int)ValueType.UpRight:
-        //            return vector + new Vector2(1, -1);
-        //    }
-        //    return vector;
-        //}
+        // Get the total map distance between two hexes. 
+        public static int GetMapDistance(Point point1, Point point2)
+        {
+            int a = 0, b = 0, ab = 0;
+            GetHexDistances(ref a, ref b, ref ab, point1, point2);
+
+            return Math.Abs(a) + Math.Abs(b) + Math.Abs(ab);
+        }
 
     }
     

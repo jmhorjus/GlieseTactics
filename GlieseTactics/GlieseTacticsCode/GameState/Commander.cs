@@ -191,6 +191,19 @@ namespace Gliese581g
         //Other stats can be added later.
         public int MyPlayerIndex;
 
+        
+        public Unit MyCommandUnit
+        { 
+            get 
+            {
+                foreach (Unit unit in MyUnits)
+                {
+                    if (unit.IsCommander)
+                        return unit;
+                }
+                return null;
+            } 
+        }
 
         /// <summary>
         /// Null constructor for serialization.

@@ -162,7 +162,13 @@ namespace Gliese581g
 
                 //If no unit is both alive and ready, skip directly to end turn. 
                 if (!canMove)
+                {
                     m_currentTurnStage = TurnStage.EndTurn;
+                    if (!m_currentPlayer.IsHuman)
+                    {
+                        EndTurn();
+                    }
+                }
                 else
                 {
                     m_currentTurnStage = TurnStage.ChooseUnit;

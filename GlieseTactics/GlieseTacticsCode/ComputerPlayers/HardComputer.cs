@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Microsoft.Xna.Framework; 
+
 
 namespace Gliese581g.ComputerPlayers
 {
@@ -10,7 +12,9 @@ namespace Gliese581g.ComputerPlayers
     {
         Dictionary<UnitType, int> LiveUnitValueByType = new Dictionary<UnitType,int>();
         Dictionary<int, int> UnitValueIgnoredByRechargeTime = new Dictionary<int,int>();
-        
+
+        int valuePerDistanceFromEnemyCommander = -4;
+        int maxDistanceToConsider = 6;
         int valuePerUnitHP = 1;
         int valuePerCommanderHP = 4;
         int valuePerNotLosing = 10000000; // Losing is bad.
@@ -44,6 +48,15 @@ namespace Gliese581g.ComputerPlayers
             {
                 // is this the current player? 
                 int valueMultiplier = (ii == currentPlayerIndex) ? 1 : -1;
+                int nextPlayerIndex = (ii + 1) % 2;
+
+                // Find the map coordinates of the enemy commander. 
+                if (gameState.Game.Players[nextPlayerIndex].MyCommandUnit == null ||
+                    gameState.Game.Players[nextPlayerIndex].MyCommandUnit.MapLocation == null)
+                    return valuePerNotLosing * 2; // No enemy commander = win.
+                MapLocation enemyCommanderLocation = gameState.Game.Players[nextPlayerIndex].MyCommandUnit.MapLocation;
+
+                
 
                 foreach (Unit unit in gameState.Game.Players[ii].MyUnits)
                 {
@@ -51,6 +64,7 @@ namespace Gliese581g.ComputerPlayers
                     {
                         // Start with the unit's intrinsic value.
                         int unitValue = LiveUnitValueByType[unit.TypeOfUnit];
+                        // Ignore some of this value if the unit is recharging and unavailable. 
                         unitValue = (unitValue * (100 - UnitValueIgnoredByRechargeTime[unit.CurrentRechargeTime])) / 100;
                         
                         // Add in the unit's HP (also whether our commander is alive).
@@ -58,6 +72,10 @@ namespace Gliese581g.ComputerPlayers
                             unitValue += (unit.CurrentHP * valuePerCommanderHP) + valuePerNotLosing;
                         else
                             unitValue += unit.CurrentHP * valuePerUnitHP;
+
+                        // Add in distance to enemy commander. 
+                        unitValue += valuePerDistanceFromEnemyCommander * (-maxDistanceToConsider +
+                            Direction.GetMapDistance(unit.MapLocation.Position, enemyCommanderLocation.Position));
 
                         // Multiply in which player the unit belongs to - negative value if not current player.
                         retVal += unitValue * valueMultiplier;
@@ -94,19 +112,13 @@ namespace Gliese581g.ComputerPlayers
         public override TurnInstructions GetNextMove(Map currentMap)
         {
             TurnInstructions retVal = null;
-            try
-            {
-                retVal = NegaMax(currentMap
+
+            retVal = NegaMax(currentMap
                     , 2/*for now try using a depth of two - one tun per player*/
                     , int.MinValue + 1 //alpha 
                     , int.MaxValue - 1 //beta
                     , currentMap.Game.CurrentPlayerIndex /*either zero or one*/
                     );
-            }
-            catch(Exception up)
-            {
-                throw up; // :(
-            }
 
             return retVal;
         }
@@ -152,7 +164,7 @@ namespace Gliese581g.ComputerPlayers
                 //TODO: Now get recharge moves for this unit and add them to allMoveStats as well.
                 // For this we only need the move template applied with all directions considered at the end.  
                 HexEffectStats rechargeStats = unit.MoveTemplate.OnApply(currentMap, unit.MapLocation,
-                    new ExpectedRechargeHexEffect(currentMap, unit),
+                    new ExpectedRechargeHexEffect(currentMap, unit, true, Point.Zero),
                     unit.CurrentHex, m_priorities);
   
                 allMoveStats = HexEffectStats.BestSingleMove(allMoveStats, rechargeStats, m_priorities);

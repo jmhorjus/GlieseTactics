@@ -16,6 +16,9 @@ namespace Gliese581g.ComputerPlayers
 
             Commander me = currentMap.Game.CurrentPlayer;
 
+            // Need to find the enemy commander. 
+            m_priorities.EnemyCommanderLocation = currentMap.Game.NextPlayer.MyCommandUnit.MapLocation;
+
             foreach (Unit unit in me.MyUnits)
             {
                 if (!unit.AliveAndReady())
@@ -40,9 +43,24 @@ namespace Gliese581g.ComputerPlayers
                     bestMoveStats = HexEffectStats.BestSingleMove(bestMoveStats, stats, m_priorities);
             }
 
-            //Debug info 
-            //int totalMoves = bestMoveStats.GetTotalMovesContained();
+            if (bestMoveStats == null || bestMoveStats.Damage + bestMoveStats.CommanderDamage == 0)
+            { // There was no attacking move, make a recharge move.  
 
+                foreach (Unit unit in me.MyUnits)
+                {
+                    if (!unit.AliveAndReady())
+                        continue;
+
+                    // Get recharge moves for this unit.
+                    HexEffectStats rechargeStats = unit.MoveTemplate.OnApply(currentMap, unit.MapLocation,
+                        new ExpectedRechargeHexEffect(currentMap, unit, 
+                            false, m_priorities.EnemyCommanderLocation.Position),//not every direction, just face toward the commander.
+                        unit.CurrentHex, m_priorities);
+
+                    bestMoveStats = HexEffectStats.BestSingleMove(bestMoveStats, rechargeStats, m_priorities);
+                }
+
+            }
 
             // We should have the "best move" picked out now.  
             // Translate/return it as a TurnInstructions object.

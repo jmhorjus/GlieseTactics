@@ -331,11 +331,33 @@ namespace Gliese581g
     {
         Map m_map;
         Unit m_owningUnit;
+        bool m_allDirections;
+        Point m_preferredDirection;
 
-        public ExpectedRechargeHexEffect(Map map, Unit owningUnit)
+        public ExpectedRechargeHexEffect(Map map, Unit owningUnit, bool allDirections, Point preferredDirection)
         {
             m_map = map;
             m_owningUnit = owningUnit;
+            m_allDirections = allDirections;
+            m_preferredDirection = preferredDirection;
+        }
+
+        protected HexEffectStats GetNewEffectForDir(Hex hex, int recoveredHP, int direction)
+        {
+            HexEffectStats effectForThisDirection = new HexEffectStats();
+
+            // Record the units/hexes involved in this calculation.
+            effectForThisDirection.AttackingUnit = m_owningUnit;
+            effectForThisDirection.AttackOriginHex = hex;
+            effectForThisDirection.AttackTargetHex = hex;
+            effectForThisDirection.RechargeFacing = new Direction(direction);
+            // Record HP gained.
+            if (m_owningUnit.IsCommander)
+                effectForThisDirection.CommanderDamage = recoveredHP;
+            else
+                effectForThisDirection.Damage = recoveredHP;
+
+            return effectForThisDirection;
         }
 
         public override HexEffectStats ApplyToHex(Hex hex, Direction templateDirection, Hex effectSourceHex)
@@ -348,26 +370,23 @@ namespace Gliese581g
                 // Amount of HP that can be recovered.
                 int recoveredHP = Math.Min(m_owningUnit.MaxHP / 5, m_owningUnit.MaxHP - m_owningUnit.CurrentHP);
 
-                for (int dir = 0; dir < 6; dir++)
+                if (this.m_allDirections)
                 {
-                    HexEffectStats effectForThisDirection = new HexEffectStats();
+                    for (int dir = 0; dir < 6; dir++)
+                    {
+                        HexEffectStats effectForThisDirection = GetNewEffectForDir(hex, recoveredHP, dir);
 
-                    // Record the units/hexes involved in this calculation.
-                    effectForThisDirection.AttackingUnit = m_owningUnit;
-                    effectForThisDirection.AttackOriginHex = hex;
-                    effectForThisDirection.AttackTargetHex = hex;
-                    effectForThisDirection.RechargeFacing = new Direction(dir);
-                    // Record HP gained.
-                    if (m_owningUnit.IsCommander)
-                        effectForThisDirection.CommanderDamage = recoveredHP;
-                    else
-                        effectForThisDirection.Damage = recoveredHP;
-
-                    // Group the stats objects. They'll have equal value.
-                    if (retVal == null)
-                        retVal = effectForThisDirection;
-                    else
-                        retVal.m_equalStatsList.Add(effectForThisDirection);
+                        // Group the stats objects. They'll have equal value.
+                        if (retVal == null)
+                            retVal = effectForThisDirection;
+                        else
+                            retVal.m_equalStatsList.Add(effectForThisDirection);
+                    }
+                }
+                else
+                { //use the preferred direction
+                    Direction towardEnemyCommander = Direction.GetDirectionFromHex(hex, m_preferredDirection);
+                    retVal = GetNewEffectForDir(hex, recoveredHP, (int)towardEnemyCommander.Value);
                 }
             }
             return retVal; 

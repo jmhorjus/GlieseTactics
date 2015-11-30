@@ -82,6 +82,7 @@ namespace Gliese581g
         protected Rectangle m_displayRectangle;
 
 
+
         public override Rectangle DisplayRect
         { get { return m_displayRectangle; } }
 
