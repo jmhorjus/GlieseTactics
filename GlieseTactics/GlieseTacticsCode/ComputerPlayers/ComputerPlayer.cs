@@ -22,7 +22,7 @@ namespace Gliese581g.ComputerPlayers
     {
         // Some default values that are somewhat sensible. 
         public int DamageWeight = 1;
-        public int CommanderDamageWeight = 3;
+        public int CommanderDamageWeight = 4;
         public int KillWeight = 25;
         public int CommanderKillWeight = 1000000;
         public int FriendlyDamageWeight = -1;
@@ -31,11 +31,11 @@ namespace Gliese581g.ComputerPlayers
         public int FriendlyCommanderKillWeight = -2000000;
 
         public int EnemyCommanderDistanceOffset = 50;
-        public int EnemyCommanderDistanceWeight = -1;
+        public int EnemyCommanderDistanceWeight = -3;
         public MapLocation EnemyCommanderLocation = null;
 
 
-        public int GetEffectValue(HexEffectStats effect)
+        public int GetEffectValue(ref HexEffectStats effect)
         {
             // Add up all the values times their respective weights.
             int retVal =
@@ -56,6 +56,8 @@ namespace Gliese581g.ComputerPlayers
                     effect.AttackOriginHex.MapPosition);
                 retVal += EnemyCommanderDistanceOffset + (distance * EnemyCommanderDistanceWeight);
             }
+
+            effect.CalculatedUtility = retVal;
 
             return retVal;
         }

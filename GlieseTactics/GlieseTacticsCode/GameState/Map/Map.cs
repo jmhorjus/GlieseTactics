@@ -209,7 +209,7 @@ namespace Gliese581g
                 //1.) Change the heading of the active unit to the direction from
                 //  "moveToHex" to "attackTarget" (i.e. the direction the attacker 
                 //  should be facing, or the opposite  of the direction of impact)
-                Direction direction = Direction.GetDirectionFromHex(moveToHex, attackTarget);
+                Direction direction = Direction.GetDirectionFromHexToMapPoint(moveToHex, attackTarget.MapPosition);
                 activeUnit.FacingDirection = direction;
 
                 //2.) Apply the damage, using templates.

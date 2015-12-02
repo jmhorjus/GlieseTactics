@@ -32,7 +32,7 @@ namespace Gliese581g
         protected HexEffectStats AccumulateStats(HexEffectStats stats1, HexEffectStats stats2, HexEffectPriorities priorities)
         {
             if (priorities != null)
-                return HexEffectStats.BestSingleMove(stats1, stats2, priorities);
+                return HexEffectStats.BestSingleMove(ref stats1, ref stats2, priorities);
             
             if (m_returnMaxStats)
                 return HexEffectStats.BestByCatagory(stats1, stats2);

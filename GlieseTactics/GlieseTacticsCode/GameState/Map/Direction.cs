@@ -123,9 +123,9 @@ namespace Gliese581g
         /// <summary>
         /// Get the prominant direction you'd have to go from startingHex to get to endingHex.
         /// </summary>
-        static public Direction GetDirectionFromHex(Hex startingHex, Hex endingHex)
+        static public Direction GetDirectionFromHexToMapPoint(Hex startingHex, Point endingHex)
         {
-            ImpactAngle angle = GetImpactAngle(startingHex.MapPosition, endingHex.MapPosition);
+            ImpactAngle angle = GetImpactAngle(startingHex.MapPosition, endingHex);
 
             return new Direction(angle);
         }

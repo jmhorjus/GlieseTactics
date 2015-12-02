@@ -19,6 +19,8 @@ namespace Gliese581g
     /// </summary>
     public class HexEffectStats
     {
+
+
         public List<HexEffectStats> m_lesserStatsList = new List<HexEffectStats>();
         public List<HexEffectStats> m_equalStatsList = new List<HexEffectStats>();
 
@@ -52,6 +54,22 @@ namespace Gliese581g
             get { return m_calculatedUtility; } 
             set { m_hasCalculatedUtility = true; m_calculatedUtility = value; } 
         }
+        // Comparison function deligate.
+        // Must return -1 if Y is greater, 0 if equal, 1 if X is greater.
+        public static int CompareByUtility(HexEffectStats X, HexEffectStats Y)
+        {
+            if (!X.HasCalculatedUtility || !Y.HasCalculatedUtility)
+                throw new Exception("utility compare error");
+
+            if (X.m_calculatedUtility < Y.m_calculatedUtility)
+                return 1;
+            if (X.m_calculatedUtility > Y.m_calculatedUtility)
+                return -1;
+
+            return 0;
+        }
+
+
 
 
         public bool IsZero() 
@@ -106,7 +124,7 @@ namespace Gliese581g
 
         // Return the move defined as best by the given priorities.
         // The lesser ranked move is kept as a member of the greater ranked move.
-        public static HexEffectStats BestSingleMove(HexEffectStats stats1, HexEffectStats stats2, 
+        public static HexEffectStats BestSingleMove(ref HexEffectStats stats1, ref HexEffectStats stats2, 
             HexEffectPriorities priorities)
         {
             if (stats1 == null)
@@ -114,8 +132,8 @@ namespace Gliese581g
             if (stats2 == null)
                 return stats1;
 
-            int weight1 = priorities.GetEffectValue(stats1);
-            int weight2 = priorities.GetEffectValue(stats2);
+            int weight1 = priorities.GetEffectValue(ref stats1);
+            int weight2 = priorities.GetEffectValue(ref stats2);
 
             if (weight1 > weight2)
             {
@@ -332,14 +350,14 @@ namespace Gliese581g
         Map m_map;
         Unit m_owningUnit;
         bool m_allDirections;
-        Point m_preferredDirection;
+        Point m_preferredDirectionPoint;
 
         public ExpectedRechargeHexEffect(Map map, Unit owningUnit, bool allDirections, Point preferredDirection)
         {
             m_map = map;
             m_owningUnit = owningUnit;
             m_allDirections = allDirections;
-            m_preferredDirection = preferredDirection;
+            m_preferredDirectionPoint = preferredDirection;
         }
 
         protected HexEffectStats GetNewEffectForDir(Hex hex, int recoveredHP, int direction)
@@ -385,7 +403,7 @@ namespace Gliese581g
                 }
                 else
                 { //use the preferred direction
-                    Direction towardEnemyCommander = Direction.GetDirectionFromHex(hex, m_preferredDirection);
+                    Direction towardEnemyCommander = Direction.GetDirectionFromHexToMapPoint(hex, m_preferredDirectionPoint);
                     retVal = GetNewEffectForDir(hex, recoveredHP, (int)towardEnemyCommander.Value);
                 }
             }
@@ -486,7 +504,7 @@ namespace Gliese581g
                 if (m_returnMaxStats)
                     retVal = HexEffectStats.BestByCatagory(stats, retVal);
                 else if (m_returnBestMove)
-                    retVal = HexEffectStats.BestSingleMove(stats, retVal, m_bestMovePriorities);
+                    retVal = HexEffectStats.BestSingleMove(ref stats, ref retVal, m_bestMovePriorities);
                 else
                 {
                     retVal += stats;

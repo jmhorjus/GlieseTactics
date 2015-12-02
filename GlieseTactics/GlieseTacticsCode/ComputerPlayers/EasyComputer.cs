@@ -40,7 +40,7 @@ namespace Gliese581g.ComputerPlayers
                 if (bestMoveStats == null || bestMoveStats.AttackingUnit == null)
                     bestMoveStats = stats;
                 else 
-                    bestMoveStats = HexEffectStats.BestSingleMove(bestMoveStats, stats, m_priorities);
+                    bestMoveStats = HexEffectStats.BestSingleMove(ref bestMoveStats, ref stats, m_priorities);
             }
 
             if (bestMoveStats == null || bestMoveStats.Damage + bestMoveStats.CommanderDamage == 0)
@@ -57,7 +57,7 @@ namespace Gliese581g.ComputerPlayers
                             false, m_priorities.EnemyCommanderLocation.Position),//not every direction, just face toward the commander.
                         unit.CurrentHex, m_priorities);
 
-                    bestMoveStats = HexEffectStats.BestSingleMove(bestMoveStats, rechargeStats, m_priorities);
+                    bestMoveStats = HexEffectStats.BestSingleMove(ref bestMoveStats, ref rechargeStats, m_priorities);
                 }
 
             }

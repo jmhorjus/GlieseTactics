@@ -33,11 +33,11 @@ namespace Gliese581g.ComputerPlayers
             // (if the minimax goes deep enough, this should not be needed)
             UnitValueIgnoredByRechargeTime[0] = 0;
             UnitValueIgnoredByRechargeTime[1] = -20; //Actively try to kill units the turn before they recharge.
-            UnitValueIgnoredByRechargeTime[2] = 20;
-            UnitValueIgnoredByRechargeTime[3] = 40;
-            UnitValueIgnoredByRechargeTime[4] = 60;
-            UnitValueIgnoredByRechargeTime[5] = 60; // Cap ignored value at 50%...seems like a good ide.
-            UnitValueIgnoredByRechargeTime[6] = 60;
+            UnitValueIgnoredByRechargeTime[2] = 10;
+            UnitValueIgnoredByRechargeTime[3] = 20;
+            UnitValueIgnoredByRechargeTime[4] = 30;
+            UnitValueIgnoredByRechargeTime[5] = 30; // Cap ignored value at 50%...seems like a good ide.
+            UnitValueIgnoredByRechargeTime[6] = 30;
         }
 
         public int CalculateUtility(Map gameState, int currentPlayerIndex)
@@ -108,13 +108,30 @@ namespace Gliese581g.ComputerPlayers
         // The default GameStatePriorities.
         GameStatePriorities m_gameStatePriorities = new GameStatePriorities();
 
+        // Algorithm parameters
+        int m_maxSearchDepth;
+        int m_maxSearchWidth;
+        int m_maxNodesToExpand;
+
+        // Constructor - sets algorithms parameters
+        public HardComputer(int maxDepth = 2, int maxWidth = -1, int maxNodesToExpand = -1)
+        {
+            m_maxSearchDepth = maxDepth;
+            m_maxSearchWidth = maxWidth;
+            m_maxNodesToExpand = maxNodesToExpand;
+        }
+
         // This function should execute the recursive mini-max/negamax function.  
         public override TurnInstructions GetNextMove(Map currentMap)
         {
             TurnInstructions retVal = null;
 
+            int nodesExpanded = 0;
+
             retVal = NegaMax(currentMap
-                    , 2/*for now try using a depth of two - one tun per player*/
+                    , m_maxSearchDepth
+                    , m_maxSearchWidth
+                    , ref nodesExpanded
                     , int.MinValue + 1 //alpha 
                     , int.MaxValue - 1 //beta
                     , currentMap.Game.CurrentPlayerIndex /*either zero or one*/
@@ -126,8 +143,16 @@ namespace Gliese581g.ComputerPlayers
         // Recursive function - returns the best move after searching to a given depth. 
         // Need to experient with time/emory limitations.
         // (limit depth, or limit beam width, possibly enforce max nodes expanded on both)...
-        protected TurnInstructions NegaMax(Map currentMap, int depth, int alpha, int beta, int currentPlayerIndex)
+        protected TurnInstructions NegaMax(
+            Map currentMap, 
+            int depth, 
+            int maxBeamWidth,
+            ref int nodesExpanded,
+            int alpha, 
+            int beta,
+            int currentPlayerIndex)
         {
+            nodesExpanded++;
             // If we've reached our depth or have reached a terminal node, just return this gamestate's utility.
             if (depth == 0 || currentMap.Game.CurrentTurnStage == Game.TurnStage.GameOver)
             {
@@ -159,15 +184,19 @@ namespace Gliese581g.ComputerPlayers
 
                 // "stats" should now contains all possible attacking moves by the given unit. 
                 // Add them into the list of possible moves.
-                allMoveStats = HexEffectStats.BestSingleMove(allMoveStats, attackStats, m_priorities);
+                allMoveStats = HexEffectStats.BestSingleMove(ref allMoveStats, ref attackStats, m_priorities);
 
                 //TODO: Now get recharge moves for this unit and add them to allMoveStats as well.
                 // For this we only need the move template applied with all directions considered at the end.  
                 HexEffectStats rechargeStats = unit.MoveTemplate.OnApply(currentMap, unit.MapLocation,
-                    new ExpectedRechargeHexEffect(currentMap, unit, true, Point.Zero),
+                    new ExpectedRechargeHexEffect(
+                        currentMap, 
+                        unit, 
+                        false, // Don't consider all directions for recharge - for performance. 
+                        currentMap.Game.NextPlayer.MyCommandUnit.MapLocation.Position),
                     unit.CurrentHex, m_priorities);
   
-                allMoveStats = HexEffectStats.BestSingleMove(allMoveStats, rechargeStats, m_priorities);
+                allMoveStats = HexEffectStats.BestSingleMove(ref allMoveStats, ref rechargeStats, m_priorities);
             }
 
             // Get the list of all valid moves.  
@@ -179,8 +208,22 @@ namespace Gliese581g.ComputerPlayers
 
 
             // Calculate the resulting game state if we make each move in the list.  
+            int widthSoFar = 0;
+
+            // Make sure the list is sorted - very important for beam searches.
+            allMoves.Sort(HexEffectStats.CompareByUtility); 
+            
             foreach (HexEffectStats move in allMoves)
             {
+                // Enforce a beam width limit.
+                widthSoFar++;
+                if (bestMoveSoFar != null)
+                {
+                    if (maxBeamWidth > 0 && widthSoFar > maxBeamWidth)
+                        break;
+                    if (m_maxNodesToExpand > 0 && nodesExpanded > m_maxNodesToExpand)
+                        break;
+                }
                 // We're going to recurse now.  
                 // 1.) Sart by making a deep copy of the current game state.
                 Map newGameState = new Map(currentMap);
@@ -192,6 +235,8 @@ namespace Gliese581g.ComputerPlayers
                 TurnInstructions newTurnInstruction = NegaMax(
                     newGameState, 
                     depth - 1,
+                    maxBeamWidth,
+                    ref nodesExpanded,
                     -beta, // -beta becomes alpha.
                     -alpha, // -alpha becomes beta.
                     currentPlayerIndex == 0 ? 1 : 0);
@@ -222,14 +267,5 @@ namespace Gliese581g.ComputerPlayers
         }
 
 
-        public int GameStateUtility(Map gameState, Commander currentPlayer, HexEffectPriorities priorities)
-        {
-            int retVal = 0;
-
-
-
-
-            return retVal;
-        }
     }
 }

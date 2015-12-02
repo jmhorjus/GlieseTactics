@@ -110,8 +110,8 @@ namespace Gliese581g
             m_currentTurnStage = TurnStage.PlacementBegin;
 
             //DEBUG TODO: HACK IN A COMPUTER PLAYER FOR TESTING
-            Players[1].ComputerPlayer = new EasyComputer();
-            Players[0].ComputerPlayer = new HardComputer();
+            Players[0].ComputerPlayer = new HardComputer(2, 120, -1);
+            Players[1].ComputerPlayer = new HardComputer(3, 30, -1);
         }
 
         /// A deep-copy constructor for use when copying game-states during AI dicision making. 
@@ -236,7 +236,8 @@ namespace Gliese581g
             }
 
             if (remainingPlayers < 1)
-                throw new Exception("Everyone is dead and there is no winner?!? Doesn't seem right.");
+                //throw new Exception("Everyone is dead and there is no winner?!? Doesn't seem right.");
+                ;
 
             if (remainingPlayers == 1) // there can be only one
             {
