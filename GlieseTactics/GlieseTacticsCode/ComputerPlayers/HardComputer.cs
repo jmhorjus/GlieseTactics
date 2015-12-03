@@ -14,29 +14,29 @@ namespace Gliese581g.ComputerPlayers
         Dictionary<int, int> UnitValueIgnoredByRechargeTime = new Dictionary<int,int>();
 
         int valuePerDistanceFromEnemyCommander = -4;
-        int maxDistanceToConsider = 6;
+        int maxDistanceToConsider = 7;
         int valuePerUnitHP = 1;
         int valuePerCommanderHP = 4;
         int valuePerNotLosing = 10000000; // Losing is bad.
 
         public GameStatePriorities()
         {
-            LiveUnitValueByType[UnitType.Commander] = 70; // Commander Value for recharge adjustment.
-            LiveUnitValueByType[UnitType.Artillery] = 50;
-            LiveUnitValueByType[UnitType.Infantry] = 25;
-            LiveUnitValueByType[UnitType.Mech] = 60;
-            LiveUnitValueByType[UnitType.RoughRider] = 30;
-            LiveUnitValueByType[UnitType.Scout] = 20;
-            LiveUnitValueByType[UnitType.Tank] = 40;
+            LiveUnitValueByType[UnitType.Commander] = 80; // Commander Value for recharge adjustment.
+            LiveUnitValueByType[UnitType.Artillery] = 60;
+            LiveUnitValueByType[UnitType.Infantry] = 40;
+            LiveUnitValueByType[UnitType.Mech] = 70;
+            LiveUnitValueByType[UnitType.RoughRider] = 45;
+            LiveUnitValueByType[UnitType.Scout] = 30;
+            LiveUnitValueByType[UnitType.Tank] = 50;
 
             // Ignore units somewhat during turns when they are not active.
             // (if the minimax goes deep enough, this should not be needed)
             UnitValueIgnoredByRechargeTime[0] = 0;
-            UnitValueIgnoredByRechargeTime[1] = -20; //Actively try to kill units the turn before they recharge.
+            UnitValueIgnoredByRechargeTime[1] = 0; //Increase value of killing units the turn before they recharge.
             UnitValueIgnoredByRechargeTime[2] = 10;
             UnitValueIgnoredByRechargeTime[3] = 20;
             UnitValueIgnoredByRechargeTime[4] = 30;
-            UnitValueIgnoredByRechargeTime[5] = 30; // Cap ignored value at 50%...seems like a good ide.
+            UnitValueIgnoredByRechargeTime[5] = 30; // Cap ignored value at 30%.
             UnitValueIgnoredByRechargeTime[6] = 30;
         }
 
@@ -51,10 +51,12 @@ namespace Gliese581g.ComputerPlayers
                 int nextPlayerIndex = (ii + 1) % 2;
 
                 // Find the map coordinates of the enemy commander. 
+                MapLocation enemyCommanderLocation;
                 if (gameState.Game.Players[nextPlayerIndex].MyCommandUnit == null ||
                     gameState.Game.Players[nextPlayerIndex].MyCommandUnit.MapLocation == null)
-                    return valuePerNotLosing * 2; // No enemy commander = win.
-                MapLocation enemyCommanderLocation = gameState.Game.Players[nextPlayerIndex].MyCommandUnit.MapLocation;
+                    enemyCommanderLocation = new MapLocation(Point.Zero, Direction.Left); 
+                else
+                    enemyCommanderLocation = gameState.Game.Players[nextPlayerIndex].MyCommandUnit.MapLocation;
 
                 
 
@@ -68,7 +70,7 @@ namespace Gliese581g.ComputerPlayers
                         unitValue = (unitValue * (100 - UnitValueIgnoredByRechargeTime[unit.CurrentRechargeTime])) / 100;
                         
                         // Add in the unit's HP (also whether our commander is alive).
-                        if (unit.TypeOfUnit == UnitType.Commander)
+                        if (unit.IsCommander)
                             unitValue += (unit.CurrentHP * valuePerCommanderHP) + valuePerNotLosing;
                         else
                             unitValue += unit.CurrentHP * valuePerUnitHP;
@@ -89,23 +91,16 @@ namespace Gliese581g.ComputerPlayers
 
     /// <summary>
     /// Hard computer should be using a true minimax/negamax algorithm and looking 
-    /// multiple turns ahead.  In order to look further, to may use a "beam search" 
+    /// multiple turns ahead.  In order to look further, it may use a "beam search" 
     /// of sorts or alpha-beta pruning to eliminate less desirable paths from 
     /// consideration.  
-    /// 
-    /// Problem:
-    /// We need a way to simulate game states moving forward over multiple turns 
-    /// without the use of code tied to the GUI and without wasting memory. 
-    /// At the very least, this means starting out with a deep-copy of the entire
-    /// game start that is handed to us, units and all.  As the search progresses 
-    /// already expanded nodes need only keep...
     /// </summary>
     class HardComputer : ComputerPlayer
     {
-        // Use the default for now (not really needed in this class)
+        // Prioirities used to sort moves during limited width search.
         HexEffectPriorities m_priorities = new HexEffectPriorities();
 
-        // The default GameStatePriorities.
+        // The default GameStatePriorities, used in negamax.
         GameStatePriorities m_gameStatePriorities = new GameStatePriorities();
 
         // Algorithm parameters
@@ -127,11 +122,13 @@ namespace Gliese581g.ComputerPlayers
             TurnInstructions retVal = null;
 
             int nodesExpanded = 0;
+            int[] nodesABPruned = new int[m_maxSearchDepth+1];
 
             retVal = NegaMax(currentMap
                     , m_maxSearchDepth
                     , m_maxSearchWidth
                     , ref nodesExpanded
+                    , ref nodesABPruned
                     , int.MinValue + 1 //alpha 
                     , int.MaxValue - 1 //beta
                     , currentMap.Game.CurrentPlayerIndex /*either zero or one*/
@@ -148,6 +145,7 @@ namespace Gliese581g.ComputerPlayers
             int depth, 
             int maxBeamWidth,
             ref int nodesExpanded,
+            ref int[] nodesABPruned,
             int alpha, 
             int beta,
             int currentPlayerIndex)
@@ -170,11 +168,11 @@ namespace Gliese581g.ComputerPlayers
             foreach (Unit unit in me.MyUnits)
             {
                 if (!unit.AliveAndReady())
-                    continue;
+                    continue; 
 
-                // Apply three nexted templates: move, attack, damage.
+                // Apply three nexted templates: move, target, attack.
                 HexEffectStats attackStats = unit.MoveTemplate.OnApply(currentMap, unit.MapLocation,
-                    new RecursiveTemplateEffect(currentMap, unit.TargetTemplate, true, true,
+                    new RecursiveTemplateEffect(currentMap, unit.TargetTemplate, true/*all directions*/, true/*redefine source hex*/, 
                         new RecursiveTemplateEffect(currentMap, unit.AttackTemplate, false, false,
                             new ExpectedDamageHexEffect(currentMap, unit),
                         false, null), // The attack template is added up, not maximized or "get best"ed.  
@@ -183,17 +181,17 @@ namespace Gliese581g.ComputerPlayers
                 m_priorities); // Move options "get best of". 
 
                 // "stats" should now contains all possible attacking moves by the given unit. 
-                // Add them into the list of possible moves.
                 allMoveStats = HexEffectStats.BestSingleMove(ref allMoveStats, ref attackStats, m_priorities);
 
-                //TODO: Now get recharge moves for this unit and add them to allMoveStats as well.
-                // For this we only need the move template applied with all directions considered at the end.  
+                //Now get recharge moves for this unit and add them to allMoveStats as well.
+                // For this we only need the move template applied  
+                Unit enemyCommander = currentMap.Game.NextPlayer.MyCommandUnit;
                 HexEffectStats rechargeStats = unit.MoveTemplate.OnApply(currentMap, unit.MapLocation,
                     new ExpectedRechargeHexEffect(
                         currentMap, 
                         unit, 
-                        false, // Don't consider all directions for recharge - for performance. 
-                        currentMap.Game.NextPlayer.MyCommandUnit.MapLocation.Position),
+                        false, // Don't consider all directions for recharge - to help performance. 
+                        (enemyCommander == null) ? Point.Zero : enemyCommander.MapLocation.Position),
                     unit.CurrentHex, m_priorities);
   
                 allMoveStats = HexEffectStats.BestSingleMove(ref allMoveStats, ref rechargeStats, m_priorities);
@@ -237,6 +235,7 @@ namespace Gliese581g.ComputerPlayers
                     depth - 1,
                     maxBeamWidth,
                     ref nodesExpanded,
+                    ref nodesABPruned,
                     -beta, // -beta becomes alpha.
                     -alpha, // -alpha becomes beta.
                     currentPlayerIndex == 0 ? 1 : 0);
@@ -258,7 +257,10 @@ namespace Gliese581g.ComputerPlayers
                 if (bestMoveSoFar != null && alpha < bestMoveSoFar.UtilityValue)
                     alpha = bestMoveSoFar.UtilityValue;
                 if (alpha >= beta)
+                {
+                    nodesABPruned[depth]++;
                     break;
+                }
             }
 
             // We should have the "best move" picked out now.  
