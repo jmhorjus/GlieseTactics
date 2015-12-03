@@ -110,7 +110,7 @@ namespace Gliese581g
             m_currentTurnStage = TurnStage.PlacementBegin;
 
             //DEBUG TODO: HACK IN A COMPUTER PLAYER FOR TESTING
-            Players[0].ComputerPlayer = new HardComputer(2, 150, -1);
+            //Players[0].ComputerPlayer = new HardComputer(2, 150, -1);
             Players[1].ComputerPlayer = new HardComputer(3, 30, -1);
         }
 
