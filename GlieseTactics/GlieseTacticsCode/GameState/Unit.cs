@@ -167,7 +167,7 @@ namespace Gliese581g
                     new UnitDamageEffect(65, true), //damage
                     true,
                     140, //hp
-                    Armor.ArmorFactory.MakeArmor(ArmorType.Medium),
+                    Armor.ArmorFactory.MakeArmor(ArmorType.Heavy),
                     4,//recharge
                     SfxStore.Get(SfxId.commander_selected_1),
                     SfxStore.Get(SfxId.mech_fire));
@@ -294,8 +294,9 @@ namespace Gliese581g
         {
             // The clicked hex is the units own hex: command it to recharge instead of firing.
             this.CurrentRechargeTime = (this.CurrentRechargeTime + 1) / 2;
+            
             // Recharging also heals a damaged unit slightly (20% of max).
-            this.CurrentHP = Math.Min(this.MaxHP, this.CurrentHP + (this.MaxHP / 5));        
+            this.CurrentHP = Math.Min(this.MaxHP, this.CurrentHP + (this.MaxHP / 10));        
         }
 
         //Sounds
