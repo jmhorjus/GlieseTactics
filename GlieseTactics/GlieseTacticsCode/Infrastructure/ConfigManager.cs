@@ -100,7 +100,7 @@ namespace Gliese581g
         {
             //TODO: Load initial settings from a settings file!!
 
-            m_playerProfileDirectory = Directory.GetCurrentDirectory() + "Content\\PlayerProfiles\\";
+            m_playerProfileDirectory = Directory.GetCurrentDirectory() + "\\Content\\PlayerProfiles\\";
             if (Directory.Exists(m_playerProfileDirectory))
                 return;
             
