@@ -292,7 +292,9 @@ namespace Gliese581g
         // Set the cooldown and healing associated with a recharge.
         public int HpGainedFromRecharge()
         {
-            return Math.Min(this.MaxHP / 10, this.MaxHP - this.CurrentHP);
+            if (IsCommander)
+                return 0;
+            return Math.Min((this.MaxHP * 15) / 100, this.MaxHP - this.CurrentHP);
         }
         
         public void PerformRecharge()
