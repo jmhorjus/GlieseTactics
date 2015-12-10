@@ -32,11 +32,10 @@ namespace Gliese581g
             TextureStore.Get(TexId.hex_trees_2), TextureStore.Get(TexId.hex_water_blue)),
 
         };
-        public const int Count = 5;
+        public const int Count = 3;
 
         public static MapEnvironment GetRandomEnvironment()
         { return Environments[new Random().Next(Count)]; }
-
 
 
         // The background image and tint that the map screen will use.  

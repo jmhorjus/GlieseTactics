@@ -73,7 +73,7 @@ namespace Gliese581g
                 players[1].MyPlayerIndex = 1;
 
                 // Create the ComputerPlayer 
-                players[0].ComputerPlayer = new ComputerPlayers.HardComputer(3, 15, -1);
+                //players[0].ComputerPlayer = new ComputerPlayers.HardComputer(3, 15, -1);
                 if (setupScreen.ComputerPlayerType == Game.ComputerPlayerType.EasyComputer)
                     players[1].ComputerPlayer = new ComputerPlayers.EasyComputer();
                 else if (setupScreen.ComputerPlayerType == Game.ComputerPlayerType.HardComputer)
