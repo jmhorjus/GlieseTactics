@@ -186,12 +186,13 @@ namespace Gliese581g.ComputerPlayers
                 //Now get recharge moves for this unit and add them to allMoveStats as well.
                 // For this we only need the move template applied  
                 Unit enemyCommander = currentMap.Game.NextPlayer.MyCommandUnit;
+                Point enemyPoint = (enemyCommander == null || enemyCommander.MapLocation == null) ? Point.Zero : enemyCommander.MapLocation.Position;
                 HexEffectStats rechargeStats = unit.MoveTemplate.OnApply(currentMap, unit.MapLocation,
                     new ExpectedRechargeHexEffect(
                         currentMap, 
                         unit, 
                         false, // Don't consider all directions for recharge - to help performance. 
-                        (enemyCommander == null) ? Point.Zero : enemyCommander.MapLocation.Position),
+                        enemyPoint),
                     unit.CurrentHex, m_priorities);
   
                 allMoveStats = HexEffectStats.BestSingleMove(ref allMoveStats, ref rechargeStats, m_priorities);

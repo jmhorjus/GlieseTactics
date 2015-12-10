@@ -106,15 +106,18 @@ namespace Gliese581g
         public ComputerPlayers.TurnInstructions PendingInstructions { get { return m_pendingInstructions; } }
 
         /// The standard constructor.
-        public Game(List<Commander> players, VictoryType victoryCondition)
+        public Game(List<Commander> players, VictoryType victoryCondition, bool doPlacement)
         {
             Players = players;
             VictoryCondition = victoryCondition;
 
             m_currentTurn = 0;
             m_currentPlayer = Players[0];
-            m_currentTurnStage = TurnStage.PlacementBegin;
 
+            if (doPlacement)
+                m_currentTurnStage = TurnStage.PlacementBegin;
+            else
+                m_currentTurnStage = TurnStage.BeginTurn;
         }
 
         /// A deep-copy constructor for use when copying game-states during AI dicision making. 
