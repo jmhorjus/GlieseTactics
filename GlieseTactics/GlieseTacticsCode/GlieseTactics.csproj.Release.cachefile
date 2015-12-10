@@ -56,7 +56,6 @@ Content\Units\recharge_numbers.xnb
 Content\Buttons\mm_dim.xnb
 Content\Buttons\mm_lit.xnb
 Content\GameSetupScreen\button_victory_assassination.xnb
-Content\GameSetupScreen\button_victory_elimination.xnb
 Content\GameSetupScreen\button_victory_elimination_2.xnb
 Content\Units\Tank.xnb
 Content\Portraits\face3.xnb
@@ -191,6 +190,10 @@ Content\Music\mainmenu.xnb
 Content\Music\battle1.xnb
 Content\Music\victory.xnb
 Content\GameSetupScreen\player_trash_dim.xnb
+Content\GameSetupScreen\button_victory_elimination.xnb
+Content\GameSetupScreen\button_vs_easy_computer.xnb
+Content\GameSetupScreen\button_vs_human.xnb
+Content\GameSetupScreen\button_vs_hard_computer.xnb
 Content\Music\mainmenu.wma
 Content\Music\battle1.wma
 Content\Music\victory.wma

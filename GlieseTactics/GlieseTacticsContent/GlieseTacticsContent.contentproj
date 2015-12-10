@@ -48,6 +48,24 @@
       <Processor>TextureProcessor</Processor>
       <ProcessorParameters_ColorKeyColor>0, 255, 0, 255</ProcessorParameters_ColorKeyColor>
     </Compile>
+    <Compile Include="GameSetupScreen\button_victory_elimination.bmp">
+      <Name>button_victory_elimination</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <ProcessorParameters_ColorKeyColor>0, 255, 0, 255</ProcessorParameters_ColorKeyColor>
+    </Compile>
+    <Compile Include="GameSetupScreen\button_vs_easy_computer.bmp">
+      <Name>button_vs_easy_computer</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <ProcessorParameters_ColorKeyColor>0, 255, 0, 255</ProcessorParameters_ColorKeyColor>
+    </Compile>
+    <Compile Include="GameSetupScreen\button_vs_human.bmp">
+      <Name>button_vs_human</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <ProcessorParameters_ColorKeyColor>0, 255, 0, 255</ProcessorParameters_ColorKeyColor>
+    </Compile>
     <Compile Include="GameSetupScreen\cancel_dim.bmp">
       <Name>cancel_dim</Name>
       <Importer>TextureImporter</Importer>
@@ -592,14 +610,6 @@
   <ItemGroup>
     <Compile Include="GameSetupScreen\button_victory_assassination.bmp">
       <Name>button_victory_assassination</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-      <ProcessorParameters_ColorKeyColor>0, 255, 0, 255</ProcessorParameters_ColorKeyColor>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="GameSetupScreen\button_victory_elimination.bmp">
-      <Name>button_victory_elimination</Name>
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
       <ProcessorParameters_ColorKeyColor>0, 255, 0, 255</ProcessorParameters_ColorKeyColor>
@@ -1317,6 +1327,14 @@
       <Name>empty_skill_socket</Name>
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="GameSetupScreen\button_vs_hard_computer.bmp">
+      <Name>button_vs_hard_computer</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <ProcessorParameters_ColorKeyColor>0, 255, 0, 255</ProcessorParameters_ColorKeyColor>
     </Compile>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\XNA Game Studio\$(XnaFrameworkVersion)\Microsoft.Xna.GameStudio.ContentPipeline.targets" />

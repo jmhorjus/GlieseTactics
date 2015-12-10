@@ -72,6 +72,13 @@ namespace Gliese581g
                 players[0].MyPlayerIndex = 0;
                 players[1].MyPlayerIndex = 1;
 
+                // Create the ComputerPlayer 
+                // players[0].ComputerPlayer = new ComputerPlayers.HardComputer(3, 15, -1);
+                if (setupScreen.ComputerPlayerType == Game.ComputerPlayerType.EasyComputer)
+                    players[1].ComputerPlayer = new ComputerPlayers.EasyComputer();
+                else if (setupScreen.ComputerPlayerType == Game.ComputerPlayerType.HardComputer)
+                    players[1].ComputerPlayer = new ComputerPlayers.HardComputer(3, 15, -1);
+
                 mapScreen.Game = new Game(players, setupScreen.VictoryType);
 
                 mapScreen.Game.InitArmies(setupScreen.ArmySize);
@@ -170,7 +177,10 @@ namespace Gliese581g
 
         RadioButton m_victoryAssassination;
         RadioButton m_victoryElimination;
-  
+
+        RadioButton m_humanOpponent;
+        RadioButton m_easyComputer;
+        RadioButton m_hardComputer;
 
         public override void InitScreen(ScreenRectangle portionOfScreen, Microsoft.Xna.Framework.Graphics.GraphicsDevice graphicsDevice)
         {
@@ -261,8 +271,17 @@ namespace Gliese581g
             m_victoryAssassination = new RadioButton(TextureStore.Get(TexId.button_victory_assassination),
                 m_fixedRectangles["victory_assassination"], this, "victory", 1);
             m_victoryElimination = new RadioButton(TextureStore.Get(TexId.button_victory_elimination),
-                m_fixedRectangles["victory_elimination"], this, "victory", 2); m_mainScreenLayer.DrawnObjects.Add(m_mapSmall);
-            
+                m_fixedRectangles["victory_elimination"], this, "victory", 2);
+
+            m_humanOpponent = new RadioButton(TextureStore.Get(TexId.button_vs_human),
+                m_fixedRectangles["vs_human"], this, "opponent", 1);
+            m_easyComputer = new RadioButton(TextureStore.Get(TexId.button_vs_easy_computer),
+                m_fixedRectangles["vs_easy_computer"], this, "opponent", 2);
+            m_hardComputer = new RadioButton(TextureStore.Get(TexId.button_vs_hard_computer),
+                m_fixedRectangles["vs_hard_computer"], this, "opponent", 3);
+
+
+            m_mainScreenLayer.DrawnObjects.Add(m_mapSmall);
             m_mainScreenLayer.DrawnObjects.Add(m_mapMedium);
             m_mainScreenLayer.DrawnObjects.Add(m_mapLarge);
           
@@ -273,9 +292,14 @@ namespace Gliese581g
             m_mainScreenLayer.DrawnObjects.Add(m_armyMedium);
             m_mainScreenLayer.DrawnObjects.Add(m_armyLarge);
 
-            m_mainScreenLayer.DrawnObjects.Add(m_victoryAssassination);
-            m_mainScreenLayer.DrawnObjects.Add(m_victoryElimination);
-       
+            // Victory type buttons disabled for now. Allways assassination.
+            //m_mainScreenLayer.DrawnObjects.Add(m_victoryAssassination);
+            //m_mainScreenLayer.DrawnObjects.Add(m_victoryElimination);
+
+            m_mainScreenLayer.DrawnObjects.Add(m_humanOpponent);
+            m_mainScreenLayer.DrawnObjects.Add(m_easyComputer);
+            m_mainScreenLayer.DrawnObjects.Add(m_hardComputer);
+
             /// Clear any previously sellected buttons. 
             RadioButton.ClearGroup("map"); 
             RadioButton.ClearGroup("map_type");
@@ -358,7 +382,8 @@ namespace Gliese581g
                     VictoryType != Game.VictoryType.NotSet &&
                     MapSize != Game.MapSize.NotSet &&
                     ArmySize != Game.ArmySize.NotSet &&
-                    MapType != Game.MapType.NotSet;
+                    MapType != Game.MapType.NotSet &&
+                    ComputerPlayerType != Game.ComputerPlayerType.NotSet;
             }  
         }
 
@@ -367,12 +392,28 @@ namespace Gliese581g
         {
             get
             {
-                if (m_victoryAssassination.Selected)
+                //if (m_victoryAssassination.Selected)
+                if (true) // Victory type selection disaled for now. Always assassination.
                     return Game.VictoryType.Assassination;
                 else if (m_victoryElimination.Selected)
                     return Game.VictoryType.Elimination;
                 else
                     return Game.VictoryType.NotSet;
+            }
+        }
+
+        public Game.ComputerPlayerType ComputerPlayerType
+        {
+            get
+            {
+                if (m_humanOpponent.Selected)
+                    return Game.ComputerPlayerType.Human;
+                else if (m_easyComputer.Selected)
+                    return Game.ComputerPlayerType.EasyComputer;
+                else if (m_hardComputer.Selected)
+                    return Game.ComputerPlayerType.HardComputer;
+                else
+                    return Game.ComputerPlayerType.NotSet;
             }
         }
 
@@ -542,6 +583,18 @@ namespace Gliese581g
             m_fixedRectangles["victory_elimination"] = new Rectangle(
                 (int)(SizeX * 0.59f), (int)(SizeY * 0.68f),
                 (int)(SizeX * buttonSize.X), (int)(SizeY * buttonSize.Y));
+
+            // Opponent type button locations
+            m_fixedRectangles["vs_human"] = new Rectangle(
+                (int)(SizeX * 0.4f), (int)(SizeY * 0.68f),
+                (int)(SizeX * buttonSize.X), (int)(SizeY * buttonSize.Y));
+            m_fixedRectangles["vs_easy_computer"] = new Rectangle(
+                (int)(SizeX * 0.59f), (int)(SizeY * 0.68f),
+                (int)(SizeX * buttonSize.X), (int)(SizeY * buttonSize.Y));
+            m_fixedRectangles["vs_hard_computer"] = new Rectangle(
+                (int)(SizeX * 0.78f), (int)(SizeY * 0.68f),
+                (int)(SizeX * buttonSize.X), (int)(SizeY * buttonSize.Y));
+
 
         }
 

@@ -66,6 +66,11 @@ namespace Gliese581g
         button_map_symmetrical,
         button_victory_elimination,
         button_victory_assassination,
+        
+        button_vs_human,
+        button_vs_easy_computer,
+        button_vs_hard_computer,
+
         button_arrow_up,
         button_arrow_down,
         button_arrow_up_lit,
@@ -347,6 +352,12 @@ namespace Gliese581g
                 case TexId.button_victory_elimination:
                     return "GameSetupScreen/button_victory_elimination";
 
+                case TexId.button_vs_human:
+                    return "GameSetupScreen/button_vs_human";
+                case TexId.button_vs_easy_computer:
+                    return "GameSetupScreen/button_vs_easy_computer";
+                case TexId.button_vs_hard_computer:
+                    return "GameSetupScreen/button_vs_hard_computer";
 
                 case TexId.button_arrow_down:
                     return "GameSetupScreen/button_arrow_down";

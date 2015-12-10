@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-using Gliese581g.ComputerPlayers;
-
 
 namespace Gliese581g
 {
@@ -37,6 +35,14 @@ namespace Gliese581g
         {
             Elimination,
             Assassination,
+            NotSet
+        }
+
+        public enum ComputerPlayerType
+        {
+            Human,
+            EasyComputer,
+            HardComputer,
             NotSet
         }
 
@@ -95,9 +101,9 @@ namespace Gliese581g
         }
 
         // In the case of AI or network/scripted game of some kind, there may be pending instructions for the current turn.
-        private TurnInstructions m_pendingInstructions = null;
+        private ComputerPlayers.TurnInstructions m_pendingInstructions = null;
         public bool HasInstructions { get { return m_pendingInstructions != null; } }
-        public TurnInstructions PendingInstructions { get { return m_pendingInstructions; } }
+        public ComputerPlayers.TurnInstructions PendingInstructions { get { return m_pendingInstructions; } }
 
         /// The standard constructor.
         public Game(List<Commander> players, VictoryType victoryCondition)
@@ -109,9 +115,6 @@ namespace Gliese581g
             m_currentPlayer = Players[0];
             m_currentTurnStage = TurnStage.PlacementBegin;
 
-            //DEBUG TODO: HACK IN A COMPUTER PLAYER FOR TESTING
-            //Players[0].ComputerPlayer = new HardComputer(2, 150, -1);
-            Players[1].ComputerPlayer = new HardComputer(3, 30, -1);
         }
 
         /// A deep-copy constructor for use when copying game-states during AI dicision making. 
