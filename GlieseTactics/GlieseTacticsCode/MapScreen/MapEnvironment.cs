@@ -13,11 +13,11 @@ namespace Gliese581g
 {
     public class MapEnvironment
     {
-        public static readonly MapEnvironment[] Environments = new MapEnvironment[5] 
+        public static readonly MapEnvironment[] Environments = new MapEnvironment[3] 
         { 
             // Waterfall, sand, water
-            new MapEnvironment(TextureStore.Get(TexId.background_waterfall), Color.Gray, 
-            TextureStore.Get(TexId.hex_sand), TextureStore.Get(TexId.hex_water_blue)),
+            //new MapEnvironment(TextureStore.Get(TexId.background_waterfall), Color.Gray, 
+            //TextureStore.Get(TexId.hex_sand), TextureStore.Get(TexId.hex_water_blue)),
             // Rocky river, sand, rocks
             new MapEnvironment(TextureStore.Get(TexId.background_rocky_river), Color.LightGray, 
             TextureStore.Get(TexId.hex_sand), TextureStore.Get(TexId.hex_rock)),
@@ -25,8 +25,8 @@ namespace Gliese581g
             new MapEnvironment(TextureStore.Get(TexId.background_river_snow), Color.Gray, 
             TextureStore.Get(TexId.hex_snow), TextureStore.Get(TexId.hex_rock)),
             // Swamp!
-            new MapEnvironment(TextureStore.Get(TexId.background_swamp), Color.White, 
-            TextureStore.Get(TexId.hex_swamp), TextureStore.Get(TexId.hex_water)),
+            //new MapEnvironment(TextureStore.Get(TexId.background_swamp), Color.White, 
+            //TextureStore.Get(TexId.hex_swamp), TextureStore.Get(TexId.hex_water)),
             // trees/water?
             new MapEnvironment(TextureStore.Get(TexId.background_mountain_river), Color.Gray, 
             TextureStore.Get(TexId.hex_trees_2), TextureStore.Get(TexId.hex_water_blue)),
