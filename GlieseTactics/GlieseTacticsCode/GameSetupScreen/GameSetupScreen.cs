@@ -189,10 +189,21 @@ namespace Gliese581g
             m_playerTrash = new CommanderTrashBin(m_fixedRectangles["player_trash"]);
             m_mainScreenLayer.DrawnObjects.Add(m_playerTrash);
 
+
+            // Create the player socket GUI objects.
+            m_playerSocket_player1 = new CommanderDisplaySocket(TextureStore.Get(TexId.portrait_empty),
+                m_fixedRectangles["player_1"], m_defaultFont, this);
+            m_playerSocket_player2 = new CommanderDisplaySocket(TextureStore.Get(TexId.portrait_empty),
+               m_fixedRectangles["player_2"], m_defaultFont, this);
+            m_mainScreenLayer.DrawnObjects.Add(m_playerSocket_player1);
+            m_mainScreenLayer.DrawnObjects.Add(m_playerSocket_player2);
+
+
+
             //Get the full path of the profile folder
             string playerProfilePath = ConfigManager.GlobalManager.PlayerProfileDirectory;
 
-            // Load all the files 
+            // Load all the profile files 
             int playerProfileIndex = 0;
             if (Directory.Exists(playerProfilePath))
             {
@@ -201,7 +212,16 @@ namespace Gliese581g
                     //Put together the file path
                     string xmlFilePath = playerProfilePath + Path.GetFileNameWithoutExtension(file) + ".xml";
                     // Create the player, and put it in a new socket on the sidebar.
-                    AddEmptySocketToSidebar().Commander = Commander.LoadXmlFile(xmlFilePath, GetMainApp().GraphicsDevice);
+                    Commander profile = Commander.LoadXmlFile(xmlFilePath, GetMainApp().GraphicsDevice);
+
+                    // Automatically put the first two profiles in the player 1 and 2 sockets.
+                    if (playerProfileIndex == 0)
+                        m_playerSocket_player1.Commander = profile;
+                    else if (playerProfileIndex == 1)
+                        m_playerSocket_player2.Commander = profile;
+                    else
+                        AddEmptySocketToSidebar().Commander = profile;
+                    
                     playerProfileIndex += 1;
                 }
             }
@@ -234,14 +254,6 @@ namespace Gliese581g
             m_mainScreenLayer.DrawnObjects.Add(m_buttonArrowDown);
             m_mainScreenLayer.DrawnObjects.Add(m_buttonArrowUp);
                
-
-            m_playerSocket_player1 = new CommanderDisplaySocket(TextureStore.Get(TexId.portrait_empty),
-                m_fixedRectangles["player_1"], m_defaultFont, this);
-            m_playerSocket_player2 = new CommanderDisplaySocket(TextureStore.Get(TexId.portrait_empty),
-               m_fixedRectangles["player_2"], m_defaultFont, this);
-
-            m_mainScreenLayer.DrawnObjects.Add(m_playerSocket_player1);
-            m_mainScreenLayer.DrawnObjects.Add(m_playerSocket_player2);
 
             m_labelVS = new TextLabel("VS", m_fontVS, m_fixedPositions["vs_label"], Color.Black, true);
             m_mainScreenLayer.DrawnObjects.Add(m_labelVS);
@@ -305,6 +317,15 @@ namespace Gliese581g
             RadioButton.ClearGroup("map_type");
             RadioButton.ClearGroup("army");
             RadioButton.ClearGroup("victory");
+            RadioButton.ClearGroup("opponent");
+
+            /// Optional: Set default values for starting a game.
+            RadioButton.SetGroupValue("map", 1);
+            RadioButton.SetGroupValue("map_type", 2);
+            RadioButton.SetGroupValue("army", 1);
+            RadioButton.SetGroupValue("victory", 1);
+            RadioButton.SetGroupValue("opponent", 3);
+
 
 
             // Cancel Button

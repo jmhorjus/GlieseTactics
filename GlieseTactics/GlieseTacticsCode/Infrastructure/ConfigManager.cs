@@ -98,9 +98,21 @@ namespace Gliese581g
 
         private ConfigManager()
         {
-            // Load initial settings from file!!
-            //m_playerProfileDirectory = Directory.GetCurrentDirectory() + "PlayerProfiles\\";
+            //TODO: Load initial settings from a settings file!!
+
+            m_playerProfileDirectory = Directory.GetCurrentDirectory() + "Content\\PlayerProfiles\\";
+            if (Directory.Exists(m_playerProfileDirectory))
+                return;
+            
+            DirectoryInfo dirInfo = new DirectoryInfo(Directory.GetCurrentDirectory());
+            DirectoryInfo parent;
+            parent = dirInfo.Parent.Parent.Parent.Parent;
+            m_playerProfileDirectory = parent.FullName + "\\GlieseTacticsContent\\PlayerProfiles\\";
+            if (Directory.Exists(m_playerProfileDirectory))
+                return;
+            
             m_playerProfileDirectory = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\Gliese581g\\PlayerProfiles\\";
+
         }
 
     }

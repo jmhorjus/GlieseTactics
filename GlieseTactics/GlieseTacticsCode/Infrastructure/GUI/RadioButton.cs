@@ -18,6 +18,10 @@ namespace Gliese581g
             if (s_values.ContainsKey(groupName))
                 s_values.Remove(groupName);
         }
+        public static void SetGroupValue(string groupName, int value)
+        {
+            s_values[groupName] = value;
+        }
 
         public class RadioButtonEvent : Event
         {
