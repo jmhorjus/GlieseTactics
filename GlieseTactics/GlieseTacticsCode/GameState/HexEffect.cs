@@ -386,7 +386,7 @@ namespace Gliese581g
             if (m_owningUnit != null)
             {
                 // Amount of HP that can be recovered.
-                int recoveredHP = Math.Min(m_owningUnit.MaxHP / 10, m_owningUnit.MaxHP - m_owningUnit.CurrentHP);
+                int recoveredHP = m_owningUnit.HpGainedFromRecharge();
 
                 if (this.m_allDirections)
                 {
