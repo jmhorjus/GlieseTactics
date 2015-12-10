@@ -107,13 +107,15 @@ namespace Gliese581g.ComputerPlayers
         int m_maxSearchDepth;
         int m_maxSearchWidth;
         int m_maxNodesToExpand;
+        bool m_doSearchExtensions;
 
         // Constructor - sets algorithms parameters
-        public HardComputer(int maxDepth = 2, int maxWidth = -1, int maxNodesToExpand = -1)
+        public HardComputer(int maxDepth = 3, int maxWidth = 15, int maxNodesToExpand = -1, bool doSearchExtensions = true)
         {
             m_maxSearchDepth = maxDepth;
             m_maxSearchWidth = maxWidth;
             m_maxNodesToExpand = maxNodesToExpand;
+            m_doSearchExtensions = doSearchExtensions;
         }
 
         // This function should execute the recursive mini-max/negamax function.  
@@ -204,7 +206,10 @@ namespace Gliese581g.ComputerPlayers
                 allMoveStats.GetTotalMovesContained(ref allMoves);
             else
                 allMoves.Add(new HexEffectStats()); // No moves available - must pass turn doing nothing.  
-
+                // In this case, we perform a search-tree extension; since this node does not branch.
+            
+            if (m_doSearchExtensions && allMoves.Count == 1)
+                depth++;
 
             // Calculate the resulting game state if we make each move in the list.  
             int widthSoFar = 0;

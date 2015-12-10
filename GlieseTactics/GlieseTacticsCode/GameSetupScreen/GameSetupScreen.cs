@@ -72,12 +72,14 @@ namespace Gliese581g
                 players[0].MyPlayerIndex = 0;
                 players[1].MyPlayerIndex = 1;
 
+                // Disable this line for bot battle testing!
+                // players[0].ComputerPlayer = new ComputerPlayers.HardComputer(3, 15, -1, false);
+                
                 // Create the ComputerPlayer 
-                //players[0].ComputerPlayer = new ComputerPlayers.HardComputer(3, 15, -1);
                 if (setupScreen.ComputerPlayerType == Game.ComputerPlayerType.EasyComputer)
                     players[1].ComputerPlayer = new ComputerPlayers.EasyComputer();
                 else if (setupScreen.ComputerPlayerType == Game.ComputerPlayerType.HardComputer)
-                    players[1].ComputerPlayer = new ComputerPlayers.HardComputer(3, 15, -1);
+                    players[1].ComputerPlayer = new ComputerPlayers.HardComputer(3, 15, -1, true);
 
                 mapScreen.Game = new Game(players, setupScreen.VictoryType, setupScreen.MapType == Game.MapType.Random);
 
